@@ -1,0 +1,367 @@
+// Prisma Schema for Expaura Platform
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==========================================
+// ENUMS
+// ==========================================
+
+enum PlatformRole {
+  SUPER_ADMIN
+  ADMIN
+  USER
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  PENDING
+  PAUSED
+}
+
+enum ComplaintStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+}
+
+// ==========================================
+// MODELS
+// ==========================================
+
+model User {
+  id           String       @id @default(uuid()) @db.Uuid
+  name         String
+  email        String       @unique
+  passwordHash String       @map("password_hash")
+  platformRole PlatformRole @default(USER) @map("platform_role")
+  isActive     Boolean      @default(true) @map("is_active")
+  lastLogin    DateTime?    @map("last_login")
+  createdAt    DateTime     @default(now()) @map("created_at")
+
+  // Relations
+  activatedRestaurants  Restaurant[]      @relation("RestaurantActivatedBy")
+  staffMemberships      RestaurantStaff[] @relation("UserStaff")
+  invitedStaff          RestaurantStaff[] @relation("StaffInvitedBy")
+  recordedSubscriptions Subscription[]    @relation("SubscriptionRecordedBy")
+  resolvedComplaints    Complaint[]       @relation("ComplaintResolvedBy")
+  auditLogs             AuditLog[]
+
+  @@map("users")
+}
+
+model City {
+  id      String  @id @default(uuid()) @db.Uuid
+  name    String
+  region  String?
+  country String
+
+  // Relations
+  restaurants Restaurant[]
+  branches    Branch[]
+
+  @@map("cities")
+}
+
+model Restaurant {
+  id            String   @id @default(uuid()) @db.Uuid
+  name          String
+  slug          String   @unique
+  phone         String?
+  whatsapp      String?
+  email         String?
+  address       String?
+  cityId        String   @map("city_id") @db.Uuid
+  latitude      Float?
+  longitude     Float?
+  openingHours  Json?    @map("opening_hours")
+  logoUrl       String?  @map("logo_url")
+  coverImageUrl String?  @map("cover_image_url")
+  instagramUrl  String?  @map("instagram_url")
+  facebookUrl   String?  @map("facebook_url")
+  isActive      Boolean  @default(true) @map("is_active")
+  activatedById String?  @map("activated_by") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  city          City              @relation(fields: [cityId], references: [id])
+  activatedBy   User?             @relation("RestaurantActivatedBy", fields: [activatedById], references: [id])
+  branches      Branch[]
+  roles         Role[]
+  staff         RestaurantStaff[]
+  subscriptions Subscription[]
+  menuImages    MenuImage[]
+  gallery       Gallery[]
+  employees     Employee[]
+  qrCodes       QrCode[]
+  reviews       Review[]
+  complaints    Complaint[]
+  auditLogs     AuditLog[]
+
+  @@map("restaurants")
+}
+
+model Permission {
+  id          String  @id @default(uuid()) @db.Uuid
+  code        String  @unique
+  module      String
+  description String?
+
+  // Relations
+  rolePermissions RolePermission[]
+
+  @@map("permissions")
+}
+
+model Role {
+  id           String   @id @default(uuid()) @db.Uuid
+  restaurantId String   @map("restaurant_id") @db.Uuid
+  name         String
+  description  String?
+  isDefault    Boolean  @default(false) @map("is_default")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  restaurant      Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  rolePermissions RolePermission[]
+  staff           RestaurantStaff[]
+
+  @@map("roles")
+}
+
+model RolePermission {
+  id           String @id @default(uuid()) @db.Uuid
+  roleId       String @map("role_id") @db.Uuid
+  permissionId String @map("permission_id") @db.Uuid
+
+  // Relations
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model RestaurantStaff {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  restaurantId String   @map("restaurant_id") @db.Uuid
+  roleId       String   @map("role_id") @db.Uuid
+  invitedById  String?  @map("invited_by") @db.Uuid
+  isActive     Boolean  @default(true) @map("is_active")
+  joinedAt     DateTime @default(now()) @map("joined_at")
+
+  // Relations
+  user       User       @relation("UserStaff", fields: [userId], references: [id], onDelete: Cascade)
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  role       Role       @relation(fields: [roleId], references: [id])
+  inviter    User?      @relation("StaffInvitedBy", fields: [invitedById], references: [id])
+
+  @@unique([userId, restaurantId])
+  @@map("restaurant_staff")
+}
+
+model Plan {
+  id                      String  @id @default(uuid()) @db.Uuid
+  name                    String
+  priceMonthly            Decimal @map("price_monthly") @db.Decimal(10, 2)
+  maxBranches             Int     @map("max_branches")
+  maxStaff                Int     @map("max_staff")
+  analyticsEnabled        Boolean @default(false) @map("analytics_enabled")
+  aiSummaryEnabled        Boolean @default(false) @map("ai_summary_enabled")
+  complaintsEnabled       Boolean @default(false) @map("complaints_enabled")
+  employeeTrackingEnabled Boolean @default(false) @map("employee_tracking_enabled")
+
+  // Relations
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id           String             @id @default(uuid()) @db.Uuid
+  restaurantId String             @map("restaurant_id") @db.Uuid
+  planId       String             @map("plan_id") @db.Uuid
+  periodStart  DateTime           @map("period_start") @db.Date
+  periodEnd    DateTime           @map("period_end") @db.Date
+  status       SubscriptionStatus
+  recordedById String?            @map("recorded_by") @db.Uuid
+  createdAt    DateTime           @default(now()) @map("created_at")
+
+  // Relations
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  plan       Plan       @relation(fields: [planId], references: [id])
+  recorder   User?      @relation("SubscriptionRecordedBy", fields: [recordedById], references: [id])
+
+  @@map("subscriptions")
+}
+
+model Branch {
+  id           String   @id @default(uuid()) @db.Uuid
+  restaurantId String   @map("restaurant_id") @db.Uuid
+  name         String
+  address      String?
+  cityId       String   @map("city_id") @db.Uuid
+  latitude     Float?
+  longitude    Float?
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  restaurant Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  city       City        @relation(fields: [cityId], references: [id])
+  menuImages MenuImage[]
+  employees  Employee[]
+  qrCodes    QrCode[]
+  reviews    Review[]
+  complaints Complaint[]
+
+  @@map("branches")
+}
+
+model MenuImage {
+  id           String   @id @default(uuid()) @db.Uuid
+  restaurantId String   @map("restaurant_id") @db.Uuid
+  branchId     String?  @map("branch_id") @db.Uuid
+  imageUrl     String   @map("image_url")
+  position     Int      @default(0)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  branch     Branch?    @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  @@map("menu_images")
+}
+
+model Gallery {
+  id           String   @id @default(uuid()) @db.Uuid
+  restaurantId String   @map("restaurant_id") @db.Uuid
+  imageUrl     String   @map("image_url")
+  caption      String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@map("gallery")
+}
+
+model Employee {
+  id           String   @id @default(uuid()) @db.Uuid
+  restaurantId String   @map("restaurant_id") @db.Uuid
+  branchId     String?  @map("branch_id") @db.Uuid
+  name         String
+  photoUrl     String?  @map("photo_url")
+  jobTitle     String?  @map("job_title")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  restaurant Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  branch     Branch?     @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  complaints Complaint[]
+
+  @@map("employees")
+}
+
+model QrCode {
+  id           String   @id @default(uuid()) @db.Uuid
+  restaurantId String   @map("restaurant_id") @db.Uuid
+  branchId     String?  @map("branch_id") @db.Uuid
+  code         String   @unique
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  branch     Branch?    @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  @@map("qr_codes")
+}
+
+model Review {
+  id                String   @id @default(uuid()) @db.Uuid
+  restaurantId      String   @map("restaurant_id") @db.Uuid
+  branchId          String?  @map("branch_id") @db.Uuid
+  overallRating     Int      @map("overall_rating")
+  foodRating        Int?     @map("food_rating")
+  serviceRating     Int?     @map("service_rating")
+  atmosphereRating  Int?     @map("atmosphere_rating")
+  cleanlinessRating Int?     @map("cleanliness_rating")
+  wouldRecommend    Boolean? @map("would_recommend")
+  comment           String?
+  tableNumber       String?  @map("table_number")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  // Relations
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  branch     Branch?    @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  complaint  Complaint?
+
+  @@map("reviews")
+}
+
+model ComplaintCategory {
+  id   String  @id @default(uuid()) @db.Uuid
+  name String  @unique
+  icon String?
+
+  // Relations
+  complaints Complaint[]
+
+  @@map("complaint_categories")
+}
+
+model Complaint {
+  id           String          @id @default(uuid()) @db.Uuid
+  reviewId     String?         @unique @map("review_id") @db.Uuid
+  restaurantId String          @map("restaurant_id") @db.Uuid
+  branchId     String?         @map("branch_id") @db.Uuid
+  employeeId   String?         @map("employee_id") @db.Uuid
+  categoryId   String          @map("category_id") @db.Uuid
+  description  String
+  status       ComplaintStatus @default(PENDING)
+  managerNote  String?         @map("manager_note")
+  resolvedById String?         @map("resolved_by") @db.Uuid
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  review     Review?           @relation(fields: [reviewId], references: [id], onDelete: SetNull)
+  restaurant Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  branch     Branch?           @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  employee   Employee?         @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+  category   ComplaintCategory @relation(fields: [categoryId], references: [id])
+  resolver   User?             @relation("ComplaintResolvedBy", fields: [resolvedById], references: [id])
+
+  @@map("complaints")
+}
+
+model AuditLog {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String?  @map("user_id") @db.Uuid
+  restaurantId String?  @map("restaurant_id") @db.Uuid
+  action       String
+  entity       String
+  entityId     String?  @map("entity_id") @db.Uuid
+  changes      Json?
+  ipAddress    String?  @map("ip_address")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user       User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  restaurant Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
+}
