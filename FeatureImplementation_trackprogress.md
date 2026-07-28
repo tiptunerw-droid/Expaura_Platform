@@ -12,8 +12,8 @@
 - [x] Set up Prisma ORM and connect to database
 - [x] Write and run initial Prisma schema migration
 - [x] Seed database with default data (cities, plans, complaint categories, permissions)
-- [ ] Set up Cloudinary for image uploads
-- [ ] Deploy project skeleton to Vercel
+- [x] Set up Cloudinary for image uploads
+- [x] Deploy project skeleton to Vercel
 
 ---
 
