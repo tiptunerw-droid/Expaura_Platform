@@ -58,11 +58,11 @@ export function ReviewForm({ restaurantId, branchId }: ReviewFormProps) {
   if (step === "done") {
     return (
       <div className="text-center py-8">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-herb-soft mb-4">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-herb/20 mb-4">
           <CheckCircle className="w-7 h-7 text-herb" />
         </div>
-        <h3 className="font-display text-xl text-ink mb-1">Review submitted</h3>
-        <p className="text-sm text-ink-muted">Thank you — your feedback helps this restaurant improve.</p>
+        <h3 className="font-display text-xl text-[#F3F3F3] mb-1">Review submitted</h3>
+        <p className="text-sm text-gray-400">Thank you — your feedback helps this restaurant improve.</p>
       </div>
     );
   }
@@ -70,31 +70,31 @@ export function ReviewForm({ restaurantId, branchId }: ReviewFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <p className="text-sm font-medium text-ink mb-2">Overall experience</p>
+        <p className="text-sm font-medium text-[#F3F3F3] mb-2">Overall experience</p>
         <RatingInput value={overallRating} onValueChange={setOverallRating} size="lg" />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <p className="text-xs text-ink-muted mb-1.5">Food</p>
+          <p className="text-xs text-gray-500 mb-1.5">Food</p>
           <RatingInput value={foodRating} onValueChange={setFoodRating} size="sm" />
         </div>
         <div>
-          <p className="text-xs text-ink-muted mb-1.5">Service</p>
+          <p className="text-xs text-gray-500 mb-1.5">Service</p>
           <RatingInput value={serviceRating} onValueChange={setServiceRating} size="sm" />
         </div>
         <div>
-          <p className="text-xs text-ink-muted mb-1.5">Atmosphere</p>
+          <p className="text-xs text-gray-500 mb-1.5">Atmosphere</p>
           <RatingInput value={atmosphereRating} onValueChange={setAtmosphereRating} size="sm" />
         </div>
         <div>
-          <p className="text-xs text-ink-muted mb-1.5">Cleanliness</p>
+          <p className="text-xs text-gray-500 mb-1.5">Cleanliness</p>
           <RatingInput value={cleanlinessRating} onValueChange={setCleanlinessRating} size="sm" />
         </div>
       </div>
 
       <div>
-        <p className="text-sm font-medium text-ink mb-2">Would you recommend this place?</p>
+        <p className="text-sm font-medium text-[#F3F3F3] mb-2">Would you recommend this place?</p>
         <div className="flex gap-2">
           <button
             type="button"
@@ -102,7 +102,7 @@ export function ReviewForm({ restaurantId, branchId }: ReviewFormProps) {
             className={`flex-1 h-10 rounded text-sm font-medium transition-colors ${
               wouldRecommend === true
                 ? "bg-herb text-white"
-                : "bg-ceramic-deep text-ink-soft hover:bg-herb-soft hover:text-herb"
+                : "bg-gray-800 text-gray-300 hover:bg-herb/20 hover:text-herb"
             }`}
           >
             Yes
@@ -113,7 +113,7 @@ export function ReviewForm({ restaurantId, branchId }: ReviewFormProps) {
             className={`flex-1 h-10 rounded text-sm font-medium transition-colors ${
               wouldRecommend === false
                 ? "bg-rose text-white"
-                : "bg-ceramic-deep text-ink-soft hover:bg-rose-soft hover:text-rose"
+                : "bg-gray-800 text-gray-300 hover:bg-rose/20 hover:text-rose"
             }`}
           >
             No
@@ -122,7 +122,7 @@ export function ReviewForm({ restaurantId, branchId }: ReviewFormProps) {
       </div>
 
       <div>
-        <p className="text-sm font-medium text-ink mb-2">Anything else? (optional)</p>
+        <p className="text-sm font-medium text-[#F3F3F3] mb-2">Anything else? (optional)</p>
         <Textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}

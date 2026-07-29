@@ -3,28 +3,59 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   MapPin, Phone, MessageCircle, Globe, Clock, Star,
-  UtensilsCrossed, Wifi, Car, Baby,
+  UtensilsCrossed, ArrowRight, ChevronRight,
 } from "lucide-react";
 import { SocialIcon } from "react-social-icons";
 import { SiteHeader } from "@/components/site/header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RestaurantTabs } from "./RestaurantTabs";
-import { RatingDisplay } from "@/components/ui/rating";
 import { SatisfactionAura } from "@/components/signature/SatisfactionAura";
 import { QrReveal } from "@/components/public/qr-reveal";
-import { getPublicRestaurantBySlug } from "@/lib/actions/restaurants";
+import { getPublicRestaurantBySlug, listRecentlyAdded } from "@/lib/actions/restaurants";
 import { listRestaurantReviews } from "@/lib/actions/reviews";
 import { listMenuImages } from "@/lib/actions/menu";
 import { listGallery } from "@/lib/actions/gallery";
-import { isRestaurantOpen } from "@/lib/utils";
+import { isRestaurantOpen, cn } from "@/lib/utils";
 
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }
 
-export default async function RestaurantPublicPage({ params }: Props) {
+function StarBubbles({ rating, size = "sm" }: { rating: number; size?: "sm" | "md" | "lg" }) {
+  const sizes = { sm: "w-3.5 h-3.5", md: "w-5 h-5", lg: "w-6 h-6" };
+  return (
+    <div className="flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map((s) => (
+        <Star
+          key={s}
+          className={cn(
+            sizes[size],
+            s <= Math.round(rating) ? "fill-brass text-brass" : "text-gray-700"
+          )}
+        />
+      ))}
+    </div>
+  );
+}
+
+function RatingBreakdown({ label, value }: { label: string; value: number }) {
+  const pct = value > 0 ? (value / 5) * 100 : 0;
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-xs text-gray-400 w-20 shrink-0">{label}</span>
+      <div className="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+        <div className="h-full rounded-full bg-emerald-500" style={{ width: `${pct}%` }} />
+      </div>
+      <span className="text-xs font-medium text-[#F3F3F3] w-6 text-right">{value > 0 ? value.toFixed(1) : "—"}</span>
+    </div>
+  );
+}
+
+export default async function RestaurantPublicPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const sp = await searchParams;
 
   let restaurant;
   try {
@@ -34,55 +65,38 @@ export default async function RestaurantPublicPage({ params }: Props) {
   }
 
   const rid = restaurant.id;
-  const [reviews, menuImages, gallery] = await Promise.all([
+  const [reviews, menuImages, gallery, similar] = await Promise.all([
     listRestaurantReviews({ restaurantId: rid, limit: 20 }),
     listMenuImages(rid),
     listGallery(rid),
+    listRecentlyAdded(4),
   ]);
 
   const { open, label } = isRestaurantOpen(restaurant.openingHours);
   const hasReviews = restaurant.reviewCount > 0;
-
-  const features = [
-    { icon: UtensilsCrossed, label: "Cuisine", value: "African · Grill" },
-    { icon: Wifi, label: "WiFi", value: "Free" },
-    { icon: Car, label: "Parking", value: "Available" },
-    { icon: Baby, label: "Family", value: "Friendly" },
-    { icon: Phone, label: "Contact", value: restaurant.phone || "—" },
-    { icon: MessageCircle, label: "WhatsApp", value: restaurant.whatsapp || "—" },
-  ];
-
-  const heroImages = gallery.slice(0, 3).map((g) => g.imageUrl);
+  const cityLower = restaurant.city?.name?.toLowerCase() || "kigali";
 
   return (
-    <>
+    <div className="min-h-screen bg-[#0A0A0A] text-[#F3F3F3]">
       <SiteHeader />
-      <main className="flex-1">
+      <main className="pt-24 flex-1">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-1.5 text-xs text-ink-muted py-3 sm:py-4">
-            <Link href="/" className="hover:text-ink transition-colors">Home</Link>
-            <span>/</span>
-            <Link href="/directory/kigali" className="hover:text-ink transition-colors">Search</Link>
-            <span>/</span>
-            <span className="text-ink">{restaurant.name}</span>
-          </nav>
-
-          {/* Asymmetric Hero Gallery */}
           <QrReveal restaurantName={restaurant.name}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
-              <div className="md:col-span-2 relative aspect-[4/3] md:aspect-auto md:row-span-2 bg-ceramic-deep rounded-lg overflow-hidden">
+            {/* Compact cover + title row */}
+            <div className="flex flex-col md:flex-row gap-6 md:gap-8 py-6 md:py-8">
+              {/* Cover image - smaller */}
+              <div className="relative w-full md:w-80 h-48 md:h-56 rounded-lg overflow-hidden bg-gray-900 shrink-0">
                 {restaurant.coverImageUrl ? (
                   <Image
                     src={restaurant.coverImageUrl}
-                    alt={`${restaurant.name} interior`}
+                    alt={`${restaurant.name}`}
                     fill
                     className="object-cover"
                     priority
-                    sizes="(max-width: 768px) 100vw, 66vw"
+                    sizes="(max-width: 768px) 100vw, 320px"
                   />
                 ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-ceramic-deep to-line" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-800" />
                 )}
                 <div className="absolute top-3 right-3">
                   <Badge variant={open ? "dark" : "outline"} size="sm">
@@ -90,133 +104,76 @@ export default async function RestaurantPublicPage({ params }: Props) {
                   </Badge>
                 </div>
               </div>
-              {heroImages.length >= 2 ? (
-                <>
-                  <div className="relative aspect-[4/3] bg-ceramic-deep rounded-lg overflow-hidden">
-                    <Image
-                      src={heroImages[0]}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
-                  </div>
-                  <div className="relative aspect-[4/3] bg-ceramic-deep rounded-lg overflow-hidden">
-                    <Image
-                      src={heroImages[1]}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="relative aspect-[4/3] bg-ceramic-deep rounded-lg overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-bl from-ceramic-deep to-line" />
-                  </div>
-                  <div className="relative aspect-[4/3] bg-ceramic-deep rounded-lg overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-ceramic-deep to-line" />
-                  </div>
-                </>
-              )}
-            </div>
 
-            {/* Main Content + Sidebar */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8 md:mt-10">
-              {/* Left: Main Content */}
-              <div className="lg:col-span-2 space-y-8">
-                {/* Title Block */}
-                <div>
-                  <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-ink leading-tight">
-                    {restaurant.name}
-                  </h1>
-                  <div className="flex flex-wrap items-center gap-3 mt-2">
-                    <div className="flex items-center gap-1 text-sm text-ink-muted">
-                      <MapPin className="w-4 h-4" style={{ color: "#d9465b" }} />
-                      <span className="text-ink-soft">{restaurant.city?.name || "Kigali"}</span>
-                      {restaurant.address && <span className="text-ink-muted">· {restaurant.address}</span>}
+              {/* Title + info */}
+              <div className="flex-1 min-w-0 flex flex-col justify-center">
+                <div className="flex items-start gap-4">
+                  {restaurant.logoUrl && (
+                    <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-800 shrink-0 border border-gray-700">
+                      <img src={restaurant.logoUrl} alt={`${restaurant.name} logo`} className="w-full h-full object-cover" />
                     </div>
-                    {hasReviews && (
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 fill-brass text-brass" />
-                        <span className="font-medium text-sm text-brass">
-                          {restaurant.averageOverall.toFixed(1)}
-                        </span>
-                        <span className="text-xs text-ink-muted">
-                          ({restaurant.reviewCount} reviews)
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-sm text-ink-soft leading-relaxed mt-3 max-w-xl">
-                    Wood-fired grills, a rooftop view over {restaurant.city?.name || "Kigali"}, and a menu built around what&apos;s fresh that morning.
-                  </p>
-                  <button className="text-xs text-ink-muted hover:text-ink transition-colors mt-1 underline underline-offset-2">
-                    Read more
-                  </button>
-                </div>
-
-                {/* Featured Info Grid (Restaurant Features) */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {features.slice(0, 6).map((f) => {
-                    const Icon = f.icon;
-                    return (
-                      <div key={f.label} className="flex items-center gap-3 p-3 bg-white border border-line rounded-lg">
-                        <Icon className="w-4 h-4 text-ink-muted shrink-0" />
-                        <div className="min-w-0">
-                          <p className="text-[10px] uppercase tracking-wider text-ink-muted">{f.label}</p>
-                          <p className="text-sm text-ink font-medium truncate">{f.value}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Secondary Info Card (Opening Hours & Practical Info) */}
-                <div className="bg-white border border-line rounded-lg p-4 sm:p-5 space-y-3">
-                  <div className="flex items-center gap-3">
-                    <Clock className="w-4 h-4 text-ink-muted" />
-                    <div>
-                      <p className="text-sm text-ink font-medium">
-                        {open ? "Open now" : "Closed"}
-                      </p>
-                      {label && (
-                        <p className="text-xs text-ink-muted">{label}</p>
+                  )}
+                  <div className="min-w-0">
+                    <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-[#F3F3F3] leading-tight">
+                      {restaurant.name}
+                    </h1>
+                    <div className="flex items-center gap-2 mt-2">
+                      <MapPin className="w-4 h-4 text-rose-500 shrink-0" />
+                      <span className="text-sm text-gray-400">
+                        {restaurant.city?.name || "Kigali"}
+                        {restaurant.address && <span className="text-gray-600"> · {restaurant.address}</span>}
+                      </span>
+                    </div>
+                    {/* Tags row */}
+                    <div className="flex flex-wrap items-center gap-2 mt-3">
+                      <Badge variant="outline" size="sm" className="border-gray-700 text-gray-300">International</Badge>
+                      <Badge variant="outline" size="sm" className="border-gray-700 text-gray-300">
+                        {restaurant.reviewCount > 50 ? "$$$$" : restaurant.reviewCount > 10 ? "$$$" : "$$"}
+                      </Badge>
+                      {hasReviews && restaurant.averageOverall >= 4.5 && (
+                        <Badge variant="brass" size="sm">Travelers&apos; Choice</Badge>
                       )}
                     </div>
                   </div>
-                  {restaurant.email && (
-                    <div className="flex items-center gap-3">
-                      <Globe className="w-4 h-4 text-ink-muted" />
-                      <p className="text-sm text-ink-soft">{restaurant.email}</p>
-                    </div>
-                  )}
                 </div>
-
-                {/* Dark Featured Card — AI Review Summary */}
                 {hasReviews && (
-                  <div className="dark-section rounded-lg p-5 sm:p-6 space-y-3">
+                  <div className="flex items-center gap-3 mt-4">
+                    <StarBubbles rating={restaurant.averageOverall} size="lg" />
+                    <span className="text-2xl font-bold text-[#F3F3F3]">{restaurant.averageOverall.toFixed(1)}</span>
+                    <span className="text-sm text-gray-500">({restaurant.reviewCount} {restaurant.reviewCount === 1 ? "review" : "reviews"})</span>
+                  </div>
+                )}
+                {/* Hours */}
+                <div className="flex items-center gap-2 mt-3 text-sm">
+                  <span className={open ? "text-emerald-400" : "text-gray-500"}>{open ? "Open now" : "Closed"}</span>
+                  {label && <span className="text-gray-500">· {label}</span>}
+                </div>
+              </div>
+            </div>
+
+            {/* Main Content + Sidebar */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Left: Main Content */}
+              <div className="lg:col-span-2 space-y-8">
+
+                {/* AI Review Summary */}
+                {hasReviews && (
+                  <div className="bg-gray-900 border border-gray-800 rounded-lg p-5 sm:p-6 space-y-4">
                     <div className="flex items-center justify-between">
-                      <h2 className="font-display text-lg text-[#fafaf8]">What guests are saying</h2>
+                      <h2 className="font-display text-lg text-[#F3F3F3]">What guests are saying</h2>
                       <SatisfactionAura rating={restaurant.averageOverall} size={48} />
                     </div>
-                    <p className="text-sm text-[#9e9e9e] leading-relaxed">
+                    <p className="text-sm text-gray-400 leading-relaxed">
                       Guests consistently praise the {restaurant.averageFood > 4 ? "exceptional food quality" : "well-prepared dishes"} and the{" "}
                       {restaurant.averageService > 4 ? "attentive, warm service" : "friendly staff"}. The atmosphere is{" "}
                       {restaurant.averageAtmosphere > 4 ? "vibrant and inviting" : "pleasant and comfortable"}.
                     </p>
-                    <div className="flex items-center gap-4 text-xs text-[#9e9e9e]">
-                      <span className="flex items-center gap-1">
-                        Food <RatingDisplay value={restaurant.averageFood} size="sm" />
-                      </span>
-                      <span className="flex items-center gap-1">
-                        Service <RatingDisplay value={restaurant.averageService} size="sm" />
-                      </span>
-                      <span className="flex items-center gap-1">
-                        Atmosphere <RatingDisplay value={restaurant.averageAtmosphere} size="sm" />
-                      </span>
+                    {/* Rating breakdown bars */}
+                    <div className="space-y-2 pt-2 border-t border-gray-800">
+                      <RatingBreakdown label="Food" value={restaurant.averageFood} />
+                      <RatingBreakdown label="Service" value={restaurant.averageService} />
+                      <RatingBreakdown label="Atmosphere" value={restaurant.averageAtmosphere} />
+                      <RatingBreakdown label="Cleanliness" value={restaurant.averageCleanliness} />
                     </div>
                   </div>
                 )}
@@ -232,17 +189,20 @@ export default async function RestaurantPublicPage({ params }: Props) {
                   averageService={restaurant.averageService}
                   averageAtmosphere={restaurant.averageAtmosphere}
                   averageCleanliness={restaurant.averageCleanliness}
+                  initialTab={sp.tab}
                 />
               </div>
 
-              {/* Right: Sticky Sidebar Card */}
+              {/* Right: Sticky Sidebar */}
               <aside className="lg:col-span-1">
                 <div className="sticky top-24 space-y-4">
-                  <div className="bg-white border border-line rounded-lg p-5 space-y-4">
-                    <h3 className="font-display text-lg text-ink">Quick actions</h3>
+                  {/* Quick Actions */}
+                  <div className="bg-gray-900 border border-gray-800 rounded-lg p-5 space-y-4">
+                    <h3 className="font-display text-lg text-[#F3F3F3]">Quick actions</h3>
                     <div className="space-y-2">
                       <Button variant="primary" size="lg" className="w-full">
                         View Digital Menu
+                        <ArrowRight className="w-4 h-4" />
                       </Button>
                       <Button variant="outline" size="default" className="w-full">
                         Leave a review
@@ -251,43 +211,41 @@ export default async function RestaurantPublicPage({ params }: Props) {
                         Report an issue
                       </Button>
                     </div>
+
+                    {/* Rating summary */}
                     {hasReviews && (
-                      <div className="pt-3 border-t border-line">
+                      <div className="pt-3 border-t border-gray-800 space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-ink-muted">Rating</span>
-                          <div className="flex items-center gap-1">
-                            <Star className="w-4 h-4 fill-brass text-brass" />
-                            <span className="font-medium text-ink">{restaurant.averageOverall.toFixed(1)}</span>
+                          <span className="text-gray-400">Rating</span>
+                          <StarBubbles rating={restaurant.averageOverall} size="sm" />
+                        </div>
+                        {[
+                          { label: "Food", value: restaurant.averageFood },
+                          { label: "Service", value: restaurant.averageService },
+                          { label: "Atmosphere", value: restaurant.averageAtmosphere },
+                          { label: "Cleanliness", value: restaurant.averageCleanliness },
+                        ].filter((r) => r.value > 0).map((item) => (
+                          <div key={item.label} className="flex items-center justify-between text-xs">
+                            <span className="text-gray-500">{item.label}</span>
+                            <span className="text-[#F3F3F3] font-medium">{item.value.toFixed(1)}</span>
                           </div>
-                        </div>
-                        <div className="flex items-center justify-between text-sm mt-1">
-                          <span className="text-ink-muted">Reviews</span>
-                          <span className="text-ink font-medium">{restaurant.reviewCount}</span>
-                        </div>
+                        ))}
                       </div>
                     )}
                   </div>
 
-                  {/* Social / Contact Mini Section */}
-                  <div className="bg-white border border-line rounded-lg p-4 space-y-3">
-                    <h4 className="text-xs uppercase tracking-wider text-ink-muted">Connect</h4>
+                  {/* Contact */}
+                  <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 space-y-3">
+                    <h4 className="text-xs uppercase tracking-wider text-gray-500">Connect</h4>
                     <div className="flex flex-wrap items-center gap-2">
                       {restaurant.phone && (
                         <a href={`tel:${restaurant.phone}`}>
-                          <Button variant="outline" size="icon">
-                            <Phone className="w-4 h-4" />
-                          </Button>
+                          <Button variant="outline" size="icon"><Phone className="w-4 h-4" /></Button>
                         </a>
                       )}
                       {restaurant.whatsapp && (
-                        <a
-                          href={`https://wa.me/${restaurant.whatsapp.replace(/[^0-9]/g, "")}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <Button variant="outline" size="icon">
-                            <MessageCircle className="w-4 h-4" />
-                          </Button>
+                        <a href={`https://wa.me/${restaurant.whatsapp.replace(/[^0-9]/g, "")}`} target="_blank" rel="noopener noreferrer">
+                          <Button variant="outline" size="icon"><MessageCircle className="w-4 h-4" /></Button>
                         </a>
                       )}
                       {restaurant.instagramUrl && (
@@ -301,40 +259,66 @@ export default async function RestaurantPublicPage({ params }: Props) {
                 </div>
               </aside>
             </div>
+
+            {/* Similar Restaurants — TripAdvisor style */}
+            {similar.length > 0 && (
+              <section className="mt-12 sm:mt-16 pb-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="font-display text-xl text-[#F3F3F3]">Similar restaurants</h2>
+                  <Link href={`/directory/${cityLower}`} className="text-xs font-medium text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1">
+                    View all <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  {similar.filter((s) => s.id !== rid).slice(0, 4).map((s) => (
+                    <Link key={s.id} href={`/r/${s.slug}`} className="group block">
+                      <div className="aspect-[4/3] bg-gray-900 rounded-lg overflow-hidden border border-gray-800 group-hover:border-gray-700 transition-colors">
+                        {s.coverImageUrl ? (
+                          <Image src={s.coverImageUrl} alt={s.name} fill className="object-cover group-hover:scale-[1.03] transition-transform duration-300" sizes="(max-width: 768px) 50vw, 25vw" />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <UtensilsCrossed className="w-8 h-8 text-gray-700" />
+                          </div>
+                        )}
+                      </div>
+                      <h3 className="text-sm font-medium text-[#F3F3F3] mt-2 group-hover:text-emerald-400 transition-colors truncate">
+                        {s.name}
+                      </h3>
+                      <p className="text-[10px] text-gray-500">{s.city?.name || "Kigali"}</p>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
           </QrReveal>
         </div>
 
-        {/* Full-bleed CTA Break */}
-        <section className="dark-section mt-12 sm:mt-16 py-16 sm:py-20 text-center">
+        {/* CTA */}
+        <section className="bg-gray-900 border-t border-gray-800 mt-12 sm:mt-16 py-16 sm:py-20 text-center">
           <div className="max-w-lg mx-auto px-4 space-y-4">
-            <h2 className="font-display text-2xl sm:text-3xl text-[#fafaf8]">
+            <h2 className="font-display text-2xl sm:text-3xl text-[#F3F3F3]">
               Get your restaurant on Expaura
             </h2>
-            <p className="text-sm text-[#9e9e9e] leading-relaxed">
+            <p className="text-sm text-gray-400 leading-relaxed">
               Join Rwanda's fastest-growing dining platform. Digital menus, guest feedback, and staff insights — all in one place.
             </p>
-            <Button variant="outline" size="lg" className="mt-2 border-[#fafaf8]/30 text-[#fafaf8] hover:bg-[#fafaf8]/10">
+            <Button variant="outline" size="lg" className="mt-2 border-gray-700 text-[#F3F3F3] hover:bg-gray-800">
               List your restaurant
             </Button>
           </div>
         </section>
       </main>
 
-      {/* Footer — dark bar */}
-      <footer className="dark-section border-t border-[#fafaf8]/10 py-6 sm:py-8">
+      <footer className="bg-gray-900 border-t border-gray-800 py-6 sm:py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <Link href="/" className="font-display text-xl text-[#fafaf8]">
-            Expaura
-          </Link>
-          <p className="text-xs text-[#9e9e9e] text-center">
-            Connecting restaurants with their guests across Rwanda.
-          </p>
+          <Link href="/" className="font-display text-xl text-[#F3F3F3]">Expaura</Link>
+          <p className="text-xs text-gray-500 text-center">Connecting restaurants with their guests across Rwanda.</p>
           <div className="flex items-center gap-2">
             <SocialIcon url="https://instagram.com/expaura_rw" target="_blank" rel="noopener noreferrer" style={{ width: 28, height: 28 }} />
             <SocialIcon url="https://twitter.com/expaura_rw" target="_blank" rel="noopener noreferrer" style={{ width: 28, height: 28 }} />
           </div>
         </div>
       </footer>
-    </>
+    </div>
   );
 }

@@ -24,19 +24,19 @@ function QrReveal({ children, restaurantName, className }: QrRevealProps) {
     <div className={cn("relative min-h-[60vh]", className)}>
       {!revealed && (
         <div
-          className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-ceramic"
+          className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0A0A0A]"
           aria-hidden={revealed}
         >
           <div className="relative w-48 h-48 flex items-center justify-center">
-            <div className="absolute inset-0 border-2 border-ink rounded-lg" />
-            <div className="absolute top-3 left-3 w-8 h-8 border-2 border-ink rounded-sm" />
-            <div className="absolute top-3 right-3 w-8 h-8 border-2 border-ink rounded-sm" />
-            <div className="absolute bottom-3 left-3 w-8 h-8 border-2 border-ink rounded-sm" />
-            <QrCode className="w-16 h-16 text-ink opacity-80" />
-            <div className="absolute inset-x-0 top-0 h-0.5 bg-ember aura-pulse origin-center" />
+            <div className="absolute inset-0 border-2 border-gray-700 rounded-lg" />
+            <div className="absolute top-3 left-3 w-8 h-8 border-2 border-gray-700 rounded-sm" />
+            <div className="absolute top-3 right-3 w-8 h-8 border-2 border-gray-700 rounded-sm" />
+            <div className="absolute bottom-3 left-3 w-8 h-8 border-2 border-gray-700 rounded-sm" />
+            <QrCode className="w-16 h-16 text-gray-400 opacity-80" />
+            <div className="absolute inset-x-0 top-0 h-0.5 bg-emerald-500 aura-pulse origin-center" />
           </div>
-          <p className="mt-6 font-display text-lg text-ink">Opening {restaurantName}…</p>
-          <p className="text-sm text-ink-muted mt-1">Menu · Hours · Reviews</p>
+          <p className="mt-6 font-display text-lg text-[#F3F3F3]">Opening {restaurantName}…</p>
+          <p className="text-sm text-gray-400 mt-1">Menu · Hours · Reviews</p>
         </div>
       )}
       <div

@@ -44,6 +44,8 @@ interface DashboardNavProps {
   className?: string;
   isOpen?: boolean;
   onClose?: () => void;
+  restaurantName?: string;
+  restaurantLogo?: string | null;
 }
 
 function DashboardNav({
@@ -52,6 +54,8 @@ function DashboardNav({
   className,
   isOpen = false,
   onClose,
+  restaurantName,
+  restaurantLogo,
 }: DashboardNavProps) {
   const pathname = usePathname();
 
@@ -74,10 +78,15 @@ function DashboardNav({
         className
       )}
     >
-      <div className="h-20 flex items-center px-8 border-b border-gray-800 shrink-0">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <span className="text-xl font-bold tracking-tighter uppercase">
-            Expaura
+      <div className="h-20 flex items-center gap-3 px-8 border-b border-gray-800 shrink-0">
+        {restaurantLogo ? (
+          <div className="w-8 h-8 rounded overflow-hidden bg-gray-800 shrink-0">
+            <img src={restaurantLogo} alt="" className="w-full h-full object-cover" />
+          </div>
+        ) : null}
+        <Link href="/dashboard" className="flex items-center gap-2 min-w-0">
+          <span className="text-xl font-bold tracking-tighter uppercase truncate">
+            {restaurantName || "Expaura"}
           </span>
         </Link>
       </div>

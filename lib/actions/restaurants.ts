@@ -196,7 +196,7 @@ export async function listFeatured(limit: number = 6) {
   const valid = limitSchema.safeParse(limit);
   if (!valid.success) throw new Error("Invalid limit");
 
-  const restaurants = await prisma.restaurant.findMany({
+  const subscribed = await prisma.restaurant.findMany({
     where: {
       isActive: true,
       subscriptions: {
@@ -207,10 +207,25 @@ export async function listFeatured(limit: number = 6) {
     take: valid.data * 3,
   });
 
-  const shuffled = restaurants.sort(() => Math.random() - 0.5).slice(0, valid.data);
+  if (subscribed.length > 0) {
+    const shuffled = subscribed.sort(() => Math.random() - 0.5).slice(0, valid.data);
+    return Promise.all(
+      shuffled.map(async (r) => ({
+        ...r,
+        ...(await aggregateRatings(r.id)),
+      }))
+    );
+  }
+
+  const recent = await prisma.restaurant.findMany({
+    where: { isActive: true },
+    include: { city: true },
+    orderBy: { createdAt: "desc" },
+    take: valid.data,
+  });
 
   return Promise.all(
-    shuffled.map(async (r) => ({
+    recent.map(async (r) => ({
       ...r,
       ...(await aggregateRatings(r.id)),
     }))

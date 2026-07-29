@@ -5,11 +5,17 @@ import { usePathname, useRouter } from "next/navigation";
 import { DashboardNav } from "@/components/dashboard/nav";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { getCurrentUser } from "@/lib/actions/auth";
+import { getManagerRestaurant } from "@/lib/actions/restaurants";
 
 interface AuthState {
   authenticated: boolean;
   userName: string;
   userRole: string;
+}
+
+interface RestaurantState {
+  name: string;
+  logoUrl: string | null;
 }
 
 export default function DashboardLayout({
@@ -22,6 +28,10 @@ export default function DashboardLayout({
     userName: "",
     userRole: "",
   });
+  const [restaurantState, setRestaurantState] = React.useState<RestaurantState>({
+    name: "",
+    logoUrl: null,
+  });
   const [loading, setLoading] = React.useState(true);
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const router = useRouter();
@@ -30,7 +40,10 @@ export default function DashboardLayout({
   React.useEffect(() => {
     const checkAuth = async () => {
       try {
-        const result = await getCurrentUser();
+        const [result, restaurant] = await Promise.all([
+          getCurrentUser(),
+          getManagerRestaurant().catch(() => null),
+        ]);
         if (result.authenticated && result.user) {
           setAuthState({
             authenticated: true,
@@ -40,6 +53,12 @@ export default function DashboardLayout({
                 ? "Super Admin"
                 : "Restaurant Manager",
           });
+          if (restaurant) {
+            setRestaurantState({
+              name: restaurant.name,
+              logoUrl: restaurant.logoUrl ?? null,
+            });
+          }
         } else {
           router.push("/login");
         }
@@ -84,6 +103,8 @@ export default function DashboardLayout({
       <DashboardNav
         userName={authState.userName}
         userRole={authState.userRole}
+        restaurantName={restaurantState.name}
+        restaurantLogo={restaurantState.logoUrl}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />

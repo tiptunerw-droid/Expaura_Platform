@@ -15,5 +15,5 @@ export default async function QrRedirectPage({ params }: Props) {
     notFound();
   }
 
-  redirect(`/r/${restaurant.slug}`);
+  redirect(`/r/${restaurant.slug}?tab=menu`);
 }

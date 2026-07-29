@@ -65,11 +65,11 @@ export function ComplaintForm({ restaurantId, branchId }: ComplaintFormProps) {
   if (step === "done") {
     return (
       <div className="text-center py-8">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-ember-soft mb-4">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-ember/20 mb-4">
           <CheckCircle className="w-7 h-7 text-ember" />
         </div>
-        <h3 className="font-display text-xl text-ink mb-1">Complaint sent</h3>
-        <p className="text-sm text-ink-muted">
+        <h3 className="font-display text-xl text-[#F3F3F3] mb-1">Complaint sent</h3>
+        <p className="text-sm text-gray-400">
           The restaurant manager has been notified and will follow up.
         </p>
       </div>

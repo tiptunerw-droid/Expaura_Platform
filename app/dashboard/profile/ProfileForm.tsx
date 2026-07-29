@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { CloudinaryUpload } from "@/components/ui/cloudinary-upload";
 import { updateRestaurantProfile } from "@/lib/actions/restaurants";
 
 interface RestaurantData {
@@ -110,13 +111,52 @@ export function ProfileForm({ restaurant }: Props) {
           <Label htmlFor="facebook">Facebook URL</Label>
           <Input id="facebook" value={form.facebookUrl} onChange={handleChange("facebookUrl")} placeholder="https://facebook.com/..." />
         </div>
-        <div>
-          <Label htmlFor="logoUrl">Logo URL</Label>
-          <Input id="logoUrl" value={form.logoUrl} onChange={handleChange("logoUrl")} placeholder="https://res.cloudinary.com/..." />
+        <div className="sm:col-span-2">
+          <Label>Restaurant logo</Label>
+          {form.logoUrl ? (
+            <div className="flex items-center gap-3 p-3 bg-gray-900 border border-gray-800 rounded-lg">
+              <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-800 shrink-0">
+                <img src={form.logoUrl} alt="Logo" className="w-full h-full object-cover" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-gray-400 truncate">{form.logoUrl}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setForm((prev) => ({ ...prev, logoUrl: "" }))}
+                className="text-[10px] text-rose-400 hover:text-rose-300 uppercase tracking-widest font-bold"
+              >
+                Remove
+              </button>
+            </div>
+          ) : null}
+          {!form.logoUrl ? (
+            <CloudinaryUpload
+              onUploaded={(url) => setForm((prev) => ({ ...prev, logoUrl: url }))}
+            />
+          ) : null}
         </div>
-        <div>
-          <Label htmlFor="coverImageUrl">Cover image URL</Label>
-          <Input id="coverImageUrl" value={form.coverImageUrl} onChange={handleChange("coverImageUrl")} placeholder="https://res.cloudinary.com/..." />
+        <div className="sm:col-span-2">
+          <Label>Cover image</Label>
+          {form.coverImageUrl ? (
+            <div className="relative aspect-[3/1] rounded-lg overflow-hidden bg-gray-900 border border-gray-800 group">
+              <img src={form.coverImageUrl} alt="Cover" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <button
+                  type="button"
+                  onClick={() => setForm((prev) => ({ ...prev, coverImageUrl: "" }))}
+                  className="text-xs text-rose-400 hover:text-rose-300 uppercase tracking-widest font-bold bg-black/60 px-3 py-1.5 rounded"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          ) : null}
+          {!form.coverImageUrl ? (
+            <CloudinaryUpload
+              onUploaded={(url) => setForm((prev) => ({ ...prev, coverImageUrl: url }))}
+            />
+          ) : null}
         </div>
       </div>
 

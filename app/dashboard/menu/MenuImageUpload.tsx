@@ -2,11 +2,10 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Loader2, Upload } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { CloudinaryUpload } from "@/components/ui/cloudinary-upload";
 import { addMenuImage } from "@/lib/actions/menu";
 
 interface Props {
@@ -17,24 +16,14 @@ interface Props {
 export function MenuImageUpload({ restaurantId, branchId }: Props) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
-  const [url, setUrl] = React.useState("");
   const [sending, setSending] = React.useState(false);
   const [error, setError] = React.useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!url.trim()) {
-      setError("Please enter an image URL");
-      return;
-    }
+  const handleUploaded = async (url: string) => {
     setSending(true);
     setError("");
     try {
-      await addMenuImage({
-        imageUrl: url.trim(),
-        branchId,
-      });
-      setUrl("");
+      await addMenuImage({ imageUrl: url, branchId });
       setOpen(false);
       router.refresh();
     } catch (err) {
@@ -54,25 +43,16 @@ export function MenuImageUpload({ restaurantId, branchId }: Props) {
         <DialogHeader>
           <DialogTitle>Add menu page</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="url">Image URL</Label>
-            <Input
-              id="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://res.cloudinary.com/…"
-            />
-            <p className="text-[10px] text-ink-muted mt-1">
-              Upload to Cloudinary first, then paste the URL here.
-            </p>
-          </div>
+        <div className="space-y-4">
+          <CloudinaryUpload onUploaded={handleUploaded} />
+          {sending && (
+            <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Saving…
+            </div>
+          )}
           {error && <p className="text-xs text-rose">{error}</p>}
-          <Button type="submit" variant="primary" className="w-full" disabled={sending}>
-            {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-            Add to menu
-          </Button>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

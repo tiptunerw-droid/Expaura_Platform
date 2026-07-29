@@ -145,28 +145,39 @@ export default async function HomePage() {
                 No featured venues currently available.
               </div>
             ) : (
-              featured.map((restaurant) => (
-                <Link href={`/r/${restaurant.slug}`} key={restaurant.id} className="group block">
-                  <div className="aspect-[4/5] bg-gray-900 relative mb-4 overflow-hidden border border-gray-800 group-hover:border-emerald-500 transition-colors">
-                    {restaurant.logoUrl ? (
-                      <img src={restaurant.logoUrl} alt={restaurant.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <ChefHat className="w-16 h-16 text-gray-800" />
+              featured.map((restaurant) => {
+                const hasRating = restaurant.reviewCount > 0;
+                return (
+                  <Link href={`/r/${restaurant.slug}`} key={restaurant.id} className="group block">
+                    <div className="aspect-[4/5] bg-gray-900 relative mb-4 overflow-hidden border border-gray-800 group-hover:border-emerald-500 transition-colors">
+                      {restaurant.coverImageUrl ? (
+                        <img src={restaurant.coverImageUrl} alt={restaurant.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-all duration-500" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <ChefHat className="w-16 h-16 text-gray-800" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      <div className="absolute top-4 left-4 bg-black/80 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur-sm">
+                        {restaurant.city.name}
                       </div>
-                    )}
-                    <div className="absolute top-4 left-4 bg-black/80 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur-sm">
-                      {restaurant.city.name}
+                      {hasRating && (
+                        <div className="absolute bottom-4 left-4 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2.5 py-1.5 rounded">
+                          <Star className="w-3.5 h-3.5 fill-brass text-brass" />
+                          <span className="text-sm font-bold text-white">{restaurant.averageOverall.toFixed(1)}</span>
+                          <span className="text-[10px] text-gray-300">({restaurant.reviewCount})</span>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                  <h3 className="text-2xl font-black uppercase tracking-tight group-hover:text-emerald-500 transition-colors truncate">
-                    {restaurant.name}
-                  </h3>
-                  <p className="text-sm text-gray-500 uppercase tracking-wider font-medium truncate mt-1">
-                    {restaurant.address || "Location TBA"}
-                  </p>
-                </Link>
-              ))
+                    <h3 className="text-xl font-black uppercase tracking-tight group-hover:text-emerald-500 transition-colors truncate">
+                      {restaurant.name}
+                    </h3>
+                    <p className="text-sm text-gray-500 uppercase tracking-wider font-medium truncate mt-1">
+                      {restaurant.address || restaurant.city.name || "Kigali"}
+                    </p>
+                  </Link>
+                );
+              })
             )}
           </div>
         </section>
