@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { formatDate, formatCurrencyRwf } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Subscriptions" };
 
 export default async function AdminSubscriptionsPage() {

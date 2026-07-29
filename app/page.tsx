@@ -4,6 +4,8 @@ import { ArrowRight, QrCode, Star, ChefHat, Search } from "lucide-react";
 import { listFeatured, listRecentlyAdded } from "@/lib/actions/restaurants";
 import { cn } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 // Minimal stark header
 function Header() {
   return (

@@ -8,6 +8,8 @@ import { getCities } from "@/lib/actions/data";
 import { listDirectory } from "@/lib/actions/restaurants";
 import { listRecentlyAdded } from "@/lib/actions/restaurants";
 
+export const dynamic = "force-dynamic";
+
 export default async function DirectoryIndexPage() {
   const { cities } = await getCities();
   const recent = await listRecentlyAdded(6);
