@@ -4,7 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { UserPlus, Loader2, Mail, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
@@ -39,12 +39,10 @@ export function InviteStaffDialog() {
 
   return (
     <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setDone(false); setEmail(""); } }}>
-      <DialogTrigger asChild>
-        <Button variant="primary" size="sm">
-          <UserPlus className="w-4 h-4" />
-          Invite staff
-        </Button>
-      </DialogTrigger>
+      <Button variant="primary" size="sm" onClick={() => setOpen(true)}>
+        <UserPlus className="w-4 h-4" />
+        Invite staff
+      </Button>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Invite a team member</DialogTitle>

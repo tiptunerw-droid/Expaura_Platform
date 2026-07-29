@@ -4,7 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { addMenuImage } from "@/lib/actions/menu";
@@ -46,12 +46,10 @@ export function MenuImageUpload({ restaurantId, branchId }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="primary" size="sm">
-          <Plus className="w-4 h-4" />
-          Add menu page
-        </Button>
-      </DialogTrigger>
+      <Button variant="primary" size="sm" onClick={() => setOpen(true)}>
+        <Plus className="w-4 h-4" />
+        Add menu page
+      </Button>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add menu page</DialogTitle>

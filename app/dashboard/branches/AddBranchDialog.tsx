@@ -4,7 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Building2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { addBranch } from "@/lib/actions/branches";
@@ -44,12 +44,10 @@ export function AddBranchDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="primary" size="sm">
-          <Building2 className="w-4 h-4" />
-          Add branch
-        </Button>
-      </DialogTrigger>
+      <Button variant="primary" size="sm" onClick={() => setOpen(true)}>
+        <Building2 className="w-4 h-4" />
+        Add branch
+      </Button>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add a branch</DialogTitle>

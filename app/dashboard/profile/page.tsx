@@ -1,13 +1,6 @@
-import * as React from "react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { getManagerRestaurant } from "@/lib/actions/restaurants";
-import { formatCurrencyRwf, formatDate } from "@/lib/utils";
-import { ProfileForm } from "./ProfileForm";
-import { QrDownload } from "./QrDownload";
 import { ProfileTabs } from "./ProfileTabs";
 
 export const metadata = { title: "Profile" };

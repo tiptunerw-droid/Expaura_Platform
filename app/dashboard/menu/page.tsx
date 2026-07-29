@@ -1,8 +1,8 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Plus, Trash2, GripVertical, Eye, UtensilsCrossed } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { UtensilsCrossed } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";

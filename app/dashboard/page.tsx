@@ -1,14 +1,11 @@
 import * as React from "react";
-import { TrendingUp, TrendingDown, Star, MessageSquare, AlertCircle, ThumbsUp, Clock, Sparkles } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { TrendingUp, TrendingDown, Star, AlertCircle } from "lucide-react";
 import { SatisfactionAura } from "@/components/signature/SatisfactionAura";
 import { AiSummaryWidget } from "@/components/dashboard/ai-summary-widget";
 import { getManagerRestaurant } from "@/lib/actions/restaurants";
 import { getRestaurantReviewsStats } from "@/lib/actions/reviews";
 import { ratingTrendByPeriod, complaintsByCategory, peakHours } from "@/lib/actions/analytics";
 import { summarizeReviews } from "@/lib/actions/ai";
-import { formatCurrencyRwf } from "@/lib/utils";
 
 async function AnalyticsDashboard() {
   let restaurant;
@@ -16,27 +13,26 @@ async function AnalyticsDashboard() {
     restaurant = await getManagerRestaurant();
   } catch {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-14 h-14 rounded-full bg-ceramic-deep flex items-center justify-center mb-4">
-          <AlertCircle className="w-7 h-7 text-ink-muted" />
+      <div className="flex flex-col items-center justify-center py-32 text-center border-2 border-dashed border-gray-800">
+        <div className="w-16 h-16 bg-red-500/10 flex items-center justify-center mb-6">
+          <AlertCircle className="w-8 h-8 text-red-500" />
         </div>
-        <h2 className="font-display text-2xl text-ink mb-2">No restaurant found</h2>
-        <p className="text-ink-muted text-sm max-w-md">
-          Set up your restaurant profile to start seeing analytics.
+        <h2 className="text-3xl font-black uppercase tracking-tighter text-white mb-2">System Uninitialized</h2>
+        <p className="text-gray-500 text-sm max-w-md font-bold uppercase tracking-widest">
+          Register your restaurant core to begin telemetry.
         </p>
       </div>
     );
   }
 
   const rid = restaurant.id;
-  const [stats, trend7, trend30, complaintsCat, peakHrs, aiSummary] = await Promise.all([
+  const [stats, trend7, complaintsCat, peakHrs, aiSummary] = await Promise.all([
     getRestaurantReviewsStats(rid),
     ratingTrendByPeriod(rid, "7d"),
-    ratingTrendByPeriod(rid, "30d"),
     complaintsByCategory(rid, 30),
     peakHours(rid, 30),
     summarizeReviews(rid, 30).catch(() => ({
-      summary: "AI insights unavailable right now.",
+      summary: "AI insights unavailable.",
       highlights: [],
       painPoints: [],
     })),
@@ -58,209 +54,202 @@ async function AnalyticsDashboard() {
     : "—";
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-2 mb-1">
-        <Badge variant="dark" size="sm">
-          {planName}
-        </Badge>
+    <div className="space-y-8 font-sans selection:bg-emerald-500 selection:text-white">
+      <div className="flex items-center gap-4 border-b border-gray-800 pb-4">
+        <span className="px-3 py-1 bg-emerald-500 text-black text-[10px] font-black uppercase tracking-[0.2em]">
+          {planName} TIER
+        </span>
         {restaurant.name && (
-          <span className="text-sm text-ink-muted">{restaurant.name}</span>
+          <span className="text-xs font-bold uppercase tracking-widest text-gray-500">
+            // {restaurant.name}
+          </span>
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between mb-3">
-              <SatisfactionAura
-                rating={stats.averageOverall || null}
-                size={72}
-                showLabel={false}
-              />
-              <Badge variant={trendDirection === "up" ? "dark" : trendDirection === "down" ? "outline" : "default"} size="sm">
-                {trendDirection === "up" ? (
-                  <TrendingUp className="w-3 h-3 mr-0.5" />
-                ) : trendDirection === "down" ? (
-                  <TrendingDown className="w-3 h-3 mr-0.5" />
-                ) : null}
-                {trendDirection === "up" ? "Rising" : trendDirection === "down" ? "Falling" : "Stable"}
-              </Badge>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-[#0A0A0A] border border-gray-800 p-6 flex flex-col justify-between hover:border-emerald-500 transition-colors">
+          <div className="flex items-center justify-between mb-8">
+            <SatisfactionAura
+              rating={stats.averageOverall || null}
+              size={56}
+              showLabel={false}
+            />
+            <div className={`px-2 py-1 text-[10px] font-black uppercase tracking-widest flex items-center gap-1 ${
+              trendDirection === "up" ? "bg-emerald-500/10 text-emerald-500" : trendDirection === "down" ? "bg-red-500/10 text-red-500" : "bg-gray-800 text-gray-400"
+            }`}>
+              {trendDirection === "up" ? <TrendingUp className="w-3 h-3" /> : trendDirection === "down" ? <TrendingDown className="w-3 h-3" /> : null}
+              {trendDirection === "up" ? "RISING" : trendDirection === "down" ? "FALLING" : "STABLE"}
             </div>
-            <p className="text-xs text-ink-muted font-medium uppercase tracking-wider">Satisfaction</p>
-            <p className="font-display text-xl text-ink mt-0.5">
+          </div>
+          <div>
+            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Satisfaction Score</p>
+            <p className="text-4xl font-black text-white mt-1">
               {stats.averageOverall > 0 ? stats.averageOverall.toFixed(1) : "—"}
-              <span className="text-sm text-ink-muted font-sans font-normal"> / 5</span>
+              <span className="text-lg text-gray-600">/5</span>
             </p>
-            <p className="text-xs text-ink-muted mt-1">{stats.totalReviews} total reviews</p>
-          </CardContent>
-        </Card>
+            <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest mt-2">{stats.totalReviews} TOTAL REVIEWS</p>
+          </div>
+        </div>
 
-        <Card>
-          <CardContent className="p-5">
-            <p className="text-xs text-ink-muted font-medium uppercase tracking-wider">Recommendation rate</p>
-            <p className="font-display text-xl text-ink mt-0.5">
+        <div className="bg-[#0A0A0A] border border-gray-800 p-6 flex flex-col justify-between hover:border-emerald-500 transition-colors">
+          <div className="mb-8">
+            <Star className="w-8 h-8 text-gray-600" />
+          </div>
+          <div>
+            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Recommendation Rate</p>
+            <p className="text-4xl font-black text-white mt-1">
               {stats.recommendRate}%
             </p>
-            <p className="text-xs text-ink-muted mt-1">would recommend to a friend</p>
-          </CardContent>
-        </Card>
+            <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest mt-2">WOULD RECOMMEND</p>
+          </div>
+        </div>
 
-        <Card>
-          <CardContent className="p-5">
-            <p className="text-xs text-ink-muted font-medium uppercase tracking-wider">Complaints (30d)</p>
-            <p className="font-display text-xl text-ink mt-0.5">
+        <div className="bg-[#0A0A0A] border border-gray-800 p-6 flex flex-col justify-between hover:border-emerald-500 transition-colors">
+          <div className="mb-8">
+            <AlertCircle className="w-8 h-8 text-gray-600" />
+          </div>
+          <div>
+            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Complaints (30d)</p>
+            <p className="text-4xl font-black text-white mt-1">
               {complaintsCat.reduce((s, c) => s + c.count, 0)}
             </p>
-            <p className="text-xs text-ink-muted mt-1">across {complaintsCat.length} categories</p>
-          </CardContent>
-        </Card>
+            <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest mt-2">IN {complaintsCat.length} CATEGORIES</p>
+          </div>
+        </div>
 
-        <Card>
-          <CardContent className="p-5">
-            <p className="text-xs text-ink-muted font-medium uppercase tracking-wider">Peak review hour</p>
-            <p className="font-display text-xl text-ink mt-0.5">{peakHourLabel}</p>
-            <p className="text-xs text-ink-muted mt-1">
-              {peakHourEntry ? `${peakHourEntry.count} reviews at this hour` : "No data"}
+        <div className="bg-[#0A0A0A] border border-gray-800 p-6 flex flex-col justify-between hover:border-emerald-500 transition-colors">
+          <div className="mb-8">
+            <TrendingUp className="w-8 h-8 text-gray-600" />
+          </div>
+          <div>
+            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Peak Hour</p>
+            <p className="text-4xl font-black text-white mt-1">{peakHourLabel}</p>
+            <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest mt-2">
+              {peakHourEntry ? `${peakHourEntry.count} REVIEWS LOGGED` : "NO DATA"}
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-display">Rating trend (7 days)</CardTitle>
-                <Badge variant="outline" size="sm">Last 7 days</Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {trend7.length > 0 ? (
-                <div className="space-y-2">
-                  {trend7.map((day) => (
-                    <div key={day.periodLabel} className="flex items-center gap-3">
-                      <span className="text-xs text-ink-muted w-24 shrink-0 font-tabular">
-                        {day.periodLabel.slice(5)}
-                      </span>
-                      <div className="flex-1 h-6 bg-ceramic-deep rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all"
-                          style={{
-                            width: `${(day.avgOverall / 5) * 100}%`,
-                            backgroundColor: day.avgOverall >= 4 ? "var(--herb)" : day.avgOverall >= 3 ? "var(--brass)" : "var(--ember)",
-                          }}
-                        />
-                      </div>
-                      <span className="text-xs font-tabular text-ink-soft w-8 text-right">
-                        {day.avgOverall > 0 ? day.avgOverall.toFixed(1) : "—"}
-                      </span>
+          <div className="bg-[#0A0A0A] border border-gray-800 p-6">
+            <div className="flex items-center justify-between mb-8 border-b border-gray-800 pb-4">
+              <h3 className="text-xl font-black uppercase tracking-tighter">7-Day Trajectory</h3>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Trailing Metrics</span>
+            </div>
+            
+            {trend7.length > 0 ? (
+              <div className="space-y-4">
+                {trend7.map((day) => (
+                  <div key={day.periodLabel} className="flex items-center gap-4">
+                    <span className="text-xs text-gray-500 w-16 shrink-0 font-bold tracking-widest uppercase">
+                      {day.periodLabel.slice(5)}
+                    </span>
+                    <div className="flex-1 h-2 bg-gray-900 overflow-hidden">
+                      <div
+                        className="h-full transition-all"
+                        style={{
+                          width: `${(day.avgOverall / 5) * 100}%`,
+                          backgroundColor: day.avgOverall >= 4 ? "#10b981" : day.avgOverall >= 3 ? "#f59e0b" : "#ef4444",
+                        }}
+                      />
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-ink-muted py-4 text-center">No reviews in the last 7 days.</p>
-              )}
-            </CardContent>
-          </Card>
+                    <span className="text-xs font-black text-white w-8 text-right">
+                      {day.avgOverall > 0 ? day.avgOverall.toFixed(1) : "—"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-gray-600 font-bold uppercase tracking-widest py-8 text-center border border-dashed border-gray-800">
+                INSUFFICIENT DATA SET
+              </p>
+            )}
+          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-display">Ratings breakdown</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="bg-[#0A0A0A] border border-gray-800 p-6">
+              <h3 className="text-sm font-black uppercase tracking-widest mb-6 text-gray-400">Breakdown</h3>
+              <div className="space-y-4">
                 {[
-                  { label: "Food", value: stats.averageFood },
+                  { label: "Food Quality", value: stats.averageFood },
                   { label: "Service", value: stats.averageService },
                   { label: "Atmosphere", value: stats.averageAtmosphere },
                   { label: "Cleanliness", value: stats.averageCleanliness },
                 ].map((item) => (
-                  <div key={item.label} className="flex items-center justify-between">
-                    <span className="text-sm text-ink-soft">{item.label}</span>
-                    <span className="flex items-center gap-1.5">
-                      <Star className="w-3.5 h-3.5 fill-brass text-brass" />
-                      <span className="font-tabular text-sm font-medium text-ink">
+                  <div key={item.label} className="flex items-center justify-between group">
+                    <span className="text-xs font-bold uppercase tracking-widest text-gray-500 group-hover:text-white transition-colors">{item.label}</span>
+                    <span className="flex items-center gap-2">
+                      <Star className="w-3 h-3 text-emerald-500 fill-emerald-500" />
+                      <span className="font-black text-sm text-white">
                         {item.value > 0 ? item.value.toFixed(1) : "—"}
                       </span>
                     </span>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-display">Complaints by category</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {complaintsCat.length > 0 ? (
-                  <div className="space-y-2.5">
-                    {complaintsCat.slice(0, 5).map((cat) => (
-                      <div key={cat.categoryName} className="flex items-center justify-between">
-                        <span className="text-sm text-ink-soft">{cat.categoryName}</span>
-                        <span className="font-tabular text-sm text-ink font-medium">{cat.count}</span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-ink-muted py-4 text-center">No complaints this period.</p>
-                )}
-              </CardContent>
-            </Card>
+            <div className="bg-[#0A0A0A] border border-gray-800 p-6">
+              <h3 className="text-sm font-black uppercase tracking-widest mb-6 text-gray-400">Incident Matrix</h3>
+              {complaintsCat.length > 0 ? (
+                <div className="space-y-4">
+                  {complaintsCat.slice(0, 5).map((cat) => (
+                    <div key={cat.categoryName} className="flex items-center justify-between group">
+                      <span className="text-xs font-bold uppercase tracking-widest text-gray-500 group-hover:text-white transition-colors">{cat.categoryName}</span>
+                      <span className="font-black text-sm text-red-500 bg-red-500/10 px-2 py-0.5">{cat.count}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-gray-600 font-bold uppercase tracking-widest py-4 text-center border border-dashed border-gray-800">
+                  NO ACTIVE ALERTS
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="space-y-6">
-          <AiSummaryWidget
-            summary={aiSummary.summary}
-            highlights={aiSummary.highlights}
-            painPoints={aiSummary.painPoints}
-          />
+          <div className="bg-gray-900 border border-gray-700 p-6">
+            <h3 className="text-sm font-black uppercase tracking-widest mb-4 text-emerald-400 flex items-center gap-2">
+              <span className="w-2 h-2 bg-emerald-400 animate-pulse" />
+              AI Telemetry
+            </h3>
+            <p className="text-sm text-gray-300 leading-relaxed font-medium">
+              {aiSummary.summary}
+            </p>
+          </div>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base font-display">Reviews (30d)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {stats.totalReviews > 0 ? (
-                <div className="grid grid-cols-5 gap-1">
-                  {[5, 4, 3, 2, 1].map((star) => {
-                    const count = stats.reviewsByStar[star] || 0;
-                    const max = Math.max(...Object.values(stats.reviewsByStar), 1);
-                    return (
-                      <div key={star} className="flex flex-col items-center gap-1.5">
-                        <span className="font-tabular text-xs text-ink-muted">{count}</span>
-                        <div
-                          className="w-full rounded-sm"
-                          style={{
-                            height: `${Math.max(4, (count / max) * 48)}px`,
-                            backgroundColor: star >= 4 ? "var(--herb)" : star >= 3 ? "var(--brass)" : "var(--ember)",
-                          }}
-                        />
-                        <span className="text-[10px] text-ink-muted">{star}★</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="text-sm text-ink-muted py-4 text-center">No reviews this period.</p>
-              )}
-            </CardContent>
-          </Card>
-
-          {restaurant.currentSubscription?.plan?.analyticsEnabled && (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-display">Popular items</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-ink-muted">
-                  Top menu items by review mentions. Unlock detailed item tracking on Premium.
-                </p>
-              </CardContent>
-            </Card>
-          )}
+          <div className="bg-[#0A0A0A] border border-gray-800 p-6">
+            <h3 className="text-sm font-black uppercase tracking-widest mb-8 text-gray-400">Distribution (30d)</h3>
+            {stats.totalReviews > 0 ? (
+              <div className="flex justify-between items-end h-32 gap-2">
+                {[5, 4, 3, 2, 1].map((star) => {
+                  const count = stats.reviewsByStar[star] || 0;
+                  const max = Math.max(...Object.values(stats.reviewsByStar), 1);
+                  return (
+                    <div key={star} className="flex flex-col items-center gap-2 flex-1 group">
+                      <span className="text-[10px] font-black text-gray-500 group-hover:text-white transition-colors">{count}</span>
+                      <div
+                        className="w-full transition-all group-hover:opacity-80"
+                        style={{
+                          height: `${Math.max(4, (count / max) * 100)}px`,
+                          backgroundColor: star >= 4 ? "#10b981" : star >= 3 ? "#f59e0b" : "#ef4444",
+                        }}
+                      />
+                      <span className="text-[10px] font-bold text-gray-600">S{star}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-xs text-gray-600 font-bold uppercase tracking-widest py-8 text-center border border-dashed border-gray-800">
+                AWAITING METRICS
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>

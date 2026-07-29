@@ -115,8 +115,8 @@ export default async function AdminOverview() {
           <CardContent>
             {revenueByMonth.length > 0 ? (
               <div className="space-y-2">
-                {revenueByMonth.map((m) => (
-                  <div key={m.monthLabel} className="flex items-center justify-between py-1.5">
+                {revenueByMonth.map((m, i) => (
+                  <div key={`${m.monthLabel}-${i}`} className="flex items-center justify-between py-1.5">
                     <span className="text-sm text-ink-soft">{m.monthLabel}</span>
                     <span className="font-tabular text-sm text-ink font-medium">
                       {formatCurrencyRwf(Number(m.amountEstimate))}

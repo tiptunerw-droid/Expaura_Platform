@@ -1,6 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
-import { Star, Search, MessageSquare } from "lucide-react";
+import { Star, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";

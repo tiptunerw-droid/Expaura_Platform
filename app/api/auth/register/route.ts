@@ -10,7 +10,7 @@ const registerOwnerSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   restaurantName: z.string().min(2, "Restaurant name must be at least 2 characters"),
-  cityId: z.string().uuid("Please select a valid city"),
+  cityName: z.string().min(1, "Please select a city"),
   phone: z.string().optional(),
   address: z.string().optional(),
 });
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { name, email, password, restaurantName, cityId, phone, address } = validation.data;
+    const { name, email, password, restaurantName, cityName, phone, address } = validation.data;
 
     // Check if email already exists
     const existingUser = await prisma.user.findUnique({
@@ -50,16 +50,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify city exists
-    const city = await prisma.city.findUnique({
-      where: { id: cityId },
+    // Resolve city — create if it doesn't exist
+    let city = await prisma.city.findFirst({
+      where: { name: { equals: cityName, mode: "insensitive" } },
     });
-
     if (!city) {
-      return NextResponse.json(
-        { error: "Selected city does not exist." },
-        { status: 400 }
-      );
+      city = await prisma.city.create({
+        data: { name: cityName, region: null, country: "Rwanda" },
+      });
     }
 
     const passwordHash = await hashPassword(password);
@@ -83,7 +81,7 @@ export async function POST(request: Request) {
         data: {
           name: restaurantName,
           slug,
-          cityId,
+          cityId: city.id,
           phone,
           address,
           email: email.toLowerCase(),

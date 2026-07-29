@@ -23,6 +23,7 @@ export default function DashboardLayout({
     userRole: "",
   });
   const [loading, setLoading] = React.useState(true);
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -53,8 +54,8 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-ceramic flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-line border-t-ember animate-spin" />
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full border-4 border-gray-800 border-t-emerald-500 animate-spin" />
       </div>
     );
   }
@@ -79,17 +80,29 @@ export default function DashboardLayout({
   const currentTitle = titleMap[pathname] || "Dashboard";
 
   return (
-    <div className="min-h-screen bg-ceramic">
+    <div className="min-h-screen bg-[#0A0A0A] text-[#F3F3F3] selection:bg-emerald-500 selection:text-white">
       <DashboardNav
         userName={authState.userName}
         userRole={authState.userRole}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
+      
+      {/* Mobile backdrop */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/80 z-20 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       <div className="lg:pl-64">
         <DashboardHeader
           title={currentTitle}
           userName={authState.userName}
+          onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
         />
-        <main className="p-6">{children}</main>
+        <main className="p-4 sm:p-8">{children}</main>
       </div>
     </div>
   );

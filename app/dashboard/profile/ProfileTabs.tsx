@@ -2,14 +2,14 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { CreditCard, QrCode } from "lucide-react";
+import { CreditCard } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatCurrencyRwf, formatDate } from "@/lib/utils";
 import { ProfileForm } from "./ProfileForm";
-import { QrDownload } from "./QrDownload";
+import { QrDisplay } from "./QrDownload";
 
 interface SubPlan {
   name: string;
@@ -32,6 +32,7 @@ interface SubData {
 interface RestaurantData {
   id: string;
   name: string;
+  slug: string;
   phone?: string | null;
   whatsapp?: string | null;
   email?: string | null;
@@ -44,6 +45,7 @@ interface RestaurantData {
   instagramUrl?: string | null;
   facebookUrl?: string | null;
   city?: { name: string } | null;
+  qrCodes?: { id: string; code: string; branchId?: string | null }[];
   currentSubscription?: SubData | null;
 }
 
@@ -166,12 +168,7 @@ export function ProfileTabs({ restaurant }: Props) {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-center">
-            <div className="w-48 h-48 mx-auto bg-white rounded-xl border-2 border-line flex items-center justify-center">
-              <QrCode className="w-24 h-24 text-ink" />
-            </div>
-            <div className="flex justify-center gap-3">
-              <QrDownload />
-            </div>
+            <QrDisplay qrCodes={restaurant.qrCodes ?? []} slug={restaurant.slug} />
             <p className="text-xs text-ink-muted">
               Print this QR and place it on tables. Customers scan with their phone camera.
             </p>

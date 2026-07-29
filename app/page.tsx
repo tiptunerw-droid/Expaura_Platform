@@ -1,184 +1,179 @@
+import React from "react";
 import Link from "next/link";
-import { Search, QrCode, Star, ChefHat, ArrowRight } from "lucide-react";
-import { SiteHeader } from "@/components/site/header";
-import { SiteFooter } from "@/components/site/footer";
-import { RestaurantCard } from "@/components/public/restaurant-card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { ArrowRight, QrCode, Star, ChefHat, Search } from "lucide-react";
 import { listFeatured, listRecentlyAdded } from "@/lib/actions/restaurants";
 import { cn } from "@/lib/utils";
 
-const CITIES = ["Kigali", "Butare", "Gisenyi", "Musanze", "Ruhengeri", "Muhanga"];
+// Minimal stark header
+function Header() {
+  return (
+    <header className="flex items-center justify-between px-8 py-6 border-b border-gray-800 bg-[#0A0A0A] fixed top-0 w-full z-50">
+      <div className="flex items-center gap-2">
+        <span className="text-xl font-bold tracking-tighter uppercase text-[#F3F3F3]">
+          Expaura
+        </span>
+      </div>
+      <nav className="hidden md:flex gap-8 text-xs font-bold uppercase tracking-widest text-gray-500">
+        <Link href="/directory" className="hover:text-white transition-colors">Directory</Link>
+        <Link href="/features" className="hover:text-white transition-colors">Features</Link>
+        <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
+      </nav>
+      <div className="flex gap-4">
+        <Link href="/login" className="text-xs font-bold uppercase tracking-widest text-gray-300 hover:text-white transition-colors py-2">
+          Login
+        </Link>
+        <Link href="/register" className="text-xs font-bold uppercase tracking-widest bg-white text-black px-4 py-2 hover:bg-emerald-500 hover:text-white transition-all">
+          List Restaurant
+        </Link>
+      </div>
+    </header>
+  );
+}
+
+// Brutalist Footer
+function Footer() {
+  return (
+    <footer className="bg-black border-t border-gray-800 py-24 px-8 sm:px-16 lg:px-24">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-16 text-[#F3F3F3]">
+        <div className="md:col-span-2">
+          <span className="text-4xl font-black tracking-tighter uppercase block mb-4">
+            Expaura.
+          </span>
+          <p className="text-gray-500 text-sm max-w-sm">
+            The standard for modern restaurant experiences. Digitizing menus, capturing feedback, and empowering operators.
+          </p>
+        </div>
+        <div>
+          <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400 mb-6">Platform</h4>
+          <ul className="space-y-4 text-sm font-medium">
+            <li><Link href="/directory" className="hover:text-white">Directory</Link></li>
+            <li><Link href="/admin/login" className="hover:text-purple-500">System Admin</Link></li>
+            <li><Link href="/register" className="hover:text-emerald-500">Join Expaura</Link></li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400 mb-6">Legal</h4>
+          <ul className="space-y-4 text-sm font-medium">
+            <li><Link href="/privacy" className="hover:text-white">Privacy</Link></li>
+            <li><Link href="/terms" className="hover:text-white">Terms</Link></li>
+          </ul>
+        </div>
+      </div>
+      <div className="mt-24 pt-8 border-t border-gray-900 text-xs text-gray-600 font-bold uppercase tracking-widest flex justify-between">
+        <span>© {new Date().getFullYear()} Expaura Platform</span>
+        <span>Kigali, Rwanda</span>
+      </div>
+    </footer>
+  );
+}
 
 export default async function HomePage() {
   const featured = await listFeatured(6);
   const recentlyAdded = await listRecentlyAdded(12);
 
   return (
-    <>
-      <SiteHeader />
-      <main className="flex-1">
-        {/* Hero */}
-        <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-10">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-            <div className="lg:col-span-2 space-y-6">
-              <div className="space-y-4">
-                <Badge variant="dark" size="sm">
-                  <ChefHat className="w-3 h-3 mr-1" />
-                  Rwanda&apos;s restaurant directory
-                </Badge>
-                <h1 className="font-display text-4xl sm:text-5xl tracking-tight text-ink leading-tight">
-                  Find your next favorite spot, from Nyamirambo brochettes to Gisenyi lakefront dining.
-                </h1>
-                <p className="text-ink-soft text-base sm:text-lg leading-relaxed max-w-xl">
-                  Honest reviews, QR menus, and real-time feedback from guests who ate there last night.
-                  Expaura is built for how Rwanda actually eats out.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="relative max-w-xl">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted" />
-                  <Input
-                    placeholder="Search restaurants, cuisines, neighborhoods…"
-                    className="pl-10 h-12"
-                  />
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  {CITIES.map((city) => (
-                    <Link key={city} href={`/directory/${city.toLowerCase()}`}>
-                      <Badge variant="outline" className="h-8 px-3.5 text-sm cursor-pointer transition-colors hover:border-line-strong">
-                        {city}
-                      </Badge>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="hidden lg:block">
-              <Card>
-                <CardContent className="p-5 space-y-4">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-xs uppercase tracking-wider text-ink-muted font-medium">
-                      Network
-                    </span>
-                    <span className="font-display text-xl text-ink">4.6</span>
-                  </div>
-                  <div className="space-y-2">
-                    {[
-                      { label: "Restaurants", value: "142" },
-                      { label: "Reviews (30d)", value: "3,847" },
-                      { label: "QR scans today", value: "1,129" },
-                      { label: "Response rate", value: "92%", highlight: true },
-                    ].map((stat) => (
-                      <div key={stat.label} className="flex items-center justify-between py-0.5">
-                        <span className="text-sm text-ink-soft">{stat.label}</span>
-                        <span className={cn("font-tabular text-sm font-medium", stat.highlight ? "text-ink" : "text-ink")}>
-                          {stat.value}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="pt-2 border-t border-line">
-                    <Link href="/qr/demo">
-                      <Button variant="outline" size="sm" className="w-full">
-                        <QrCode className="w-4 h-4" />
-                        Try the demo QR
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+    <div className="min-h-screen bg-[#0A0A0A] text-[#F3F3F3] font-sans selection:bg-emerald-500 selection:text-white">
+      <Header />
+      
+      <main className="pt-24">
+        {/* HERO SECTION */}
+        <section className="relative min-h-[90vh] flex flex-col justify-center px-8 sm:px-16 lg:px-24">
+          <div className="absolute inset-0 z-0 opacity-40">
+            <img 
+              src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=2000&auto=format&fit=crop" 
+              alt="Restaurant background" 
+              className="w-full h-full object-cover grayscale mix-blend-overlay"
+            />
           </div>
-        </section>
-
-        {/* Featured */}
-        <section className="max-w-6xl mx-auto px-4 sm:px-6 py-12" id="directory">
-          <div className="flex items-end justify-between mb-6">
-            <div>
-              <Badge variant="dark" size="sm" className="mb-2">
-                Loved this week
-              </Badge>
-              <h2 className="font-display text-2xl sm:text-3xl text-ink tracking-tight">
-                Featured restaurants
-              </h2>
-            </div>
-            <Link href="/directory/kigali" className="text-sm text-ink-muted hover:text-ink transition-colors flex items-center gap-1">
-              View all <ArrowRight className="w-3 h-3" />
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {featured.map((r) => (
-              <RestaurantCard
-                key={r.id}
-                slug={r.slug}
-                name={r.name}
-                cityName={r.city?.name}
-                coverImageUrl={r.coverImageUrl}
-                logoUrl={r.logoUrl}
-                averageOverall={r.averageOverall}
-                reviewCount={r.reviewCount}
-                openingHours={r.openingHours}
-              />
-            ))}
-          </div>
-        </section>
-
-        {/* Recently Added */}
-        <section className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-          <div className="flex items-end justify-between mb-6">
-            <div>
-              <Badge variant="dark" size="sm" className="mb-2">
-                Just joined
-              </Badge>
-              <h2 className="font-display text-2xl sm:text-3xl text-ink tracking-tight">
-                Recently added
-              </h2>
-            </div>
-            <Link href="/directory/kigali" className="text-sm text-ink-muted hover:text-ink transition-colors flex items-center gap-1">
-              View all <ArrowRight className="w-3 h-3" />
-            </Link>
-          </div>
-          <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 sm:lg:grid-cols-4 sm:overflow-visible">
-            {recentlyAdded.map((r) => (
-              <div key={r.id} className="shrink-0 w-[260px] sm:w-auto sm:shrink">
-                <RestaurantCard
-                  slug={r.slug}
-                  name={r.name}
-                  cityName={r.city?.name}
-                  coverImageUrl={r.coverImageUrl}
-                  logoUrl={r.logoUrl}
-                  averageOverall={r.averageOverall}
-                  reviewCount={r.reviewCount}
-                  openingHours={r.openingHours}
-                  compact
-                />
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Full-bleed CTA */}
-        <section className="dark-section mt-8 py-16 sm:py-20 text-center">
-          <div className="max-w-lg mx-auto px-4 space-y-4">
-            <h2 className="font-display text-2xl sm:text-3xl text-[#fafaf8]">
-              Own a restaurant?
-            </h2>
-            <p className="text-sm text-[#9e9e9e] leading-relaxed">
-              Join Rwanda&apos;s fastest-growing dining platform. Digital menus, guest feedback, and staff insights — all in one place.
+          
+          <div className="relative z-10 max-w-4xl mix-blend-difference">
+            <h1 className="text-[12vw] sm:text-[8rem] font-black tracking-tighter leading-[0.8] uppercase mb-8">
+              The<br/><span className="text-emerald-500">Standard.</span>
+            </h1>
+            <p className="text-xl sm:text-2xl text-gray-300 font-medium max-w-2xl mb-12">
+              Elevate your dining experience. Explore curated venues, digital menus, and authentic reviews.
             </p>
-            <Button variant="outline" size="lg" className="mt-2 border-[#fafaf8]/30 text-[#fafaf8] hover:bg-[#fafaf8]/10">
-              Get started
-            </Button>
+            
+            <div className="flex flex-col sm:flex-row gap-6">
+              <Link 
+                href="/directory" 
+                className="bg-white text-black font-black uppercase tracking-widest px-8 py-5 hover:bg-emerald-500 hover:text-white transition-all flex items-center justify-center gap-3"
+              >
+                Explore Directory <ArrowRight size={20} />
+              </Link>
+              <Link 
+                href="/register" 
+                className="border-2 border-white text-white font-black uppercase tracking-widest px-8 py-5 hover:bg-white hover:text-black transition-all flex items-center justify-center"
+              >
+                For Restaurants
+              </Link>
+            </div>
           </div>
         </section>
+
+        {/* FEATURES GRID */}
+        <section className="py-24 border-y border-gray-800">
+          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-800">
+            {[
+              { icon: QrCode, title: "Scan & Dine", desc: "Instant access to digital menus via QR. No apps, no waiting." },
+              { icon: Star, title: "Authentic Reviews", desc: "Real feedback from verified diners shaping the culinary landscape." },
+              { icon: ChefHat, title: "Curated Venues", desc: "Discover the finest spots in the city, handpicked and vetted." }
+            ].map((feat, idx) => (
+              <div key={idx} className="p-12 hover:bg-gray-900/50 transition-colors group">
+                <feat.icon className="w-12 h-12 text-gray-600 group-hover:text-emerald-500 transition-colors mb-8" />
+                <h3 className="text-2xl font-black uppercase tracking-tight mb-4">{feat.title}</h3>
+                <p className="text-gray-400 font-medium">{feat.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* FEATURED RESTAURANTS */}
+        <section className="py-24 px-8 sm:px-16 lg:px-24">
+          <div className="flex justify-between items-end mb-16 border-b border-gray-800 pb-8">
+            <h2 className="text-4xl sm:text-5xl font-black tracking-tighter uppercase">
+              Featured<br/>Venues
+            </h2>
+            <Link href="/directory" className="text-sm font-bold uppercase tracking-widest text-emerald-500 hover:text-white transition-colors flex items-center gap-2">
+              View All <ArrowRight size={16} />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {featured.length === 0 ? (
+              <div className="col-span-full py-12 text-center text-gray-500 font-bold uppercase tracking-widest border border-dashed border-gray-800">
+                No featured venues currently available.
+              </div>
+            ) : (
+              featured.map((restaurant) => (
+                <Link href={`/r/${restaurant.slug}`} key={restaurant.id} className="group block">
+                  <div className="aspect-[4/5] bg-gray-900 relative mb-4 overflow-hidden border border-gray-800 group-hover:border-emerald-500 transition-colors">
+                    {restaurant.logoUrl ? (
+                      <img src={restaurant.logoUrl} alt={restaurant.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ChefHat className="w-16 h-16 text-gray-800" />
+                      </div>
+                    )}
+                    <div className="absolute top-4 left-4 bg-black/80 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur-sm">
+                      {restaurant.city.name}
+                    </div>
+                  </div>
+                  <h3 className="text-2xl font-black uppercase tracking-tight group-hover:text-emerald-500 transition-colors truncate">
+                    {restaurant.name}
+                  </h3>
+                  <p className="text-sm text-gray-500 uppercase tracking-wider font-medium truncate mt-1">
+                    {restaurant.address || "Location TBA"}
+                  </p>
+                </Link>
+              ))
+            )}
+          </div>
+        </section>
+
       </main>
-      <SiteFooter />
-    </>
+
+      <Footer />
+    </div>
   );
 }

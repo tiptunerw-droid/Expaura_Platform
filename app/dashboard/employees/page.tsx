@@ -1,7 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
-import { UsersRound, Plus } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { UsersRound } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";

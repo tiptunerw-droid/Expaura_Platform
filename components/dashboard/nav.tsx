@@ -17,7 +17,6 @@ import {
   LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { logout } from "@/lib/actions/auth";
 
 interface NavItem {
@@ -43,12 +42,16 @@ interface DashboardNavProps {
   userName?: string;
   userRole?: string;
   className?: string;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 function DashboardNav({
   userName = "Manager",
   userRole = "Restaurant Owner",
   className,
+  isOpen = false,
+  onClose,
 }: DashboardNavProps) {
   const pathname = usePathname();
 
@@ -66,19 +69,20 @@ function DashboardNav({
   return (
     <aside
       className={cn(
-        "hidden lg:flex lg:flex-col fixed left-0 top-0 w-64 h-screen bg-white border-r border-line z-30",
+        "fixed left-0 top-0 w-64 h-screen bg-[#0A0A0A] border-r border-gray-800 z-30 text-[#F3F3F3] selection:bg-emerald-500 selection:text-white transition-transform duration-300 ease-in-out",
+        isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         className
       )}
     >
-      <div className="h-16 flex items-center px-6 border-b border-line shrink-0">
+      <div className="h-20 flex items-center px-8 border-b border-gray-800 shrink-0">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <span className="font-display text-xl tracking-tight text-ink">
+          <span className="text-xl font-bold tracking-tighter uppercase">
             Expaura
           </span>
         </Link>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+      <nav className="flex-1 overflow-y-auto px-4 py-8 space-y-2">
         {navItems.map((item) => {
           const isActive =
             item.href === "/dashboard"
@@ -90,11 +94,12 @@ function DashboardNav({
             <Link
               key={item.href}
               href={item.href}
+              onClick={onClose}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded text-sm font-medium transition-colors",
+                "flex items-center gap-4 px-4 py-3 text-xs font-bold uppercase tracking-widest transition-all",
                 isActive
-                  ? "bg-ember-soft text-ember"
-                  : "text-ink-soft hover:bg-ceramic-deep hover:text-ink"
+                  ? "bg-white text-black"
+                  : "text-gray-500 hover:text-white hover:bg-gray-900"
               )}
             >
               <Icon className="w-4 h-4 shrink-0" />
@@ -104,25 +109,23 @@ function DashboardNav({
         })}
       </nav>
 
-      <div className="shrink-0 border-t border-line p-3">
-        <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-ceramic-deep">
-          <div className="flex items-center justify-center w-9 h-9 rounded-full bg-ember text-white text-sm font-semibold shrink-0">
+      <div className="shrink-0 border-t border-gray-800 p-4">
+        <div className="flex items-center gap-4 p-3 bg-gray-900">
+          <div className="flex items-center justify-center w-10 h-10 bg-emerald-500 text-black text-xs font-black shrink-0">
             {initials || "U"}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-ink truncate">{userName}</p>
-            <p className="text-xs text-ink-muted truncate">{userRole}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-white truncate">{userName}</p>
+            <p className="text-[9px] uppercase tracking-wider text-emerald-500 truncate">{userRole}</p>
           </div>
           <form action={handleLogout}>
-            <Button
-              variant="ghost"
-              size="icon"
+            <button
               type="submit"
-              className="h-8 w-8 text-ink-muted hover:text-ink"
+              className="h-8 w-8 text-gray-500 hover:text-red-500 transition-colors flex items-center justify-center"
               aria-label="Logout"
             >
               <LogOut className="w-4 h-4" />
-            </Button>
+            </button>
           </form>
         </div>
       </div>

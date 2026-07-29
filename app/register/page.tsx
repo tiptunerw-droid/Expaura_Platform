@@ -1,19 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-interface City {
-  id: string;
-  name: string;
-  region: string | null;
-  country: string;
-}
+const RWANDAN_CITIES = [
+  "Kigali", "Butare", "Gisenyi", "Musanze", "Ruhengeri",
+  "Muhanga", "Nyagatare", "Rusizi", "Nyamata", "Rwamagana",
+  "Kibuye", "Cyangugu", "Nyanza", "Kibungo", "Ruhango",
+];
 
 export default function RestaurantOwnerRegisterPage() {
   const router = useRouter();
-  const [cities, setCities] = useState<City[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,22 +20,10 @@ export default function RestaurantOwnerRegisterPage() {
     email: "",
     password: "",
     restaurantName: "",
-    cityId: "",
+    cityName: "Kigali",
     phone: "",
     address: "",
   });
-
-  useEffect(() => {
-    fetch("/api/cities")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.cities && data.cities.length > 0) {
-          setCities(data.cities);
-          setForm((prev) => ({ ...prev, cityId: data.cities[0].id }));
-        }
-      })
-      .catch((err) => console.error("Failed to load cities", err));
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +50,8 @@ export default function RestaurantOwnerRegisterPage() {
       setLoading(false);
     }
   };
+
+  const canSubmit = !loading && form.name && form.email && form.password && form.restaurantName;
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row-reverse bg-[#0A0A0A] text-[#F3F3F3] font-sans selection:bg-emerald-500 selection:text-white">
@@ -165,19 +153,15 @@ export default function RestaurantOwnerRegisterPage() {
                   </label>
                   <select
                     required
-                    value={form.cityId}
-                    onChange={(e) => setForm({ ...form, cityId: e.target.value })}
+                    value={form.cityName}
+                    onChange={(e) => setForm({ ...form, cityName: e.target.value })}
                     className="w-full bg-transparent border-b-2 border-gray-800 py-2 text-white focus:outline-none focus:border-emerald-500 transition-colors text-lg appearance-none rounded-none"
                   >
-                    {cities.length === 0 ? (
-                      <option value="" className="bg-[#0A0A0A]">Loading...</option>
-                    ) : (
-                      cities.map((city) => (
-                        <option key={city.id} value={city.id} className="bg-[#111]">
-                          {city.name}
-                        </option>
-                      ))
-                    )}
+                    {RWANDAN_CITIES.map((city) => (
+                      <option key={city} value={city} className="bg-[#111]">
+                        {city}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -211,7 +195,7 @@ export default function RestaurantOwnerRegisterPage() {
 
             <button
               type="submit"
-              disabled={loading || !form.cityId}
+              disabled={!canSubmit}
               className="w-full bg-white text-black font-bold uppercase tracking-widest py-4 hover:bg-emerald-500 hover:text-white transition-all duration-300 disabled:opacity-50 mt-8"
             >
               {loading ? "Creating..." : "Initialize"}

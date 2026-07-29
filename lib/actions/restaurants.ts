@@ -228,6 +228,10 @@ export async function getManagerRestaurant() {
     include: {
       city: true,
       branches: true,
+      qrCodes: {
+        where: { isActive: true },
+        orderBy: { createdAt: "desc" },
+      },
       subscriptions: {
         orderBy: { createdAt: "desc" },
         take: 1,

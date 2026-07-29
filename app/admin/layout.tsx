@@ -14,11 +14,9 @@ import {
   Search,
   Bell,
   ChevronDown,
+  Menu,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { getCurrentUser, logout } from "@/lib/actions/auth";
 
 interface NavItem {
@@ -36,7 +34,7 @@ const navItems: NavItem[] = [
   { href: "/admin/profile", label: "Profile", icon: Settings },
 ];
 
-function AdminSidebar({ userName }: { userName: string }) {
+function AdminSidebar({ userName, isOpen, onClose }: { userName: string; isOpen?: boolean; onClose?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -54,19 +52,24 @@ function AdminSidebar({ userName }: { userName: string }) {
     .toUpperCase();
 
   return (
-    <aside className="hidden lg:flex lg:flex-col fixed left-0 top-0 w-64 h-screen bg-white border-r border-line z-30">
-      <div className="px-6 pt-5 pb-2 border-b border-line shrink-0">
-        <Badge variant="brass" size="sm" className="mb-3">
+    <aside
+      className={cn(
+        "fixed left-0 top-0 w-64 h-screen bg-[#0A0A0A] border-r border-gray-800 z-30 text-[#F3F3F3] selection:bg-purple-600 selection:text-white transition-transform duration-300 ease-in-out flex flex-col",
+        isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      )}
+    >
+      <div className="h-20 flex flex-col justify-center px-8 border-b border-gray-800 shrink-0">
+        <span className="text-[8px] font-black uppercase tracking-[0.2em] text-purple-500 bg-purple-500/10 px-2 py-0.5 w-max mb-1">
           Platform Admin
-        </Badge>
+        </span>
         <Link href="/admin" className="flex items-center gap-2">
-          <span className="font-display text-xl tracking-tight text-ink">
+          <span className="text-xl font-bold tracking-tighter uppercase">
             Expaura
           </span>
         </Link>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+      <nav className="flex-1 overflow-y-auto px-4 py-8 space-y-2">
         {navItems.map((item) => {
           const isActive =
             item.href === "/admin"
@@ -78,11 +81,12 @@ function AdminSidebar({ userName }: { userName: string }) {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onClose}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded text-sm font-medium transition-colors",
+                "flex items-center gap-4 px-4 py-3 text-xs font-bold uppercase tracking-widest transition-all",
                 isActive
-                  ? "bg-ember-soft text-ember"
-                  : "text-ink-soft hover:bg-ceramic-deep hover:text-ink"
+                  ? "bg-white text-black"
+                  : "text-gray-500 hover:text-white hover:bg-gray-900"
               )}
             >
               <Icon className="w-4 h-4 shrink-0" />
@@ -92,25 +96,23 @@ function AdminSidebar({ userName }: { userName: string }) {
         })}
       </nav>
 
-      <div className="shrink-0 border-t border-line p-3">
-        <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-ceramic-deep">
-          <div className="flex items-center justify-center w-9 h-9 rounded-full bg-ember text-white text-sm font-semibold shrink-0">
+      <div className="shrink-0 border-t border-gray-800 p-4">
+        <div className="flex items-center gap-4 p-3 bg-gray-900">
+          <div className="flex items-center justify-center w-10 h-10 bg-purple-600 text-white text-xs font-black shrink-0">
             {initials || "U"}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-ink truncate">{userName}</p>
-            <p className="text-xs text-ink-muted truncate">Super Admin</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-white truncate">{userName}</p>
+            <p className="text-[9px] uppercase tracking-wider text-purple-500 truncate">Super Admin</p>
           </div>
           <form action={handleLogout}>
-            <Button
-              variant="ghost"
-              size="icon"
+            <button
               type="submit"
-              className="h-8 w-8 text-ink-muted hover:text-ink"
+              className="h-8 w-8 text-gray-500 hover:text-red-500 transition-colors flex items-center justify-center"
               aria-label="Logout"
             >
               <LogOut className="w-4 h-4" />
-            </Button>
+            </button>
           </form>
         </div>
       </div>
@@ -122,12 +124,14 @@ interface AdminHeaderProps {
   title: string;
   breadcrumbs?: { label: string; href?: string }[];
   userName: string;
+  onMenuToggle?: () => void;
 }
 
 function AdminHeader({
   title,
   breadcrumbs = [{ label: "Admin" }],
   userName,
+  onMenuToggle,
 }: AdminHeaderProps) {
   const [menuOpen, setMenuOpen] = React.useState(false);
 
@@ -139,65 +143,70 @@ function AdminHeader({
     .toUpperCase();
 
   return (
-    <header className="sticky top-0 z-20 h-16 bg-white/80 backdrop-blur-md border-b border-line flex items-center pl-64">
-      <div className="flex-1 min-w-0 flex items-center gap-4 px-6">
+    <header className="sticky top-0 z-20 h-20 bg-[#0A0A0A] border-b border-gray-800 flex items-center justify-between text-[#F3F3F3]">
+      <div className="flex-1 min-w-0 flex items-center gap-4 px-4 sm:px-8">
+        {onMenuToggle && (
+          <button 
+            onClick={onMenuToggle}
+            className="lg:hidden p-2 text-gray-500 hover:text-white transition-colors"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        )}
         <div className="min-w-0">
-          <div className="flex items-center gap-1.5 text-xs text-ink-muted mb-0.5">
+          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-purple-500 mb-1">
             {breadcrumbs.map((crumb, i) => (
               <React.Fragment key={crumb.label}>
-                {i > 0 && <span>/</span>}
+                {i > 0 && <span className="text-gray-700">/</span>}
                 <span className="truncate">{crumb.label}</span>
               </React.Fragment>
             ))}
           </div>
-          <h1 className="font-display text-lg text-ink truncate">{title}</h1>
+          <h1 className="text-3xl font-black uppercase tracking-tighter truncate">{title}</h1>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 px-6">
-        <div className="hidden md:block relative w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted pointer-events-none" />
-          <Input
+      <div className="flex items-center gap-4 px-8">
+        <div className="hidden md:block relative w-64 group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-purple-500 transition-colors" />
+          <input
             type="search"
-            placeholder="Search..."
-            className="pl-9 h-9 bg-ceramic-deep/50 border-transparent focus:border-brass"
+            placeholder="SEARCH..."
+            className="w-full pl-10 pr-4 py-2 bg-transparent border-b-2 border-gray-800 focus:outline-none focus:border-purple-500 text-white placeholder-gray-700 text-xs font-bold uppercase tracking-widest transition-colors"
           />
         </div>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 relative"
+        <button
+          className="relative p-2 text-gray-500 hover:text-white transition-colors"
           aria-label="Notifications"
         >
-          <Bell className="w-4 h-4 text-ink-soft" />
-          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-ember" />
-        </Button>
+          <Bell className="w-5 h-5" />
+          <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-purple-500" />
+        </button>
 
         <div className="relative">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-9 gap-2 pl-1 pr-2"
+          <button
+            className="flex items-center gap-2 pl-2 pr-1 h-10 border border-gray-800 hover:border-purple-500 transition-colors bg-gray-900"
             onClick={() => setMenuOpen((v) => !v)}
             aria-expanded={menuOpen}
             aria-haspopup="true"
           >
-            <span className="flex items-center justify-center w-7 h-7 rounded-full bg-brass text-white text-xs font-semibold">
+            <span className="flex items-center justify-center w-6 h-6 bg-purple-600 text-white text-xs font-black">
               {initials || "U"}
             </span>
-            <ChevronDown className="w-3.5 h-3.5 text-ink-muted" />
-          </Button>
+            <ChevronDown className="w-4 h-4 text-gray-500" />
+          </button>
+          
           {menuOpen && (
             <>
               <div
                 className="fixed inset-0 z-10"
                 onClick={() => setMenuOpen(false)}
               />
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-line py-1 z-20">
+              <div className="absolute right-0 mt-2 w-48 bg-[#0A0A0A] border border-gray-800 z-20">
                 <Link
                   href="/admin/profile"
-                  className="block w-full text-left px-3 py-2 text-sm text-ink-soft hover:bg-ceramic-deep"
+                  className="block w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-widest text-gray-400 hover:bg-gray-900 hover:text-white transition-colors"
                   onClick={() => setMenuOpen(false)}
                 >
                   Profile Settings
@@ -226,6 +235,7 @@ export default function AdminLayout({
     userName: "",
   });
   const [loading, setLoading] = React.useState(true);
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -267,18 +277,35 @@ export default function AdminLayout({
       return <>{children}</>;
     }
     return (
-      <div className="min-h-screen bg-ceramic flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-line border-t-ember animate-spin" />
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full border-4 border-gray-800 border-t-purple-600 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-ceramic">
-      <AdminSidebar userName={authState.userName} />
+    <div className="min-h-screen bg-[#0A0A0A] text-[#F3F3F3] selection:bg-purple-600 selection:text-white">
+      <AdminSidebar 
+        userName={authState.userName} 
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+
+      {/* Mobile backdrop */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/80 z-20 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       <div className="lg:pl-64">
-        <AdminHeader title="Platform Admin" userName={authState.userName} />
-        <main className="p-6">{children}</main>
+        <AdminHeader 
+          title="Platform Admin" 
+          userName={authState.userName} 
+          onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
+        />
+        <main className="p-4 sm:p-8">{children}</main>
       </div>
     </div>
   );

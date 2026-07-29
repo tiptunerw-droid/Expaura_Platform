@@ -4,7 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { addGalleryImage } from "@/lib/actions/gallery";
@@ -40,12 +40,10 @@ export function GalleryImageUpload() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="primary" size="sm">
-          <Plus className="w-4 h-4" />
-          Add photo
-        </Button>
-      </DialogTrigger>
+      <Button variant="primary" size="sm" onClick={() => setOpen(true)}>
+        <Plus className="w-4 h-4" />
+        Add photo
+      </Button>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add gallery photo</DialogTitle>

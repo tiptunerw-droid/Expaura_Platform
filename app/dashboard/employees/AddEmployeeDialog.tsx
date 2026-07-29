@@ -4,7 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { UserPlus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { addEmployee } from "@/lib/actions/employees";
@@ -43,12 +43,10 @@ export function AddEmployeeDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="primary" size="sm">
-          <UserPlus className="w-4 h-4" />
-          Add employee
-        </Button>
-      </DialogTrigger>
+      <Button variant="primary" size="sm" onClick={() => setOpen(true)}>
+        <UserPlus className="w-4 h-4" />
+        Add employee
+      </Button>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add employee</DialogTitle>
