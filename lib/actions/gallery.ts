@@ -64,6 +64,7 @@ export async function updateGalleryImage(id: string, form: z.infer<typeof update
     throw new Error("Unauthorized");
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: any = {};
   if (valid.data.caption !== undefined) data.caption = valid.data.caption;
 

@@ -300,7 +300,7 @@ export default async function RestaurantPublicPage({ params, searchParams }: Pro
               Get your restaurant on Expaura
             </h2>
             <p className="text-sm text-gray-400 leading-relaxed">
-              Join Rwanda's fastest-growing dining platform. Digital menus, guest feedback, and staff insights — all in one place.
+              Join Rwanda&apos;s fastest-growing dining platform. Digital menus, guest feedback, and staff insights — all in one place.
             </p>
             <Button variant="outline" size="lg" className="mt-2 border-gray-700 text-[#F3F3F3] hover:bg-gray-800">
               List your restaurant

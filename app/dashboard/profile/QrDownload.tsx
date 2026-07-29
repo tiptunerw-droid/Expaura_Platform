@@ -24,21 +24,16 @@ export function QrDisplay({ qrCodes, slug }: Props) {
   const [qrDataUrl, setQrDataUrl] = React.useState<string | null>(null);
 
   const latest = qrCodes[0];
-  const [baseUrl, setBaseUrl] = React.useState("");
+  const [baseUrl] = React.useState(() =>
+    typeof window !== "undefined" ? window.location.origin : ""
+  );
 
   React.useEffect(() => {
-    setBaseUrl(window.location.origin);
-  }, []);
-
-  React.useEffect(() => {
-    if (latest && baseUrl) {
-      const url = `${baseUrl}/q/${latest.code}`;
-      QRCode.toDataURL(url, { width: 400, margin: 2, color: { dark: "#1a1a1a", light: "#ffffff" } })
-        .then(setQrDataUrl)
-        .catch(console.error);
-    } else {
-      setQrDataUrl(null);
-    }
+    if (!latest || !baseUrl) return;
+    const url = `${baseUrl}/q/${latest.code}`;
+    QRCode.toDataURL(url, { width: 400, margin: 2, color: { dark: "#1a1a1a", light: "#ffffff" } })
+      .then(setQrDataUrl)
+      .catch(console.error);
   }, [latest, baseUrl]);
 
   const handleGenerate = async () => {

@@ -84,6 +84,7 @@ export async function listRestaurantComplaints(input: z.infer<typeof listComplai
 
   const { status, categoryId, employeeId, branchId, from, to } = valid.data;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: any = { restaurantId: session.activeRestaurantId };
   if (status) where.status = status;
   if (categoryId) where.categoryId = categoryId;
@@ -127,6 +128,7 @@ export async function updateComplaintStatus(input: z.infer<typeof updateStatusSc
     throw new Error("Unauthorized");
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: any = { status };
   if (managerNote !== undefined) data.managerNote = managerNote;
   if (status === ComplaintStatus.RESOLVED || status === ComplaintStatus.REJECTED) {

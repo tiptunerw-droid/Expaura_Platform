@@ -78,6 +78,7 @@ export async function updateBranch(id: string, form: z.infer<typeof updateBranch
     throw new Error("Unauthorized");
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: any = {};
   for (const [key, value] of Object.entries(valid.data)) {
     if (value !== undefined) data[key] = value;

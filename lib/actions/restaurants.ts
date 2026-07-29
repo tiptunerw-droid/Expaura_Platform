@@ -140,6 +140,7 @@ export async function listDirectory(input: z.infer<typeof listDirectorySchema>) 
 
   const { cityName, search, minRating } = valid.data;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: any = { isActive: true };
   if (cityName) where.city = { name: { contains: cityName, mode: "insensitive" } };
   if (search) where.name = { contains: search, mode: "insensitive" };
@@ -274,6 +275,7 @@ export async function updateRestaurantProfile(form: z.infer<typeof updateRestaur
     throw new Error(valid.error.issues[0]?.message || "Validation failed");
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: any = {};
   for (const [key, value] of Object.entries(valid.data)) {
     if (value !== undefined) data[key] = value;

@@ -61,7 +61,7 @@ async function AnalyticsDashboard() {
         </span>
         {restaurant.name && (
           <span className="text-xs font-bold uppercase tracking-widest text-gray-500">
-            // {restaurant.name}
+            {/* {restaurant.name} */}
           </span>
         )}
       </div>

@@ -16,7 +16,7 @@ export async function proxy(request: NextRequest) {
 
   const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
   const session = token ? await decryptSession(token).catch(() => null) : null;
-  let response = NextResponse.next();
+  const response = NextResponse.next();
 
   // STRICT ADMIN RULE:
   // If the user is a SUPER_ADMIN and navigates to ANY page outside of the admin portals (/admin, /dashboard, etc)

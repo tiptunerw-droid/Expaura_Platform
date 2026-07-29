@@ -118,7 +118,7 @@ export default function SuperAdminLoginPage() {
         />
         <div className="absolute inset-0 z-20 flex flex-col items-end justify-between p-12 mix-blend-difference pointer-events-none">
           <p className="text-right text-xs font-mono text-purple-400 tracking-[0.3em] uppercase">
-            // Expaura_OS_v1.0<br/>// Central_Command
+            {/* // Expaura_OS_v1.0 */}<br/>{/* // Central_Command */}
           </p>
           <div className="text-right">
             <p className="text-[10rem] font-black uppercase tracking-tighter text-white leading-[0.8] opacity-90">

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, Loader2, CheckCircle, Clock, XCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { updateComplaintStatus } from "@/lib/actions/complaints";
+import { ComplaintStatus } from "@/generated/prisma/client";
 
 const statusFlow = ["PENDING", "IN_PROGRESS", "RESOLVED", "REJECTED"];
 
@@ -36,7 +37,7 @@ export function UpdateComplaintStatus({ complaintId, currentStatus }: Props) {
   const handleUpdate = async (status: string) => {
     setSending(true);
     try {
-      await updateComplaintStatus({ id: complaintId, status: status as any });
+      await updateComplaintStatus({ id: complaintId, status: status as ComplaintStatus });
       router.refresh();
     } catch (e) {
       console.error(e);

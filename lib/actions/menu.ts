@@ -26,6 +26,7 @@ export async function listMenuImages(restaurantId: string, branchId?: string) {
     if (!bidValid.success) throw new Error("Invalid branch ID");
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: any = { restaurantId: ridValid.data };
   if (branchId) where.branchId = branchId;
   if (!branchId) where.branchId = null;
@@ -49,6 +50,7 @@ export async function addMenuImage(form: z.infer<typeof addMenuImageSchema>) {
 
   let position = valid.data.position;
   if (position === undefined) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: any = { restaurantId: session.activeRestaurantId };
     if (valid.data.branchId) where.branchId = valid.data.branchId;
     else where.branchId = null;

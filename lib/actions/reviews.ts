@@ -81,6 +81,7 @@ export async function listRestaurantReviews(input: z.infer<typeof listReviewsSch
 
   const { restaurantId, minRating, from, to, limit } = valid.data;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: any = { restaurantId };
   if (minRating != null) where.overallRating = { gte: minRating };
   if (from || to) {

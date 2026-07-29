@@ -104,7 +104,7 @@ export default function SharedLoginPage() {
           </form>
 
           <div className="mt-12 text-sm text-gray-500 font-medium">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/register" className="text-white hover:text-[#4F46E5] transition-colors underline decoration-2 underline-offset-4">
               Register Restaurant
             </Link>

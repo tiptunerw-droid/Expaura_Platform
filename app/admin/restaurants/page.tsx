@@ -18,7 +18,7 @@ export default async function AdminRestaurantsPage({
   searchParams: Promise<{ city?: string; plan?: string; status?: string }>;
 }) {
   const sp = await searchParams;
-  const where: any = {};
+  const where: Record<string, unknown> = {};
 
   if (sp.status === "active") where.isActive = true;
   else if (sp.status === "inactive") where.isActive = false;

@@ -84,6 +84,7 @@ export async function updateEmployee(id: string, form: z.infer<typeof updateEmpl
     throw new Error("Unauthorized");
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: any = {};
   for (const [key, value] of Object.entries(valid.data)) {
     if (value !== undefined) data[key] = value;

@@ -292,7 +292,7 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
                   {filtered.map((r, idx) => {
                     const { open, label } = isRestaurantOpen(r.openingHours);
                     const hasRating = r.reviewCount > 0;
-                    const snippet = (r as any).reviews?.[0]?.comment || null;
+                    const snippet = (r as { reviews?: { comment: string }[] }).reviews?.[0]?.comment || null;
                     const price = priceLevel(r.reviewCount);
                     const isTopRated = hasRating && r.averageOverall >= 4.5 && r.reviewCount >= 20;
                     const isTravelersChoice = hasRating && r.averageOverall >= 4.0 && r.reviewCount >= 50;
