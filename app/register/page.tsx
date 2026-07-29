@@ -1,15 +1,20 @@
 "use client";
 
-import React, { useState, useEffect, useTransition } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getCities, type City } from "@/lib/actions/data";
-import { registerRestaurantOwner } from "@/lib/actions/auth";
+
+interface City {
+  id: string;
+  name: string;
+  region: string | null;
+  country: string;
+}
 
 export default function RestaurantOwnerRegisterPage() {
   const router = useRouter();
   const [cities, setCities] = useState<City[]>([]);
-  const [isPending, startTransition] = useTransition();
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [form, setForm] = useState({
@@ -23,178 +28,217 @@ export default function RestaurantOwnerRegisterPage() {
   });
 
   useEffect(() => {
-    getCities().then((data) => {
-      if (data.cities && data.cities.length > 0) {
-        setCities(data.cities);
-        setForm((prev) => ({ ...prev, cityId: data.cities[0].id }));
-      }
-    });
+    fetch("/api/cities")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.cities && data.cities.length > 0) {
+          setCities(data.cities);
+          setForm((prev) => ({ ...prev, cityId: data.cities[0].id }));
+        }
+      })
+      .catch((err) => console.error("Failed to load cities", err));
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
 
-    startTransition(async () => {
-      try {
-        const result = await registerRestaurantOwner(form);
-        router.push(result.redirectUrl);
-        router.refresh();
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Something went wrong");
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Registration failed");
       }
-    });
+
+      router.push("/dashboard");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Glow backgrounds */}
-      <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-indigo-600/15 blur-[140px] rounded-full pointer-events-none"></div>
-      <div className="absolute bottom-10 left-10 w-[350px] h-[350px] bg-emerald-600/15 blur-[120px] rounded-full pointer-events-none"></div>
+    <div className="min-h-screen flex flex-col lg:flex-row-reverse bg-[#0A0A0A] text-[#F3F3F3] font-sans selection:bg-emerald-500 selection:text-white">
+      {/* Right Panel - Form */}
+      <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-16 lg:px-24 py-12 relative z-10 overflow-y-auto max-h-screen">
+        <div className="max-w-md w-full mx-auto pb-12">
+          <div className="mb-12 mt-8 lg:mt-0">
+            <span className="text-xl font-bold tracking-tighter uppercase border-b-2 border-emerald-500 pb-1">
+              Expaura
+            </span>
+          </div>
+          
+          <h1 className="text-4xl sm:text-5xl font-black tracking-tighter leading-none mb-4 uppercase">
+            Start<br/><span className="text-emerald-500">Different.</span>
+          </h1>
+          <p className="text-lg text-gray-400 mb-10 max-w-sm">
+            Register your restaurant to digitize your menu and track customer experiences.
+          </p>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-lg z-10 text-center">
-        <span className="text-3xl font-black bg-gradient-to-r from-emerald-400 via-teal-400 to-indigo-400 bg-clip-text text-transparent">
-          Expaura
-        </span>
-        <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-100">
-          Register Your Restaurant
-        </h2>
-        <p className="mt-1 text-sm text-slate-400">
-          Digitize your menu, gather customer feedback, and grow your business
-        </p>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-lg z-10 px-4">
-        <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 py-8 px-6 shadow-2xl rounded-2xl sm:px-10">
-          <form className="space-y-5" onSubmit={handleSubmit}>
+          <form className="space-y-10" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm">
+              <div className="bg-red-500/10 border-l-4 border-red-500 text-red-400 px-4 py-3 text-sm font-medium">
                 {error}
               </div>
             )}
 
-            <div className="border-b border-slate-800 pb-4">
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-3">
-                1. Owner Account Details
+            <div className="space-y-6">
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-emerald-500/80 mb-2">
+                01. Owner Details
               </h3>
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-300">Your Full Name</label>
-                  <input
-                    type="text"
-                    required
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    placeholder="Jean Paul Habimana"
-                    className="mt-1 block w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-                  />
-                </div>
+              
+              <div className="space-y-2 group">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 group-focus-within:text-white transition-colors">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="Jean Paul"
+                  className="w-full bg-transparent border-b-2 border-gray-800 py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
+                />
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-300">Email Address</label>
-                  <input
-                    type="email"
-                    required
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    placeholder="owner@restaurant.rw"
-                    className="mt-1 block w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-                  />
-                </div>
+              <div className="space-y-2 group">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 group-focus-within:text-white transition-colors">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="owner@restaurant.rw"
+                  className="w-full bg-transparent border-b-2 border-gray-800 py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
+                />
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-300">Password</label>
-                  <input
-                    type="password"
-                    required
-                    minLength={8}
-                    value={form.password}
-                    onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    placeholder="••••••••••••"
-                    className="mt-1 block w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-                  />
-                </div>
+              <div className="space-y-2 group">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 group-focus-within:text-white transition-colors">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  minLength={8}
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  placeholder="••••••••"
+                  className="w-full bg-transparent border-b-2 border-gray-800 py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
+                />
               </div>
             </div>
 
-            <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-emerald-400 mb-3">
-                2. Restaurant Details
+            <div className="space-y-6 pt-4">
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-emerald-500/80 mb-2">
+                02. Restaurant Details
               </h3>
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-300">Restaurant Name</label>
-                  <input
-                    type="text"
+              
+              <div className="space-y-2 group">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 group-focus-within:text-white transition-colors">
+                  Restaurant Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={form.restaurantName}
+                  onChange={(e) => setForm({ ...form, restaurantName: e.target.value })}
+                  placeholder="Cafe Kigali"
+                  className="w-full bg-transparent border-b-2 border-gray-800 py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2 group">
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 group-focus-within:text-white transition-colors">
+                    City
+                  </label>
+                  <select
                     required
-                    value={form.restaurantName}
-                    onChange={(e) => setForm({ ...form, restaurantName: e.target.value })}
-                    placeholder="Bourbon Coffee Kigali"
-                    className="mt-1 block w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-                  />
+                    value={form.cityId}
+                    onChange={(e) => setForm({ ...form, cityId: e.target.value })}
+                    className="w-full bg-transparent border-b-2 border-gray-800 py-2 text-white focus:outline-none focus:border-emerald-500 transition-colors text-lg appearance-none rounded-none"
+                  >
+                    {cities.length === 0 ? (
+                      <option value="" className="bg-[#0A0A0A]">Loading...</option>
+                    ) : (
+                      cities.map((city) => (
+                        <option key={city.id} value={city.id} className="bg-[#111]">
+                          {city.name}
+                        </option>
+                      ))
+                    )}
+                  </select>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300">City</label>
-                    <select
-                      required
-                      value={form.cityId}
-                      onChange={(e) => setForm({ ...form, cityId: e.target.value })}
-                      className="mt-1 block w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-                    >
-                      {cities.length === 0 ? (
-                        <option value="">Loading cities...</option>
-                      ) : (
-                        cities.map((city) => (
-                          <option key={city.id} value={city.id}>
-                            {city.name} ({city.country})
-                          </option>
-                        ))
-                      )}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300">Phone Number</label>
-                    <input
-                      type="tel"
-                      value={form.phone}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      placeholder="+250 788 123 456"
-                      className="mt-1 block w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-300">Physical Address</label>
+                <div className="space-y-2 group">
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 group-focus-within:text-white transition-colors">
+                    Phone
+                  </label>
                   <input
-                    type="text"
-                    value={form.address}
-                    onChange={(e) => setForm({ ...form, address: e.target.value })}
-                    placeholder="KG 7 Ave, Nyarugenge"
-                    className="mt-1 block w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+                    type="tel"
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    placeholder="+250 788"
+                    className="w-full bg-transparent border-b-2 border-gray-800 py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2 group">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 group-focus-within:text-white transition-colors">
+                  Address
+                </label>
+                <input
+                  type="text"
+                  value={form.address}
+                  onChange={(e) => setForm({ ...form, address: e.target.value })}
+                  placeholder="KG 7 Ave"
+                  className="w-full bg-transparent border-b-2 border-gray-800 py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
+                />
               </div>
             </div>
 
             <button
               type="submit"
-              disabled={isPending || !form.cityId}
-              className="w-full py-3 px-4 border border-transparent rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg shadow-emerald-600/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 disabled:opacity-50"
+              disabled={loading || !form.cityId}
+              className="w-full bg-white text-black font-bold uppercase tracking-widest py-4 hover:bg-emerald-500 hover:text-white transition-all duration-300 disabled:opacity-50 mt-8"
             >
-              {isPending ? "Registering Restaurant..." : "Create Account & Restaurant"}
+              {loading ? "Creating..." : "Initialize"}
             </button>
           </form>
 
-          <div className="mt-6 border-t border-slate-800 pt-6 text-center text-sm text-slate-400">
-            Already have an account?{" "}
-            <Link href="/login" className="font-medium text-emerald-400 hover:underline">
-              Sign In
+          <div className="mt-12 text-sm text-gray-500 font-medium">
+            Already registered?{" "}
+            <Link href="/login" className="text-white hover:text-emerald-500 transition-colors underline decoration-2 underline-offset-4">
+              Enter Dashboard
             </Link>
           </div>
+        </div>
+      </div>
+
+      {/* Left Panel - Image */}
+      <div className="hidden lg:block lg:w-1/2 relative bg-black">
+        <div className="absolute inset-0 bg-black/30 z-10" />
+        <img 
+          src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1974&auto=format&fit=crop" 
+          alt="Restaurant Ambiance" 
+          className="absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 ease-in-out opacity-80"
+        />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 mix-blend-overlay w-full text-center pointer-events-none">
+          <p className="text-[12rem] font-black uppercase tracking-tighter text-white opacity-20 leading-none">
+            EXP
+          </p>
         </div>
       </div>
     </div>

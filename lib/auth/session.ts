@@ -21,7 +21,7 @@ export async function encryptSession(payload: SessionPayload): Promise<string> {
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("7d")
+    .setExpirationTime("10m")
     .sign(JWT_SECRET);
 }
 
@@ -44,7 +44,7 @@ export async function setSessionCookie(payload: SessionPayload): Promise<void> {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: 7 * 24 * 60 * 60, // 7 days
+    maxAge: 10 * 60, // 10 minutes
   });
 }
 

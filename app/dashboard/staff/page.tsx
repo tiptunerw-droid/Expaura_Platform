@@ -1,0 +1,86 @@
+import * as React from "react";
+import Link from "next/link";
+import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/auth/session";
+import { Users, Plus, Mail } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { EmptyState } from "@/components/ui/empty-state";
+import { formatDate } from "@/lib/utils";
+import { InviteStaffDialog } from "./InviteStaffDialog";
+
+export const metadata = { title: "Staff" };
+
+export default async function StaffPage() {
+  const session = await getSession();
+  if (!session?.activeRestaurantId) {
+    return <div className="flex flex-col items-center justify-center py-20"><Link href="/login"><Button>Log in</Button></Link></div>;
+  }
+
+  const staff = await prisma.restaurantStaff.findMany({
+    where: { restaurantId: session.activeRestaurantId },
+    include: {
+      user: { select: { id: true, name: true, email: true, lastLogin: true } },
+      role: true,
+      inviter: { select: { name: true } },
+    },
+    orderBy: { joinedAt: "desc" },
+  });
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="font-display text-xl text-ink">Staff</h2>
+          <p className="text-sm text-ink-muted mt-0.5">{staff.length} member{staff.length !== 1 ? "s" : ""}</p>
+        </div>
+        <InviteStaffDialog />
+      </div>
+
+      {staff.length > 0 ? (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Joined</TableHead>
+              <TableHead>Last login</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {staff.map((s) => (
+              <TableRow key={s.id}>
+                <TableCell className="font-medium text-ink">{s.user.name}</TableCell>
+                <TableCell className="text-sm">{s.user.email}</TableCell>
+                <TableCell>
+                  <Badge variant="outline" size="sm">{s.role.name}</Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant={s.isActive ? "herb" : "default"} size="sm">
+                    {s.isActive ? "Active" : "Inactive"}
+                  </Badge>
+                </TableCell>
+                <TableCell className="font-tabular text-xs">{formatDate(s.joinedAt)}</TableCell>
+                <TableCell className="font-tabular text-xs">
+                  {s.user.lastLogin ? formatDate(s.user.lastLogin) : "Never"}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      ) : (
+        <EmptyState
+          icon={<Users className="w-full h-full" />}
+          variant="neutral"
+          title="No staff yet"
+          description="Invite your team members to help manage the restaurant."
+          action={<InviteStaffDialog />}
+        />
+      )}
+    </div>
+  );
+}

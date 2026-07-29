@@ -1,96 +1,129 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { superAdminLogin } from "@/lib/actions/auth";
 
 export default function SuperAdminLoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
-  const [isPending, startTransition] = useTransition();
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
 
-    startTransition(async () => {
-      try {
-        const result = await superAdminLogin(form);
-        router.push(result.redirectUrl);
-        router.refresh();
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Something went wrong");
+    try {
+      const res = await fetch("/api/auth/super-admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Login failed");
       }
-    });
+
+      router.push("/admin");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/20 blur-[120px] rounded-full pointer-events-none"></div>
+    <div className="min-h-screen flex flex-col lg:flex-row bg-[#0A0A0A] text-[#F3F3F3] font-sans selection:bg-purple-600 selection:text-white">
+      <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-16 lg:px-24 py-12 relative z-10">
+        <div className="max-w-md w-full mx-auto">
+          <div className="mb-16 flex items-center justify-between">
+            <span className="text-xl font-bold tracking-tighter uppercase border-b-2 border-white pb-1">
+              Expaura
+            </span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-purple-500 bg-purple-500/10 px-3 py-1 border border-purple-500/20">
+              System Access
+            </span>
+          </div>
+          
+          <h1 className="text-5xl sm:text-6xl font-black tracking-tighter leading-none mb-4 uppercase">
+            Admin<br/><span className="text-purple-600">Control.</span>
+          </h1>
+          <p className="text-lg text-gray-400 mb-12 max-w-sm">
+            Access the core platform administration and global analytics engine.
+          </p>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md z-10">
-        <div className="flex justify-center mb-4">
-          <span className="text-3xl font-extrabold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Expaura Admin
-          </span>
-        </div>
-        <h2 className="text-center text-2xl font-bold tracking-tight text-slate-100">
-          Super Admin Login
-        </h2>
-        <p className="mt-2 text-center text-sm text-slate-400">
-          Access Platform Operations & Analytics
-        </p>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md z-10 px-4">
-        <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 py-8 px-6 shadow-2xl rounded-2xl sm:px-10">
-          <form className="space-y-5" onSubmit={handleSubmit}>
+          <form className="space-y-8" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm">
+              <div className="bg-red-500/10 border-l-4 border-red-500 text-red-400 px-4 py-3 text-sm font-medium">
                 {error}
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-medium text-slate-300">Admin Email</label>
+            <div className="space-y-2 group">
+              <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 group-focus-within:text-white transition-colors">
+                Admin Email
+              </label>
               <input
                 type="email"
                 required
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 placeholder="admin@expaura.rw"
-                className="mt-1 block w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                className="w-full bg-transparent border-b-2 border-gray-800 py-3 text-white placeholder-gray-700 focus:outline-none focus:border-purple-600 transition-colors text-lg"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-300">Password</label>
+            <div className="space-y-2 group">
+              <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 group-focus-within:text-white transition-colors">
+                Password
+              </label>
               <input
                 type="password"
                 required
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 placeholder="••••••••••••"
-                className="mt-1 block w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                className="w-full bg-transparent border-b-2 border-gray-800 py-3 text-white placeholder-gray-700 focus:outline-none focus:border-purple-600 transition-colors text-lg"
               />
             </div>
 
             <button
               type="submit"
-              disabled={isPending}
-              className="w-full py-3 px-4 border border-transparent rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-600/25 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 disabled:opacity-50"
+              disabled={loading}
+              className="w-full bg-white text-black font-bold uppercase tracking-widest py-4 hover:bg-purple-600 hover:text-white transition-all duration-300 disabled:opacity-50 mt-4"
             >
-              {isPending ? "Signing in..." : "Sign In to Admin Portal"}
+              {loading ? "Authenticating..." : "Authorize"}
             </button>
           </form>
 
-          <div className="mt-6 border-t border-slate-800 pt-6 text-center text-xs text-slate-500">
-            Need to register initial admin?{" "}
-            <Link href="/admin/register" className="text-indigo-400 hover:underline">
-              Bootstrap Super Admin
+          <div className="mt-12 text-sm text-gray-500 font-medium">
+            System uninitialized?{" "}
+            <Link href="/admin/register" className="text-white hover:text-purple-500 transition-colors underline decoration-2 underline-offset-4">
+              Bootstrap Core
             </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="hidden lg:block lg:w-1/2 relative bg-[#111]">
+        <div className="absolute inset-0 bg-black/60 z-10 mix-blend-multiply" />
+        <img 
+          src="https://images.unsplash.com/photo-1550989460-0adf9ea622e2?q=80&w=1974&auto=format&fit=crop" 
+          alt="Server Architecture" 
+          className="absolute inset-0 w-full h-full object-cover grayscale opacity-50"
+        />
+        <div className="absolute inset-0 z-20 flex flex-col items-end justify-between p-12 mix-blend-difference pointer-events-none">
+          <p className="text-right text-xs font-mono text-purple-400 tracking-[0.3em] uppercase">
+            // Expaura_OS_v1.0<br/>// Central_Command
+          </p>
+          <div className="text-right">
+            <p className="text-[10rem] font-black uppercase tracking-tighter text-white leading-[0.8] opacity-90">
+              SYS
+            </p>
           </div>
         </div>
       </div>

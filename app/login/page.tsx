@@ -1,75 +1,87 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { login } from "@/lib/actions/auth";
 
 export default function SharedLoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
-  const [isPending, startTransition] = useTransition();
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
 
-    startTransition(async () => {
-      try {
-        const result = await login(form);
-        router.push(result.redirectUrl);
-        router.refresh();
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Something went wrong");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Login failed");
       }
-    });
+
+      router.push(data.redirectUrl || "/dashboard");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/20 blur-[120px] rounded-full pointer-events-none"></div>
+    <div className="min-h-screen flex flex-col lg:flex-row bg-[#0A0A0A] text-[#F3F3F3] font-sans selection:bg-[#4F46E5] selection:text-white">
+      {/* Left Panel - Form */}
+      <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-16 lg:px-24 py-12 relative z-10">
+        <div className="max-w-md w-full mx-auto">
+          <div className="mb-16">
+            <span className="text-xl font-bold tracking-tighter uppercase border-b-2 border-white pb-1">
+              Expaura
+            </span>
+          </div>
+          
+          <h1 className="text-5xl sm:text-6xl font-black tracking-tighter leading-none mb-4 uppercase">
+            Normal is<br/><span className="text-[#4F46E5]">Boring.</span>
+          </h1>
+          <p className="text-lg text-gray-400 mb-12 max-w-sm">
+            Sign in to access your restaurant dashboard and elevate your customer experience.
+          </p>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md z-10">
-        <div className="flex justify-center mb-2">
-          <span className="text-4xl font-extrabold bg-gradient-to-r from-emerald-400 via-teal-400 to-indigo-400 bg-clip-text text-transparent">
-            Expaura
-          </span>
-        </div>
-        <h2 className="text-center text-2xl font-bold tracking-tight text-slate-100">
-          Welcome back
-        </h2>
-        <p className="mt-1 text-center text-sm text-slate-400">
-          Sign in to your restaurant dashboard
-        </p>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md z-10 px-4">
-        <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 py-8 px-6 shadow-2xl rounded-2xl sm:px-10">
-          <form className="space-y-5" onSubmit={handleSubmit}>
+          <form className="space-y-8" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm">
+              <div className="bg-red-500/10 border-l-4 border-red-500 text-red-400 px-4 py-3 text-sm font-medium">
                 {error}
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-medium text-slate-300">Email Address</label>
+            <div className="space-y-2 group">
+              <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 group-focus-within:text-white transition-colors">
+                Email Address
+              </label>
               <input
                 type="email"
                 required
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 placeholder="you@restaurant.rw"
-                className="mt-1 block w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+                className="w-full bg-transparent border-b-2 border-gray-800 py-3 text-white placeholder-gray-700 focus:outline-none focus:border-[#4F46E5] transition-colors text-lg"
               />
             </div>
 
-            <div>
+            <div className="space-y-2 group">
               <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium text-slate-300">Password</label>
-                <Link href="/forgot-password" className="text-xs text-indigo-400 hover:underline">
-                  Forgot password?
+                <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 group-focus-within:text-white transition-colors">
+                  Password
+                </label>
+                <Link href="/forgot-password" className="text-xs text-gray-500 hover:text-white transition-colors uppercase tracking-wider">
+                  Forgot?
                 </Link>
               </div>
               <input
@@ -78,25 +90,43 @@ export default function SharedLoginPage() {
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 placeholder="••••••••••••"
-                className="mt-1 block w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+                className="w-full bg-transparent border-b-2 border-gray-800 py-3 text-white placeholder-gray-700 focus:outline-none focus:border-[#4F46E5] transition-colors text-lg"
               />
             </div>
 
             <button
               type="submit"
-              disabled={isPending}
-              className="w-full py-3 px-4 border border-transparent rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-600/25 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 disabled:opacity-50"
+              disabled={loading}
+              className="w-full bg-white text-black font-bold uppercase tracking-widest py-4 hover:bg-[#4F46E5] hover:text-white transition-all duration-300 disabled:opacity-50 mt-4"
             >
-              {isPending ? "Signing in..." : "Sign In"}
+              {loading ? "Signing in..." : "Enter"}
             </button>
           </form>
 
-          <div className="mt-6 border-t border-slate-800 pt-6 text-center text-sm text-slate-400">
-            Don&apos;t have a restaurant account yet?{" "}
-            <Link href="/register" className="font-medium text-emerald-400 hover:underline">
+          <div className="mt-12 text-sm text-gray-500 font-medium">
+            Don't have an account?{" "}
+            <Link href="/register" className="text-white hover:text-[#4F46E5] transition-colors underline decoration-2 underline-offset-4">
               Register Restaurant
             </Link>
           </div>
+        </div>
+      </div>
+
+      {/* Right Panel - Image */}
+      <div className="hidden lg:block lg:w-1/2 relative">
+        <div className="absolute inset-0 bg-black/40 z-10" />
+        <img 
+          src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1974&auto=format&fit=crop" 
+          alt="Restaurant in Kigali" 
+          className="absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 ease-in-out"
+        />
+        <div className="absolute bottom-12 right-12 z-20 text-right mix-blend-difference">
+          <p className="text-5xl font-black uppercase tracking-tighter text-white opacity-80 leading-none">
+            Kigali
+          </p>
+          <p className="text-xl font-bold tracking-widest text-white opacity-60 uppercase mt-2">
+            Rwanda
+          </p>
         </div>
       </div>
     </div>
