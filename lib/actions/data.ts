@@ -1,5 +1,6 @@
 "use server";
 
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 
 export interface City {
@@ -9,7 +10,7 @@ export interface City {
   country: string;
 }
 
-export async function getCities(): Promise<{ cities: City[] }> {
+export const getCities = cache(async (): Promise<{ cities: City[] }> => {
   try {
     const cities = await prisma.city.findMany({
       orderBy: { name: "asc" },
@@ -26,4 +27,4 @@ export async function getCities(): Promise<{ cities: City[] }> {
     console.error("[Get Cities Error]", error);
     return { cities: [] };
   }
-}
+});

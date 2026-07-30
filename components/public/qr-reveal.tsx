@@ -24,7 +24,7 @@ function QrReveal({ children, restaurantName, className }: QrRevealProps) {
     <div className={cn("relative min-h-[60vh]", className)}>
       {!revealed && (
         <div
-          className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0A0A0A]"
+          className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-surface"
           aria-hidden={revealed}
         >
           <div className="relative w-48 h-48 flex items-center justify-center">

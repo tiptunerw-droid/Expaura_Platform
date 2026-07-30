@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 
@@ -26,7 +27,7 @@ const assignStaffSchema = z.object({
   branchId: z.string().uuid(),
 });
 
-export async function listBranches(restaurantId: string) {
+export const listBranches = cache(async (restaurantId: string) => {
   const valid = z.string().uuid().safeParse(restaurantId);
   if (!valid.success) throw new Error("Invalid restaurant ID");
 
@@ -35,7 +36,7 @@ export async function listBranches(restaurantId: string) {
     include: { city: true },
     orderBy: { createdAt: "desc" },
   });
-}
+});
 
 export async function addBranch(form: z.infer<typeof addBranchSchema>) {
   const session = await getSession();

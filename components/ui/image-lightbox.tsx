@@ -50,7 +50,7 @@ export function ImageLightbox({ images, startIndex, onClose }: Props) {
       {/* Floating close button */}
       <button
         onClick={onClose}
-        className="absolute top-3 right-3 sm:top-5 sm:right-5 z-10 w-10 h-10 rounded-full bg-black/60 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+        className="absolute top-3 right-3 sm:top-5 sm:right-5 z-10 w-10 h-10 rounded-full bg-black/60 hover:bg-white/20 flex items-center justify-center text-[#ffffff] transition-colors"
         aria-label="Close"
       >
         <X className="w-5 h-5" />
@@ -81,14 +81,14 @@ export function ImageLightbox({ images, startIndex, onClose }: Props) {
         <>
           <button
             onClick={goPrev}
-            className="absolute left-0 sm:left-2 top-1/2 -translate-y-1/2 w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-all z-10"
+            className="absolute left-0 sm:left-2 top-1/2 -translate-y-1/2 w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center text-[#ffffff]/80 hover:text-[#ffffff] hover:bg-white/10 transition-all z-10"
             aria-label="Previous"
           >
             <ChevronLeft className="w-7 h-7 sm:w-8 sm:h-8" />
           </button>
           <button
             onClick={goNext}
-            className="absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-all z-10"
+            className="absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center text-[#ffffff]/80 hover:text-[#ffffff] hover:bg-white/10 transition-all z-10"
             aria-label="Next"
           >
             <ChevronRight className="w-7 h-7 sm:w-8 sm:h-8" />

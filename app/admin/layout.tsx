@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getCurrentUser, logout } from "@/lib/actions/auth";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 interface NavItem {
   href: string;
@@ -54,11 +55,11 @@ function AdminSidebar({ userName, isOpen, onClose }: { userName: string; isOpen?
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 w-64 h-screen bg-[#0A0A0A] border-r border-gray-800 z-30 text-[#F3F3F3] selection:bg-purple-600 selection:text-white transition-transform duration-300 ease-in-out flex flex-col",
+        "fixed left-0 top-0 w-64 h-screen bg-surface border-r border-border-subtle z-30 text-primary selection:bg-purple-600 selection:text-white transition-transform duration-300 ease-in-out flex flex-col",
         isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}
     >
-      <div className="h-20 flex flex-col justify-center px-8 border-b border-gray-800 shrink-0">
+      <div className="h-20 flex flex-col justify-center px-8 border-b border-border-subtle shrink-0">
         <span className="text-[8px] font-black uppercase tracking-[0.2em] text-purple-500 bg-purple-500/10 px-2 py-0.5 w-max mb-1">
           Platform Admin
         </span>
@@ -86,7 +87,7 @@ function AdminSidebar({ userName, isOpen, onClose }: { userName: string; isOpen?
                 "flex items-center gap-4 px-4 py-3 text-xs font-bold uppercase tracking-widest transition-all",
                 isActive
                   ? "bg-white text-black"
-                  : "text-gray-500 hover:text-white hover:bg-gray-900"
+                  : "text-gray-500 hover:text-white hover:bg-surface-alt"
               )}
             >
               <Icon className="w-4 h-4 shrink-0" />
@@ -96,8 +97,8 @@ function AdminSidebar({ userName, isOpen, onClose }: { userName: string; isOpen?
         })}
       </nav>
 
-      <div className="shrink-0 border-t border-gray-800 p-4">
-        <div className="flex items-center gap-4 p-3 bg-gray-900">
+      <div className="shrink-0 border-t border-border-subtle p-4">
+        <div className="flex items-center gap-4 p-3 bg-surface-alt">
           <div className="flex items-center justify-center w-10 h-10 bg-purple-600 text-white text-xs font-black shrink-0">
             {initials || "U"}
           </div>
@@ -143,7 +144,7 @@ function AdminHeader({
     .toUpperCase();
 
   return (
-    <header className="sticky top-0 z-20 h-20 bg-[#0A0A0A] border-b border-gray-800 flex items-center justify-between text-[#F3F3F3]">
+    <header className="sticky top-0 z-20 h-20 bg-surface border-b border-border-subtle flex items-center justify-between text-text-primary">
       <div className="flex-1 min-w-0 flex items-center gap-4 px-4 sm:px-8">
         {onMenuToggle && (
           <button 
@@ -172,9 +173,11 @@ function AdminHeader({
           <input
             type="search"
             placeholder="SEARCH..."
-            className="w-full pl-10 pr-4 py-2 bg-transparent border-b-2 border-gray-800 focus:outline-none focus:border-purple-500 text-white placeholder-gray-700 text-xs font-bold uppercase tracking-widest transition-colors"
+            className="w-full pl-10 pr-4 py-2 bg-transparent border-b-2 border-border-subtle focus:outline-none focus:border-purple-500 text-white placeholder-gray-700 text-xs font-bold uppercase tracking-widest transition-colors"
           />
         </div>
+
+        <ThemeToggle />
 
         <button
           className="relative p-2 text-gray-500 hover:text-white transition-colors"
@@ -186,7 +189,7 @@ function AdminHeader({
 
         <div className="relative">
           <button
-            className="flex items-center gap-2 pl-2 pr-1 h-10 border border-gray-800 hover:border-purple-500 transition-colors bg-gray-900"
+            className="flex items-center gap-2 pl-2 pr-1 h-10 border border-border-subtle hover:border-purple-500 transition-colors bg-surface-alt"
             onClick={() => setMenuOpen((v) => !v)}
             aria-expanded={menuOpen}
             aria-haspopup="true"
@@ -203,10 +206,10 @@ function AdminHeader({
                 className="fixed inset-0 z-10"
                 onClick={() => setMenuOpen(false)}
               />
-              <div className="absolute right-0 mt-2 w-48 bg-[#0A0A0A] border border-gray-800 z-20">
+              <div className="absolute right-0 mt-2 w-48 bg-surface border border-border-subtle z-20">
                 <Link
                   href="/admin/profile"
-                  className="block w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-widest text-gray-400 hover:bg-gray-900 hover:text-white transition-colors"
+                  className="block w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-widest text-gray-400 hover:bg-surface-alt hover:text-white transition-colors"
                   onClick={() => setMenuOpen(false)}
                 >
                   Profile Settings
@@ -277,14 +280,14 @@ export default function AdminLayout({
       return <>{children}</>;
     }
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <div className="w-12 h-12 rounded-full border-4 border-gray-800 border-t-purple-600 animate-spin" />
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full border-4 border-border-subtle border-t-purple-600 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#F3F3F3] selection:bg-purple-600 selection:text-white">
+    <div className="min-h-screen bg-surface text-primary selection:bg-purple-600 selection:text-white">
       <AdminSidebar 
         userName={authState.userName} 
         isOpen={sidebarOpen}

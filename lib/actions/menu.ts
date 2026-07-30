@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 
@@ -17,7 +18,7 @@ const orderItemSchema = z.object({
 
 const updateMenuImageOrderSchema = z.array(orderItemSchema);
 
-export async function listMenuImages(restaurantId: string, branchId?: string) {
+export const listMenuImages = cache(async (restaurantId: string, branchId?: string) => {
   const ridValid = z.string().uuid().safeParse(restaurantId);
   if (!ridValid.success) throw new Error("Invalid restaurant ID");
 
@@ -35,7 +36,7 @@ export async function listMenuImages(restaurantId: string, branchId?: string) {
     where,
     orderBy: { position: "asc" },
   });
-}
+});
 
 export async function addMenuImage(form: z.infer<typeof addMenuImageSchema>) {
   const session = await getSession();

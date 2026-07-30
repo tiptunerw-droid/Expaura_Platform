@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 
@@ -13,7 +14,7 @@ const updateGallerySchema = z.object({
   caption: z.string().optional(),
 });
 
-export async function listGallery(restaurantId: string) {
+export const listGallery = cache(async (restaurantId: string) => {
   const valid = z.string().uuid().safeParse(restaurantId);
   if (!valid.success) throw new Error("Invalid restaurant ID");
 
@@ -21,7 +22,7 @@ export async function listGallery(restaurantId: string) {
     where: { restaurantId: valid.data },
     orderBy: { createdAt: "desc" },
   });
-}
+});
 
 export async function addGalleryImage(form: z.infer<typeof addGallerySchema>) {
   const session = await getSession();

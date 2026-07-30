@@ -10,7 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-ember text-white hover:bg-ember-deep active:bg-ember-deep/90 shadow-sm",
+          "bg-ember text-[#ffffff] hover:bg-ember-deep active:bg-ember-deep/90 shadow-sm",
         secondary:
           "bg-ceramic-deep text-ink hover:bg-line-strong",
         ghost:
@@ -18,9 +18,9 @@ const buttonVariants = cva(
         outline:
           "bg-transparent text-ink border border-line hover:bg-ceramic-deep",
         destructive:
-          "bg-rose text-white hover:bg-rose/90 shadow-sm",
+          "bg-rose text-[#ffffff] hover:bg-rose/90 shadow-sm",
         brass:
-          "bg-brass-soft text-brass hover:bg-brass hover:text-white",
+          "bg-brass-soft text-brass hover:bg-brass hover:text-[#ffffff]",
       },
       size: {
         sm: "h-8 px-3 text-xs",

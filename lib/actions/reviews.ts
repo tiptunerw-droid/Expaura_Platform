@@ -1,8 +1,10 @@
 "use server";
 
 import { z } from "zod";
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { ComplaintStatus } from "@/generated/prisma/client";
+import { createNotification } from "@/lib/actions/notifications";
 
 const rating15 = z.number().int().min(1, "Rating must be at least 1").max(5, "Rating must be at most 5");
 
@@ -70,10 +72,28 @@ export async function submitReview(form: z.infer<typeof submitReviewSchema>) {
     return { reviewId: review.id, complaintId };
   });
 
+  await createNotification(
+    valid.data.restaurantId,
+    "NEW_REVIEW",
+    "New Review Submitted",
+    valid.data.comment?.slice(0, 120) ?? undefined,
+    `/dashboard/reviews`,
+  );
+
+  if (result.complaintId) {
+    await createNotification(
+      valid.data.restaurantId,
+      "NEW_COMPLAINT",
+      "Auto-flagged Complaint",
+      "A low-rated review was automatically escalated",
+      `/dashboard/complaints`,
+    );
+  }
+
   return result;
 }
 
-export async function listRestaurantReviews(input: z.infer<typeof listReviewsSchema>) {
+export const listRestaurantReviews = cache(async (input: z.infer<typeof listReviewsSchema>) => {
   const valid = listReviewsSchema.safeParse(input);
   if (!valid.success) {
     throw new Error(valid.error.issues[0]?.message || "Validation failed");
@@ -95,9 +115,9 @@ export async function listRestaurantReviews(input: z.infer<typeof listReviewsSch
     orderBy: { createdAt: "desc" },
     take: limit || 100,
   });
-}
+});
 
-export async function getRestaurantReviewsStats(restaurantId: string) {
+export const getRestaurantReviewsStats = cache(async (restaurantId: string) => {
   const idValid = z.string().uuid().safeParse(restaurantId);
   if (!idValid.success) throw new Error("Invalid restaurant ID");
 
@@ -158,4 +178,4 @@ export async function getRestaurantReviewsStats(restaurantId: string) {
     reviewsByStar,
     reviewsLast30Days,
   };
-}
+});

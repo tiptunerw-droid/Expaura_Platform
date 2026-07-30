@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Shield, ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,6 +45,7 @@ interface Props {
   averageAtmosphere: number;
   averageCleanliness: number;
   initialTab?: string;
+  canInteract?: boolean;
 }
 
 export function RestaurantTabs({
@@ -57,8 +59,36 @@ export function RestaurantTabs({
   averageAtmosphere,
   averageCleanliness,
   initialTab,
+  canInteract = true,
 }: Props) {
-  const [tab, setTab] = React.useState(initialTab === "menu" || initialTab === "reviews" || initialTab === "gallery" || initialTab === "report" ? initialTab : "menu");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabFromUrl = searchParams.get("tab");
+
+  const availableTabs = canInteract
+    ? ["menu", "reviews", "gallery", "report"]
+    : ["menu", "reviews", "gallery"];
+
+  const [tab, setTabState] = React.useState(
+    tabFromUrl && availableTabs.includes(tabFromUrl)
+      ? tabFromUrl
+      : initialTab && availableTabs.includes(initialTab)
+        ? initialTab
+        : "menu"
+  );
+
+  React.useEffect(() => {
+    if (tabFromUrl && availableTabs.includes(tabFromUrl) && tabFromUrl !== tab) {
+      setTabState(tabFromUrl);
+    }
+  }, [tabFromUrl]);
+
+  const setTab = (value: string) => {
+    setTabState(value);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", value);
+    router.replace(`?${params.toString()}`, { scroll: false });
+  };
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = React.useState(0);
   const [lightbox, setLightbox] = React.useState<{ images: { id: string; imageUrl: string; caption?: string | null }[]; index: number } | null>(null);
@@ -107,7 +137,7 @@ export function RestaurantTabs({
         <TabsTrigger value="menu" className="flex-1">Menu</TabsTrigger>
         <TabsTrigger value="reviews" className="flex-1">Reviews</TabsTrigger>
         <TabsTrigger value="gallery" className="flex-1">Gallery</TabsTrigger>
-        <TabsTrigger value="report" className="flex-1">Report</TabsTrigger>
+        {canInteract && <TabsTrigger value="report" className="flex-1">Report</TabsTrigger>}
       </TabsList>
 
       <TabsContent value="menu">
@@ -122,7 +152,7 @@ export function RestaurantTabs({
                 <div key={img.id} className="snap-center shrink-0 w-[80vw] sm:w-[380px] first:ml-0 last:mr-0">
                   <button
                     onClick={() => setLightbox({ images: menuImages, index: i })}
-                    className="relative aspect-[3/4] bg-gray-900 rounded-lg border border-gray-800 overflow-hidden w-full cursor-pointer group"
+                    className="relative aspect-[3/4] bg-surface-alt rounded-lg border border-border-subtle overflow-hidden w-full cursor-pointer group"
                   >
                     <Image
                       src={img.imageUrl}
@@ -140,13 +170,13 @@ export function RestaurantTabs({
               <>
                 <button
                   onClick={scrollPrev}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-gray-900/90 border border-gray-700 flex items-center justify-center text-gray-300 hover:bg-gray-800 hover:text-white transition-all opacity-0 group-hover:opacity-100 z-10"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-surface-alt/90 border border-gray-700 flex items-center justify-center text-gray-300 hover:bg-gray-800 hover:text-white transition-all opacity-0 group-hover:opacity-100 z-10"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <button
                   onClick={scrollNext}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-gray-900/90 border border-gray-700 flex items-center justify-center text-gray-300 hover:bg-gray-800 hover:text-white transition-all opacity-0 group-hover:opacity-100 z-10"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-surface-alt/90 border border-gray-700 flex items-center justify-center text-gray-300 hover:bg-gray-800 hover:text-white transition-all opacity-0 group-hover:opacity-100 z-10"
                 >
                   <ChevronRight className="w-5 h-5" />
                 </button>
@@ -184,12 +214,12 @@ export function RestaurantTabs({
               ].filter((r) => r.value > 0).map((item) => (
                 <div
                   key={item.label}
-                  className="bg-gray-900 rounded-lg border border-gray-800 p-3 text-center"
+                  className="bg-surface-alt rounded-lg border border-border-subtle p-3 text-center"
                 >
                   <p className="text-[10px] uppercase tracking-wider text-gray-500">
                     {item.label}
                   </p>
-                  <p className="font-display text-xl text-[#F3F3F3] mt-0.5">
+                  <p className="font-display text-xl text-text-primary mt-0.5">
                     {item.value.toFixed(1)}
                   </p>
                   <RatingDisplay value={item.value} size="sm" />
@@ -198,29 +228,31 @@ export function RestaurantTabs({
             </div>
           )}
 
-          <Card className="bg-gray-900 border-gray-800">
-            <CardHeader>
-              <CardTitle className="text-base font-display">
-                Leave a review
-              </CardTitle>
-              <p className="text-xs text-gray-500">
-                No account needed — takes 30 seconds
-              </p>
-            </CardHeader>
-            <CardContent>
-              <ReviewForm restaurantId={restaurantId} />
-            </CardContent>
-          </Card>
+          {canInteract && (
+            <Card className="bg-surface-alt border-border-subtle">
+              <CardHeader>
+                <CardTitle className="text-base font-display">
+                  Leave a review
+                </CardTitle>
+                <p className="text-xs text-gray-500">
+                  No account needed — takes 30 seconds
+                </p>
+              </CardHeader>
+              <CardContent>
+                <ReviewForm restaurantId={restaurantId} />
+              </CardContent>
+            </Card>
+          )}
 
           {reviews.length > 0 && (
             <div className="space-y-3">
-              <h3 className="font-display text-lg text-[#F3F3F3]">
+              <h3 className="font-display text-lg text-text-primary">
                 Recent reviews
               </h3>
               {reviews.slice(0, 10).map((review) => (
                 <div
                   key={review.id}
-                  className="bg-gray-900 rounded-lg border border-gray-800 p-4"
+                  className="bg-surface-alt rounded-lg border border-border-subtle p-4"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <RatingDisplay value={review.overallRating} size="sm" />
@@ -270,7 +302,7 @@ export function RestaurantTabs({
               <button
                 key={img.id}
                 onClick={() => setLightbox({ images: gallery, index: i })}
-                className="relative aspect-square bg-gray-900 rounded-lg overflow-hidden cursor-pointer group text-left"
+                className="relative aspect-square bg-surface-alt rounded-lg overflow-hidden cursor-pointer group text-left"
               >
                 <Image
                   src={img.imageUrl}
@@ -295,28 +327,30 @@ export function RestaurantTabs({
         )}
       </TabsContent>
 
-      <TabsContent value="report">
-        <Card className="bg-gray-900 border-gray-800">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-ember-soft flex items-center justify-center">
-                <Shield className="w-4 h-4 text-ember" />
+      {canInteract && (
+        <TabsContent value="report">
+          <Card className="bg-surface-alt border-border-subtle">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-ember-soft flex items-center justify-center">
+                  <Shield className="w-4 h-4 text-ember" />
+                </div>
+                <div>
+                  <CardTitle className="text-base font-display">
+                    Report an issue
+                  </CardTitle>
+                  <p className="text-xs text-gray-500">
+                    Help the manager address problems quickly
+                  </p>
+                </div>
               </div>
-              <div>
-                <CardTitle className="text-base font-display">
-                  Report an issue
-                </CardTitle>
-                <p className="text-xs text-gray-500">
-                  Help the manager address problems quickly
-                </p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <ComplaintForm restaurantId={restaurantId} />
-          </CardContent>
-        </Card>
-      </TabsContent>
+            </CardHeader>
+            <CardContent>
+              <ComplaintForm restaurantId={restaurantId} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      )}
       {lightbox && (
         <ImageLightbox
           images={lightbox.images}

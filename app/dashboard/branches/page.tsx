@@ -77,6 +77,7 @@ export default async function BranchesPage() {
           icon={<Building2 className="w-full h-full" />}
           variant="neutral"
           title="No branches yet"
+          titleClassName="text-ink"
           description="Add multiple locations to manage them all from one dashboard."
           action={canAdd ? <AddBranchDialog /> : undefined}
         />

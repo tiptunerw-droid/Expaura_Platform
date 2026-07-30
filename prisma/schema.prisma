@@ -56,6 +56,8 @@ model User {
   resolvedComplaints    Complaint[]       @relation("ComplaintResolvedBy")
   auditLogs             AuditLog[]
 
+  @@index([platformRole])
+  @@index([isActive])
   @@map("users")
 }
 
@@ -69,6 +71,7 @@ model City {
   restaurants Restaurant[]
   branches    Branch[]
 
+  @@index([name])
   @@map("cities")
 }
 
@@ -107,7 +110,11 @@ model Restaurant {
   reviews       Review[]
   complaints    Complaint[]
   auditLogs     AuditLog[]
+  notifications Notification[]
 
+  @@index([isActive])
+  @@index([cityId])
+  @@index([isActive, createdAt])
   @@map("restaurants")
 }
 
@@ -120,6 +127,7 @@ model Permission {
   // Relations
   rolePermissions RolePermission[]
 
+  @@index([module])
   @@map("permissions")
 }
 
@@ -136,6 +144,7 @@ model Role {
   rolePermissions RolePermission[]
   staff           RestaurantStaff[]
 
+  @@index([restaurantId])
   @@map("roles")
 }
 
@@ -149,6 +158,8 @@ model RolePermission {
   permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
   @@map("role_permissions")
 }
 
@@ -168,6 +179,9 @@ model RestaurantStaff {
   inviter    User?      @relation("StaffInvitedBy", fields: [invitedById], references: [id])
 
   @@unique([userId, restaurantId])
+  @@index([userId])
+  @@index([restaurantId])
+  @@index([roleId])
   @@map("restaurant_staff")
 }
 
@@ -185,6 +199,7 @@ model Plan {
   // Relations
   subscriptions Subscription[]
 
+  @@index([name])
   @@map("plans")
 }
 
@@ -203,6 +218,11 @@ model Subscription {
   plan       Plan       @relation(fields: [planId], references: [id])
   recorder   User?      @relation("SubscriptionRecordedBy", fields: [recordedById], references: [id])
 
+  @@index([restaurantId])
+  @@index([planId])
+  @@index([status])
+  @@index([restaurantId, status])
+  @@index([restaurantId, periodEnd])
   @@map("subscriptions")
 }
 
@@ -226,6 +246,9 @@ model Branch {
   reviews    Review[]
   complaints Complaint[]
 
+  @@index([restaurantId])
+  @@index([cityId])
+  @@index([restaurantId, isActive])
   @@map("branches")
 }
 
@@ -241,6 +264,9 @@ model MenuImage {
   restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   branch     Branch?    @relation(fields: [branchId], references: [id], onDelete: SetNull)
 
+  @@index([restaurantId])
+  @@index([branchId])
+  @@index([restaurantId, branchId])
   @@map("menu_images")
 }
 
@@ -254,6 +280,7 @@ model Gallery {
   // Relations
   restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
+  @@index([restaurantId])
   @@map("gallery")
 }
 
@@ -272,6 +299,9 @@ model Employee {
   branch     Branch?     @relation(fields: [branchId], references: [id], onDelete: SetNull)
   complaints Complaint[]
 
+  @@index([restaurantId])
+  @@index([branchId])
+  @@index([name])
   @@map("employees")
 }
 
@@ -287,6 +317,9 @@ model QrCode {
   restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   branch     Branch?    @relation(fields: [branchId], references: [id], onDelete: SetNull)
 
+  @@index([restaurantId])
+  @@index([code, isActive])
+  @@index([restaurantId, isActive])
   @@map("qr_codes")
 }
 
@@ -309,6 +342,11 @@ model Review {
   branch     Branch?    @relation(fields: [branchId], references: [id], onDelete: SetNull)
   complaint  Complaint?
 
+  @@index([restaurantId])
+  @@index([branchId])
+  @@index([createdAt])
+  @@index([restaurantId, createdAt])
+  @@index([restaurantId, overallRating])
   @@map("reviews")
 }
 
@@ -345,7 +383,37 @@ model Complaint {
   category   ComplaintCategory @relation(fields: [categoryId], references: [id])
   resolver   User?             @relation("ComplaintResolvedBy", fields: [resolvedById], references: [id])
 
+  @@index([restaurantId])
+  @@index([branchId])
+  @@index([status])
+  @@index([categoryId])
+  @@index([employeeId])
+  @@index([restaurantId, status])
+  @@index([restaurantId, createdAt])
   @@map("complaints")
+}
+
+enum NotificationType {
+  NEW_REVIEW
+  NEW_COMPLAINT
+  COMPLAINT_RESOLVED
+}
+
+model Notification {
+  id           String           @id @default(uuid()) @db.Uuid
+  restaurantId String           @map("restaurant_id") @db.Uuid
+  type         NotificationType
+  title        String
+  message      String?
+  link         String?
+  isRead       Boolean          @default(false) @map("is_read")
+  createdAt    DateTime         @default(now()) @map("created_at")
+
+  restaurant   Restaurant       @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@index([restaurantId, isRead])
+  @@index([restaurantId, createdAt])
+  @@map("notifications")
 }
 
 model AuditLog {
@@ -363,5 +431,10 @@ model AuditLog {
   user       User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
   restaurant Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: SetNull)
 
+  @@index([userId])
+  @@index([restaurantId])
+  @@index([action])
+  @@index([entity])
+  @@index([restaurantId, action])
   @@map("audit_logs")
 }

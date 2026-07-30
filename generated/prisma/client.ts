@@ -127,6 +127,11 @@ export type ComplaintCategory = Prisma.ComplaintCategoryModel
  */
 export type Complaint = Prisma.ComplaintModel
 /**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel
+/**
  * Model AuditLog
  * 
  */

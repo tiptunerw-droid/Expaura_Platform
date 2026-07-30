@@ -341,6 +341,7 @@ export type RestaurantWhereInput = {
   reviews?: Prisma.ReviewListRelationFilter
   complaints?: Prisma.ComplaintListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
 }
 
 export type RestaurantOrderByWithRelationInput = {
@@ -376,6 +377,7 @@ export type RestaurantOrderByWithRelationInput = {
   reviews?: Prisma.ReviewOrderByRelationAggregateInput
   complaints?: Prisma.ComplaintOrderByRelationAggregateInput
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
+  notifications?: Prisma.NotificationOrderByRelationAggregateInput
 }
 
 export type RestaurantWhereUniqueInput = Prisma.AtLeast<{
@@ -414,6 +416,7 @@ export type RestaurantWhereUniqueInput = Prisma.AtLeast<{
   reviews?: Prisma.ReviewListRelationFilter
   complaints?: Prisma.ComplaintListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
 }, "id" | "slug">
 
 export type RestaurantOrderByWithAggregationInput = {
@@ -499,6 +502,7 @@ export type RestaurantCreateInput = {
   reviews?: Prisma.ReviewCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateInput = {
@@ -532,6 +536,7 @@ export type RestaurantUncheckedCreateInput = {
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUpdateInput = {
@@ -565,6 +570,7 @@ export type RestaurantUpdateInput = {
   reviews?: Prisma.ReviewUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateInput = {
@@ -598,6 +604,7 @@ export type RestaurantUncheckedUpdateInput = {
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantCreateManyInput = {
@@ -990,6 +997,20 @@ export type RestaurantUpdateOneRequiredWithoutComplaintsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.RestaurantUpdateToOneWithWhereWithoutComplaintsInput, Prisma.RestaurantUpdateWithoutComplaintsInput>, Prisma.RestaurantUncheckedUpdateWithoutComplaintsInput>
 }
 
+export type RestaurantCreateNestedOneWithoutNotificationsInput = {
+  create?: Prisma.XOR<Prisma.RestaurantCreateWithoutNotificationsInput, Prisma.RestaurantUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.RestaurantCreateOrConnectWithoutNotificationsInput
+  connect?: Prisma.RestaurantWhereUniqueInput
+}
+
+export type RestaurantUpdateOneRequiredWithoutNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.RestaurantCreateWithoutNotificationsInput, Prisma.RestaurantUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.RestaurantCreateOrConnectWithoutNotificationsInput
+  upsert?: Prisma.RestaurantUpsertWithoutNotificationsInput
+  connect?: Prisma.RestaurantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RestaurantUpdateToOneWithWhereWithoutNotificationsInput, Prisma.RestaurantUpdateWithoutNotificationsInput>, Prisma.RestaurantUncheckedUpdateWithoutNotificationsInput>
+}
+
 export type RestaurantCreateNestedOneWithoutAuditLogsInput = {
   create?: Prisma.XOR<Prisma.RestaurantCreateWithoutAuditLogsInput, Prisma.RestaurantUncheckedCreateWithoutAuditLogsInput>
   connectOrCreate?: Prisma.RestaurantCreateOrConnectWithoutAuditLogsInput
@@ -1036,6 +1057,7 @@ export type RestaurantCreateWithoutActivatedByInput = {
   reviews?: Prisma.ReviewCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateWithoutActivatedByInput = {
@@ -1068,6 +1090,7 @@ export type RestaurantUncheckedCreateWithoutActivatedByInput = {
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantCreateOrConnectWithoutActivatedByInput = {
@@ -1151,6 +1174,7 @@ export type RestaurantCreateWithoutCityInput = {
   reviews?: Prisma.ReviewCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateWithoutCityInput = {
@@ -1183,6 +1207,7 @@ export type RestaurantUncheckedCreateWithoutCityInput = {
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantCreateOrConnectWithoutCityInput = {
@@ -1241,6 +1266,7 @@ export type RestaurantCreateWithoutRolesInput = {
   reviews?: Prisma.ReviewCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateWithoutRolesInput = {
@@ -1273,6 +1299,7 @@ export type RestaurantUncheckedCreateWithoutRolesInput = {
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantCreateOrConnectWithoutRolesInput = {
@@ -1321,6 +1348,7 @@ export type RestaurantUpdateWithoutRolesInput = {
   reviews?: Prisma.ReviewUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateWithoutRolesInput = {
@@ -1353,6 +1381,7 @@ export type RestaurantUncheckedUpdateWithoutRolesInput = {
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantCreateWithoutStaffInput = {
@@ -1385,6 +1414,7 @@ export type RestaurantCreateWithoutStaffInput = {
   reviews?: Prisma.ReviewCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateWithoutStaffInput = {
@@ -1417,6 +1447,7 @@ export type RestaurantUncheckedCreateWithoutStaffInput = {
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantCreateOrConnectWithoutStaffInput = {
@@ -1465,6 +1496,7 @@ export type RestaurantUpdateWithoutStaffInput = {
   reviews?: Prisma.ReviewUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateWithoutStaffInput = {
@@ -1497,6 +1529,7 @@ export type RestaurantUncheckedUpdateWithoutStaffInput = {
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantCreateWithoutSubscriptionsInput = {
@@ -1529,6 +1562,7 @@ export type RestaurantCreateWithoutSubscriptionsInput = {
   reviews?: Prisma.ReviewCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateWithoutSubscriptionsInput = {
@@ -1561,6 +1595,7 @@ export type RestaurantUncheckedCreateWithoutSubscriptionsInput = {
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantCreateOrConnectWithoutSubscriptionsInput = {
@@ -1609,6 +1644,7 @@ export type RestaurantUpdateWithoutSubscriptionsInput = {
   reviews?: Prisma.ReviewUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateWithoutSubscriptionsInput = {
@@ -1641,6 +1677,7 @@ export type RestaurantUncheckedUpdateWithoutSubscriptionsInput = {
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantCreateWithoutBranchesInput = {
@@ -1673,6 +1710,7 @@ export type RestaurantCreateWithoutBranchesInput = {
   reviews?: Prisma.ReviewCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateWithoutBranchesInput = {
@@ -1705,6 +1743,7 @@ export type RestaurantUncheckedCreateWithoutBranchesInput = {
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantCreateOrConnectWithoutBranchesInput = {
@@ -1753,6 +1792,7 @@ export type RestaurantUpdateWithoutBranchesInput = {
   reviews?: Prisma.ReviewUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateWithoutBranchesInput = {
@@ -1785,6 +1825,7 @@ export type RestaurantUncheckedUpdateWithoutBranchesInput = {
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantCreateWithoutMenuImagesInput = {
@@ -1817,6 +1858,7 @@ export type RestaurantCreateWithoutMenuImagesInput = {
   reviews?: Prisma.ReviewCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateWithoutMenuImagesInput = {
@@ -1849,6 +1891,7 @@ export type RestaurantUncheckedCreateWithoutMenuImagesInput = {
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantCreateOrConnectWithoutMenuImagesInput = {
@@ -1897,6 +1940,7 @@ export type RestaurantUpdateWithoutMenuImagesInput = {
   reviews?: Prisma.ReviewUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateWithoutMenuImagesInput = {
@@ -1929,6 +1973,7 @@ export type RestaurantUncheckedUpdateWithoutMenuImagesInput = {
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantCreateWithoutGalleryInput = {
@@ -1961,6 +2006,7 @@ export type RestaurantCreateWithoutGalleryInput = {
   reviews?: Prisma.ReviewCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateWithoutGalleryInput = {
@@ -1993,6 +2039,7 @@ export type RestaurantUncheckedCreateWithoutGalleryInput = {
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantCreateOrConnectWithoutGalleryInput = {
@@ -2041,6 +2088,7 @@ export type RestaurantUpdateWithoutGalleryInput = {
   reviews?: Prisma.ReviewUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateWithoutGalleryInput = {
@@ -2073,6 +2121,7 @@ export type RestaurantUncheckedUpdateWithoutGalleryInput = {
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantCreateWithoutEmployeesInput = {
@@ -2105,6 +2154,7 @@ export type RestaurantCreateWithoutEmployeesInput = {
   reviews?: Prisma.ReviewCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateWithoutEmployeesInput = {
@@ -2137,6 +2187,7 @@ export type RestaurantUncheckedCreateWithoutEmployeesInput = {
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantCreateOrConnectWithoutEmployeesInput = {
@@ -2185,6 +2236,7 @@ export type RestaurantUpdateWithoutEmployeesInput = {
   reviews?: Prisma.ReviewUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateWithoutEmployeesInput = {
@@ -2217,6 +2269,7 @@ export type RestaurantUncheckedUpdateWithoutEmployeesInput = {
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantCreateWithoutQrCodesInput = {
@@ -2249,6 +2302,7 @@ export type RestaurantCreateWithoutQrCodesInput = {
   reviews?: Prisma.ReviewCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateWithoutQrCodesInput = {
@@ -2281,6 +2335,7 @@ export type RestaurantUncheckedCreateWithoutQrCodesInput = {
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantCreateOrConnectWithoutQrCodesInput = {
@@ -2329,6 +2384,7 @@ export type RestaurantUpdateWithoutQrCodesInput = {
   reviews?: Prisma.ReviewUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateWithoutQrCodesInput = {
@@ -2361,6 +2417,7 @@ export type RestaurantUncheckedUpdateWithoutQrCodesInput = {
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantCreateWithoutReviewsInput = {
@@ -2393,6 +2450,7 @@ export type RestaurantCreateWithoutReviewsInput = {
   qrCodes?: Prisma.QrCodeCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateWithoutReviewsInput = {
@@ -2425,6 +2483,7 @@ export type RestaurantUncheckedCreateWithoutReviewsInput = {
   qrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantCreateOrConnectWithoutReviewsInput = {
@@ -2473,6 +2532,7 @@ export type RestaurantUpdateWithoutReviewsInput = {
   qrCodes?: Prisma.QrCodeUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateWithoutReviewsInput = {
@@ -2505,6 +2565,7 @@ export type RestaurantUncheckedUpdateWithoutReviewsInput = {
   qrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantCreateWithoutComplaintsInput = {
@@ -2537,6 +2598,7 @@ export type RestaurantCreateWithoutComplaintsInput = {
   qrCodes?: Prisma.QrCodeCreateNestedManyWithoutRestaurantInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateWithoutComplaintsInput = {
@@ -2569,6 +2631,7 @@ export type RestaurantUncheckedCreateWithoutComplaintsInput = {
   qrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutRestaurantInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutRestaurantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantCreateOrConnectWithoutComplaintsInput = {
@@ -2617,6 +2680,7 @@ export type RestaurantUpdateWithoutComplaintsInput = {
   qrCodes?: Prisma.QrCodeUpdateManyWithoutRestaurantNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateWithoutComplaintsInput = {
@@ -2648,6 +2712,155 @@ export type RestaurantUncheckedUpdateWithoutComplaintsInput = {
   employees?: Prisma.EmployeeUncheckedUpdateManyWithoutRestaurantNestedInput
   qrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutRestaurantNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutRestaurantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
+}
+
+export type RestaurantCreateWithoutNotificationsInput = {
+  id?: string
+  name: string
+  slug: string
+  phone?: string | null
+  whatsapp?: string | null
+  email?: string | null
+  address?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  openingHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  logoUrl?: string | null
+  coverImageUrl?: string | null
+  instagramUrl?: string | null
+  facebookUrl?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  city: Prisma.CityCreateNestedOneWithoutRestaurantsInput
+  activatedBy?: Prisma.UserCreateNestedOneWithoutActivatedRestaurantsInput
+  branches?: Prisma.BranchCreateNestedManyWithoutRestaurantInput
+  roles?: Prisma.RoleCreateNestedManyWithoutRestaurantInput
+  staff?: Prisma.RestaurantStaffCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutRestaurantInput
+  menuImages?: Prisma.MenuImageCreateNestedManyWithoutRestaurantInput
+  gallery?: Prisma.GalleryCreateNestedManyWithoutRestaurantInput
+  employees?: Prisma.EmployeeCreateNestedManyWithoutRestaurantInput
+  qrCodes?: Prisma.QrCodeCreateNestedManyWithoutRestaurantInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutRestaurantInput
+  complaints?: Prisma.ComplaintCreateNestedManyWithoutRestaurantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutRestaurantInput
+}
+
+export type RestaurantUncheckedCreateWithoutNotificationsInput = {
+  id?: string
+  name: string
+  slug: string
+  phone?: string | null
+  whatsapp?: string | null
+  email?: string | null
+  address?: string | null
+  cityId: string
+  latitude?: number | null
+  longitude?: number | null
+  openingHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  logoUrl?: string | null
+  coverImageUrl?: string | null
+  instagramUrl?: string | null
+  facebookUrl?: string | null
+  isActive?: boolean
+  activatedById?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branches?: Prisma.BranchUncheckedCreateNestedManyWithoutRestaurantInput
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutRestaurantInput
+  staff?: Prisma.RestaurantStaffUncheckedCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutRestaurantInput
+  menuImages?: Prisma.MenuImageUncheckedCreateNestedManyWithoutRestaurantInput
+  gallery?: Prisma.GalleryUncheckedCreateNestedManyWithoutRestaurantInput
+  employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutRestaurantInput
+  qrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutRestaurantInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutRestaurantInput
+  complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutRestaurantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutRestaurantInput
+}
+
+export type RestaurantCreateOrConnectWithoutNotificationsInput = {
+  where: Prisma.RestaurantWhereUniqueInput
+  create: Prisma.XOR<Prisma.RestaurantCreateWithoutNotificationsInput, Prisma.RestaurantUncheckedCreateWithoutNotificationsInput>
+}
+
+export type RestaurantUpsertWithoutNotificationsInput = {
+  update: Prisma.XOR<Prisma.RestaurantUpdateWithoutNotificationsInput, Prisma.RestaurantUncheckedUpdateWithoutNotificationsInput>
+  create: Prisma.XOR<Prisma.RestaurantCreateWithoutNotificationsInput, Prisma.RestaurantUncheckedCreateWithoutNotificationsInput>
+  where?: Prisma.RestaurantWhereInput
+}
+
+export type RestaurantUpdateToOneWithWhereWithoutNotificationsInput = {
+  where?: Prisma.RestaurantWhereInput
+  data: Prisma.XOR<Prisma.RestaurantUpdateWithoutNotificationsInput, Prisma.RestaurantUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type RestaurantUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  openingHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facebookUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  city?: Prisma.CityUpdateOneRequiredWithoutRestaurantsNestedInput
+  activatedBy?: Prisma.UserUpdateOneWithoutActivatedRestaurantsNestedInput
+  branches?: Prisma.BranchUpdateManyWithoutRestaurantNestedInput
+  roles?: Prisma.RoleUpdateManyWithoutRestaurantNestedInput
+  staff?: Prisma.RestaurantStaffUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutRestaurantNestedInput
+  menuImages?: Prisma.MenuImageUpdateManyWithoutRestaurantNestedInput
+  gallery?: Prisma.GalleryUpdateManyWithoutRestaurantNestedInput
+  employees?: Prisma.EmployeeUpdateManyWithoutRestaurantNestedInput
+  qrCodes?: Prisma.QrCodeUpdateManyWithoutRestaurantNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutRestaurantNestedInput
+  complaints?: Prisma.ComplaintUpdateManyWithoutRestaurantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutRestaurantNestedInput
+}
+
+export type RestaurantUncheckedUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cityId?: Prisma.StringFieldUpdateOperationsInput | string
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  openingHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  facebookUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  activatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branches?: Prisma.BranchUncheckedUpdateManyWithoutRestaurantNestedInput
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutRestaurantNestedInput
+  staff?: Prisma.RestaurantStaffUncheckedUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutRestaurantNestedInput
+  menuImages?: Prisma.MenuImageUncheckedUpdateManyWithoutRestaurantNestedInput
+  gallery?: Prisma.GalleryUncheckedUpdateManyWithoutRestaurantNestedInput
+  employees?: Prisma.EmployeeUncheckedUpdateManyWithoutRestaurantNestedInput
+  qrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutRestaurantNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutRestaurantNestedInput
+  complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
@@ -2681,6 +2894,7 @@ export type RestaurantCreateWithoutAuditLogsInput = {
   qrCodes?: Prisma.QrCodeCreateNestedManyWithoutRestaurantInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateWithoutAuditLogsInput = {
@@ -2713,6 +2927,7 @@ export type RestaurantUncheckedCreateWithoutAuditLogsInput = {
   qrCodes?: Prisma.QrCodeUncheckedCreateNestedManyWithoutRestaurantInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutRestaurantInput
   complaints?: Prisma.ComplaintUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantCreateOrConnectWithoutAuditLogsInput = {
@@ -2761,6 +2976,7 @@ export type RestaurantUpdateWithoutAuditLogsInput = {
   qrCodes?: Prisma.QrCodeUpdateManyWithoutRestaurantNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateWithoutAuditLogsInput = {
@@ -2793,6 +3009,7 @@ export type RestaurantUncheckedUpdateWithoutAuditLogsInput = {
   qrCodes?: Prisma.QrCodeUncheckedUpdateManyWithoutRestaurantNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantCreateManyActivatedByInput = {
@@ -2846,6 +3063,7 @@ export type RestaurantUpdateWithoutActivatedByInput = {
   reviews?: Prisma.ReviewUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateWithoutActivatedByInput = {
@@ -2878,6 +3096,7 @@ export type RestaurantUncheckedUpdateWithoutActivatedByInput = {
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateManyWithoutActivatedByInput = {
@@ -2952,6 +3171,7 @@ export type RestaurantUpdateWithoutCityInput = {
   reviews?: Prisma.ReviewUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateWithoutCityInput = {
@@ -2984,6 +3204,7 @@ export type RestaurantUncheckedUpdateWithoutCityInput = {
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutRestaurantNestedInput
   complaints?: Prisma.ComplaintUncheckedUpdateManyWithoutRestaurantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateManyWithoutCityInput = {
@@ -3024,6 +3245,7 @@ export type RestaurantCountOutputType = {
   reviews: number
   complaints: number
   auditLogs: number
+  notifications: number
 }
 
 export type RestaurantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3038,6 +3260,7 @@ export type RestaurantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extens
   reviews?: boolean | RestaurantCountOutputTypeCountReviewsArgs
   complaints?: boolean | RestaurantCountOutputTypeCountComplaintsArgs
   auditLogs?: boolean | RestaurantCountOutputTypeCountAuditLogsArgs
+  notifications?: boolean | RestaurantCountOutputTypeCountNotificationsArgs
 }
 
 /**
@@ -3127,6 +3350,13 @@ export type RestaurantCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.
   where?: Prisma.AuditLogWhereInput
 }
 
+/**
+ * RestaurantCountOutputType without action
+ */
+export type RestaurantCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationWhereInput
+}
+
 
 export type RestaurantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -3161,6 +3391,7 @@ export type RestaurantSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   reviews?: boolean | Prisma.Restaurant$reviewsArgs<ExtArgs>
   complaints?: boolean | Prisma.Restaurant$complaintsArgs<ExtArgs>
   auditLogs?: boolean | Prisma.Restaurant$auditLogsArgs<ExtArgs>
+  notifications?: boolean | Prisma.Restaurant$notificationsArgs<ExtArgs>
   _count?: boolean | Prisma.RestaurantCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["restaurant"]>
 
@@ -3249,6 +3480,7 @@ export type RestaurantInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   reviews?: boolean | Prisma.Restaurant$reviewsArgs<ExtArgs>
   complaints?: boolean | Prisma.Restaurant$complaintsArgs<ExtArgs>
   auditLogs?: boolean | Prisma.Restaurant$auditLogsArgs<ExtArgs>
+  notifications?: boolean | Prisma.Restaurant$notificationsArgs<ExtArgs>
   _count?: boolean | Prisma.RestaurantCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RestaurantIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3276,6 +3508,7 @@ export type $RestaurantPayload<ExtArgs extends runtime.Types.Extensions.Internal
     reviews: Prisma.$ReviewPayload<ExtArgs>[]
     complaints: Prisma.$ComplaintPayload<ExtArgs>[]
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
+    notifications: Prisma.$NotificationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -3704,6 +3937,7 @@ export interface Prisma__RestaurantClient<T, Null = never, ExtArgs extends runti
   reviews<T extends Prisma.Restaurant$reviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Restaurant$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   complaints<T extends Prisma.Restaurant$complaintsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Restaurant$complaintsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogs<T extends Prisma.Restaurant$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Restaurant$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notifications<T extends Prisma.Restaurant$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Restaurant$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4433,6 +4667,30 @@ export type Restaurant$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
+}
+
+/**
+ * Restaurant.notifications
+ */
+export type Restaurant$notificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notification
+   */
+  select?: Prisma.NotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notification
+   */
+  omit?: Prisma.NotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationInclude<ExtArgs> | null
+  where?: Prisma.NotificationWhereInput
+  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
 }
 
 /**

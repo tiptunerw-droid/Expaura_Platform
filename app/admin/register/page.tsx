@@ -50,14 +50,14 @@ export default function SuperAdminRegisterPage() {
 
   if (isAvailable === null) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] text-[#F3F3F3] flex items-center justify-center font-mono text-xs uppercase tracking-widest">
+      <div className="min-h-screen bg-surface text-text-primary flex items-center justify-center font-mono text-xs uppercase tracking-widest">
         Booting Core...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row-reverse bg-[#0A0A0A] text-[#F3F3F3] font-sans selection:bg-purple-600 selection:text-white">
+    <div className="min-h-screen flex flex-col lg:flex-row-reverse bg-surface text-text-primary font-sans selection:bg-purple-600 selection:text-white">
       <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-16 lg:px-24 py-12 relative z-10">
         <div className="max-w-md w-full mx-auto">
           <div className="mb-16 flex items-center justify-between">
@@ -115,7 +115,7 @@ export default function SuperAdminRegisterPage() {
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   placeholder="Root User"
-                  className="w-full bg-transparent border-b-2 border-gray-800 py-3 text-white placeholder-gray-700 focus:outline-none focus:border-purple-600 transition-colors text-lg"
+                  className="w-full bg-transparent border-b-2 border-border-subtle py-3 text-white placeholder-gray-700 focus:outline-none focus:border-purple-600 transition-colors text-lg"
                 />
               </div>
 
@@ -129,7 +129,7 @@ export default function SuperAdminRegisterPage() {
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   placeholder="admin@expaura.rw"
-                  className="w-full bg-transparent border-b-2 border-gray-800 py-3 text-white placeholder-gray-700 focus:outline-none focus:border-purple-600 transition-colors text-lg"
+                  className="w-full bg-transparent border-b-2 border-border-subtle py-3 text-white placeholder-gray-700 focus:outline-none focus:border-purple-600 transition-colors text-lg"
                 />
               </div>
 
@@ -144,7 +144,7 @@ export default function SuperAdminRegisterPage() {
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   placeholder="••••••••••••"
-                  className="w-full bg-transparent border-b-2 border-gray-800 py-3 text-white placeholder-gray-700 focus:outline-none focus:border-purple-600 transition-colors text-lg"
+                  className="w-full bg-transparent border-b-2 border-border-subtle py-3 text-white placeholder-gray-700 focus:outline-none focus:border-purple-600 transition-colors text-lg"
                 />
               </div>
 

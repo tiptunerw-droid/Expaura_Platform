@@ -1,3 +1,6 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "public";
+
 -- CreateEnum
 CREATE TYPE "PlatformRole" AS ENUM ('SUPER_ADMIN', 'ADMIN', 'USER');
 
@@ -257,25 +260,181 @@ CREATE TABLE "audit_logs" (
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
+CREATE INDEX "users_email_idx" ON "users"("email");
+
+-- CreateIndex
+CREATE INDEX "users_platform_role_idx" ON "users"("platform_role");
+
+-- CreateIndex
+CREATE INDEX "users_is_active_idx" ON "users"("is_active");
+
+-- CreateIndex
+CREATE INDEX "cities_name_idx" ON "cities"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "restaurants_slug_key" ON "restaurants"("slug");
+
+-- CreateIndex
+CREATE INDEX "restaurants_is_active_idx" ON "restaurants"("is_active");
+
+-- CreateIndex
+CREATE INDEX "restaurants_city_id_idx" ON "restaurants"("city_id");
+
+-- CreateIndex
+CREATE INDEX "restaurants_is_active_created_at_idx" ON "restaurants"("is_active", "created_at");
+
+-- CreateIndex
+CREATE INDEX "restaurants_slug_idx" ON "restaurants"("slug");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "permissions_code_key" ON "permissions"("code");
 
 -- CreateIndex
+CREATE INDEX "permissions_module_idx" ON "permissions"("module");
+
+-- CreateIndex
+CREATE INDEX "roles_restaurant_id_idx" ON "roles"("restaurant_id");
+
+-- CreateIndex
+CREATE INDEX "role_permissions_role_id_idx" ON "role_permissions"("role_id");
+
+-- CreateIndex
+CREATE INDEX "role_permissions_permission_id_idx" ON "role_permissions"("permission_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "role_permissions_role_id_permission_id_key" ON "role_permissions"("role_id", "permission_id");
+
+-- CreateIndex
+CREATE INDEX "restaurant_staff_user_id_idx" ON "restaurant_staff"("user_id");
+
+-- CreateIndex
+CREATE INDEX "restaurant_staff_restaurant_id_idx" ON "restaurant_staff"("restaurant_id");
+
+-- CreateIndex
+CREATE INDEX "restaurant_staff_role_id_idx" ON "restaurant_staff"("role_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "restaurant_staff_user_id_restaurant_id_key" ON "restaurant_staff"("user_id", "restaurant_id");
 
 -- CreateIndex
+CREATE INDEX "plans_name_idx" ON "plans"("name");
+
+-- CreateIndex
+CREATE INDEX "subscriptions_restaurant_id_idx" ON "subscriptions"("restaurant_id");
+
+-- CreateIndex
+CREATE INDEX "subscriptions_plan_id_idx" ON "subscriptions"("plan_id");
+
+-- CreateIndex
+CREATE INDEX "subscriptions_status_idx" ON "subscriptions"("status");
+
+-- CreateIndex
+CREATE INDEX "subscriptions_restaurant_id_status_idx" ON "subscriptions"("restaurant_id", "status");
+
+-- CreateIndex
+CREATE INDEX "subscriptions_restaurant_id_period_end_idx" ON "subscriptions"("restaurant_id", "period_end");
+
+-- CreateIndex
+CREATE INDEX "branches_restaurant_id_idx" ON "branches"("restaurant_id");
+
+-- CreateIndex
+CREATE INDEX "branches_city_id_idx" ON "branches"("city_id");
+
+-- CreateIndex
+CREATE INDEX "branches_restaurant_id_is_active_idx" ON "branches"("restaurant_id", "is_active");
+
+-- CreateIndex
+CREATE INDEX "menu_images_restaurant_id_idx" ON "menu_images"("restaurant_id");
+
+-- CreateIndex
+CREATE INDEX "menu_images_branch_id_idx" ON "menu_images"("branch_id");
+
+-- CreateIndex
+CREATE INDEX "menu_images_restaurant_id_branch_id_idx" ON "menu_images"("restaurant_id", "branch_id");
+
+-- CreateIndex
+CREATE INDEX "gallery_restaurant_id_idx" ON "gallery"("restaurant_id");
+
+-- CreateIndex
+CREATE INDEX "employees_restaurant_id_idx" ON "employees"("restaurant_id");
+
+-- CreateIndex
+CREATE INDEX "employees_branch_id_idx" ON "employees"("branch_id");
+
+-- CreateIndex
+CREATE INDEX "employees_name_idx" ON "employees"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "qr_codes_code_key" ON "qr_codes"("code");
+
+-- CreateIndex
+CREATE INDEX "qr_codes_restaurant_id_idx" ON "qr_codes"("restaurant_id");
+
+-- CreateIndex
+CREATE INDEX "qr_codes_code_is_active_idx" ON "qr_codes"("code", "is_active");
+
+-- CreateIndex
+CREATE INDEX "qr_codes_restaurant_id_is_active_idx" ON "qr_codes"("restaurant_id", "is_active");
+
+-- CreateIndex
+CREATE INDEX "reviews_restaurant_id_idx" ON "reviews"("restaurant_id");
+
+-- CreateIndex
+CREATE INDEX "reviews_branch_id_idx" ON "reviews"("branch_id");
+
+-- CreateIndex
+CREATE INDEX "reviews_created_at_idx" ON "reviews"("created_at");
+
+-- CreateIndex
+CREATE INDEX "reviews_restaurant_id_created_at_idx" ON "reviews"("restaurant_id", "created_at");
+
+-- CreateIndex
+CREATE INDEX "reviews_restaurant_id_overall_rating_idx" ON "reviews"("restaurant_id", "overall_rating");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "complaint_categories_name_key" ON "complaint_categories"("name");
 
 -- CreateIndex
+CREATE INDEX "complaint_categories_name_idx" ON "complaint_categories"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "complaints_review_id_key" ON "complaints"("review_id");
+
+-- CreateIndex
+CREATE INDEX "complaints_restaurant_id_idx" ON "complaints"("restaurant_id");
+
+-- CreateIndex
+CREATE INDEX "complaints_branch_id_idx" ON "complaints"("branch_id");
+
+-- CreateIndex
+CREATE INDEX "complaints_status_idx" ON "complaints"("status");
+
+-- CreateIndex
+CREATE INDEX "complaints_category_id_idx" ON "complaints"("category_id");
+
+-- CreateIndex
+CREATE INDEX "complaints_employee_id_idx" ON "complaints"("employee_id");
+
+-- CreateIndex
+CREATE INDEX "complaints_restaurant_id_status_idx" ON "complaints"("restaurant_id", "status");
+
+-- CreateIndex
+CREATE INDEX "complaints_restaurant_id_created_at_idx" ON "complaints"("restaurant_id", "created_at");
+
+-- CreateIndex
+CREATE INDEX "audit_logs_user_id_idx" ON "audit_logs"("user_id");
+
+-- CreateIndex
+CREATE INDEX "audit_logs_restaurant_id_idx" ON "audit_logs"("restaurant_id");
+
+-- CreateIndex
+CREATE INDEX "audit_logs_action_idx" ON "audit_logs"("action");
+
+-- CreateIndex
+CREATE INDEX "audit_logs_entity_idx" ON "audit_logs"("entity");
+
+-- CreateIndex
+CREATE INDEX "audit_logs_restaurant_id_action_idx" ON "audit_logs"("restaurant_id", "action");
 
 -- AddForeignKey
 ALTER TABLE "restaurants" ADD CONSTRAINT "restaurants_city_id_fkey" FOREIGN KEY ("city_id") REFERENCES "cities"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -369,3 +528,4 @@ ALTER TABLE "audit_logs" ADD CONSTRAINT "audit_logs_user_id_fkey" FOREIGN KEY ("
 
 -- AddForeignKey
 ALTER TABLE "audit_logs" ADD CONSTRAINT "audit_logs_restaurant_id_fkey" FOREIGN KEY ("restaurant_id") REFERENCES "restaurants"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+

@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import { randomUUID } from "crypto";
@@ -35,30 +36,20 @@ function round1dp(n: number): number {
   return Math.round(n * 10) / 10;
 }
 
-async function aggregateRatings(restaurantId: string) {
-  const reviews = await prisma.review.findMany({
-    where: { restaurantId },
-    select: {
-      overallRating: true,
-      foodRating: true,
-      serviceRating: true,
-      atmosphereRating: true,
-      cleanlinessRating: true,
-    },
-  });
+type Ratings = {
+  averageOverall: number;
+  averageFood: number;
+  averageService: number;
+  averageAtmosphere: number;
+  averageCleanliness: number;
+  reviewCount: number;
+};
 
+function computeRatings(reviews: { overallRating: number; foodRating: number | null; serviceRating: number | null; atmosphereRating: number | null; cleanlinessRating: number | null }[]): Ratings {
   const count = reviews.length;
   if (count === 0) {
-    return {
-      averageOverall: 0,
-      averageFood: 0,
-      averageService: 0,
-      averageAtmosphere: 0,
-      averageCleanliness: 0,
-      reviewCount: 0,
-    };
+    return { averageOverall: 0, averageFood: 0, averageService: 0, averageAtmosphere: 0, averageCleanliness: 0, reviewCount: 0 };
   }
-
   const sum = reviews.reduce(
     (acc, r) => {
       acc.overall += r.overallRating;
@@ -70,12 +61,10 @@ async function aggregateRatings(restaurantId: string) {
     },
     { overall: 0, food: 0, service: 0, atmosphere: 0, cleanliness: 0 }
   );
-
   const foodN = reviews.filter((r) => r.foodRating != null).length;
   const serviceN = reviews.filter((r) => r.serviceRating != null).length;
   const atmosphereN = reviews.filter((r) => r.atmosphereRating != null).length;
   const cleanlinessN = reviews.filter((r) => r.cleanlinessRating != null).length;
-
   return {
     averageOverall: round1dp(sum.overall / count),
     averageFood: foodN ? round1dp(sum.food / foodN) : 0,
@@ -86,7 +75,45 @@ async function aggregateRatings(restaurantId: string) {
   };
 }
 
-export async function getPublicRestaurantBySlug(slug: string) {
+const aggregateRatings = cache(async (restaurantId: string) => {
+  const reviews = await prisma.review.findMany({
+    where: { restaurantId },
+    select: {
+      overallRating: true,
+      foodRating: true,
+      serviceRating: true,
+      atmosphereRating: true,
+      cleanlinessRating: true,
+    },
+  });
+  return computeRatings(reviews);
+});
+
+const batchAggregateRatings = cache(async (restaurantIds: string[]) => {
+  const reviews = await prisma.review.findMany({
+    where: { restaurantId: { in: restaurantIds } },
+    select: {
+      restaurantId: true,
+      overallRating: true,
+      foodRating: true,
+      serviceRating: true,
+      atmosphereRating: true,
+      cleanlinessRating: true,
+    },
+  });
+  const grouped = new Map<string, Ratings>();
+  const map = new Map<string, typeof reviews>();
+  for (const r of reviews) {
+    if (!map.has(r.restaurantId)) map.set(r.restaurantId, []);
+    map.get(r.restaurantId)!.push(r);
+  }
+  for (const [id, revs] of map) {
+    grouped.set(id, computeRatings(revs));
+  }
+  return grouped;
+});
+
+export const getPublicRestaurantBySlug = cache(async (slug: string) => {
   const slugSchema = z.string().min(1, "Slug is required");
   const valid = slugSchema.safeParse(slug);
   if (!valid.success) throw new Error(valid.error.issues[0]?.message || "Invalid slug");
@@ -106,9 +133,9 @@ export async function getPublicRestaurantBySlug(slug: string) {
     ...restaurant,
     ...ratings,
   };
-}
+});
 
-export async function getPublicRestaurantByQr(code: string) {
+export const getPublicRestaurantByQr = cache(async (code: string) => {
   const codeSchema = z.string().min(1, "QR code is required");
   const valid = codeSchema.safeParse(code);
   if (!valid.success) throw new Error(valid.error.issues[0]?.message || "Invalid QR code");
@@ -132,9 +159,31 @@ export async function getPublicRestaurantByQr(code: string) {
     branch: qr.branch,
     ...ratings,
   };
-}
+});
 
-export async function listDirectory(input: z.infer<typeof listDirectorySchema>) {
+export const getCityRestaurantCounts = cache(async (): Promise<Record<string, number>> => {
+  try {
+    const [counts, cities] = await Promise.all([
+      prisma.restaurant.groupBy({
+        by: ["cityId"],
+        where: { isActive: true },
+        _count: { id: true },
+      }),
+      prisma.city.findMany({ select: { id: true, name: true } }),
+    ]);
+    const cityMap = new Map(cities.map((c) => [c.id, c.name]));
+    const result: Record<string, number> = {};
+    for (const c of counts) {
+      const name = cityMap.get(c.cityId);
+      if (name) result[name] = c._count.id;
+    }
+    return result;
+  } catch {
+    return {};
+  }
+});
+
+export const listDirectory = cache(async (input: z.infer<typeof listDirectorySchema>) => {
   const valid = listDirectorySchema.safeParse(input);
   if (!valid.success) throw new Error(valid.error.issues[0]?.message || "Invalid filters");
 
@@ -152,12 +201,13 @@ export async function listDirectory(input: z.infer<typeof listDirectorySchema>) 
     take: 50,
   });
 
-  const enriched = await Promise.all(
-    restaurants.map(async (r) => {
-      const ratings = await aggregateRatings(r.id);
-      return { ...r, ...ratings };
-    })
-  );
+  const ids = restaurants.map((r) => r.id);
+  const ratingsMap = ids.length > 0 ? await batchAggregateRatings(ids) : new Map();
+
+  const enriched = restaurants.map((r) => ({
+    ...r,
+    ...(ratingsMap.get(r.id) ?? { averageOverall: 0, averageFood: 0, averageService: 0, averageAtmosphere: 0, averageCleanliness: 0, reviewCount: 0 }),
+  }));
 
   let filtered = enriched;
   if (minRating != null) {
@@ -170,9 +220,9 @@ export async function listDirectory(input: z.infer<typeof listDirectorySchema>) 
   });
 
   return filtered;
-}
+});
 
-export async function listRecentlyAdded(limit: number = 12) {
+export const listRecentlyAdded = cache(async (limit: number = 12) => {
   const limitSchema = z.number().min(1).max(100).default(12);
   const valid = limitSchema.safeParse(limit);
   if (!valid.success) throw new Error("Invalid limit");
@@ -184,15 +234,16 @@ export async function listRecentlyAdded(limit: number = 12) {
     take: valid.data,
   });
 
-  return Promise.all(
-    restaurants.map(async (r) => ({
-      ...r,
-      ...(await aggregateRatings(r.id)),
-    }))
-  );
-}
+  const ids = restaurants.map((r) => r.id);
+  const ratingsMap = ids.length > 0 ? await batchAggregateRatings(ids) : new Map();
 
-export async function listFeatured(limit: number = 6) {
+  return restaurants.map((r) => ({
+    ...r,
+    ...(ratingsMap.get(r.id) ?? { averageOverall: 0, averageFood: 0, averageService: 0, averageAtmosphere: 0, averageCleanliness: 0, reviewCount: 0 }),
+  }));
+});
+
+export const listFeatured = cache(async (limit: number = 6) => {
   const limitSchema = z.number().min(1).max(100).default(6);
   const valid = limitSchema.safeParse(limit);
   if (!valid.success) throw new Error("Invalid limit");
@@ -208,32 +259,28 @@ export async function listFeatured(limit: number = 6) {
     take: valid.data * 3,
   });
 
-  if (subscribed.length > 0) {
-    const shuffled = subscribed.sort(() => Math.random() - 0.5).slice(0, valid.data);
-    return Promise.all(
-      shuffled.map(async (r) => ({
-        ...r,
-        ...(await aggregateRatings(r.id)),
-      }))
-    );
+  let picks = subscribed;
+  if (picks.length > 0) {
+    picks = picks.sort(() => Math.random() - 0.5).slice(0, valid.data);
+  } else {
+    picks = await prisma.restaurant.findMany({
+      where: { isActive: true },
+      include: { city: true },
+      orderBy: { createdAt: "desc" },
+      take: valid.data,
+    });
   }
 
-  const recent = await prisma.restaurant.findMany({
-    where: { isActive: true },
-    include: { city: true },
-    orderBy: { createdAt: "desc" },
-    take: valid.data,
-  });
+  const ids = picks.map((r) => r.id);
+  const ratingsMap = ids.length > 0 ? await batchAggregateRatings(ids) : new Map();
 
-  return Promise.all(
-    recent.map(async (r) => ({
-      ...r,
-      ...(await aggregateRatings(r.id)),
-    }))
-  );
-}
+  return picks.map((r) => ({
+    ...r,
+    ...(ratingsMap.get(r.id) ?? { averageOverall: 0, averageFood: 0, averageService: 0, averageAtmosphere: 0, averageCleanliness: 0, reviewCount: 0 }),
+  }));
+});
 
-export async function getManagerRestaurant() {
+export const getManagerRestaurant = cache(async () => {
   const session = await getSession();
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
@@ -262,7 +309,7 @@ export async function getManagerRestaurant() {
     ...restaurant,
     currentSubscription: restaurant.subscriptions[0] || null,
   };
-}
+});
 
 export async function updateRestaurantProfile(form: z.infer<typeof updateRestaurantProfileSchema>) {
   const session = await getSession();

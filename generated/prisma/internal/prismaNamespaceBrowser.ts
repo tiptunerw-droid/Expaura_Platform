@@ -68,6 +68,7 @@ export const ModelName = {
   Review: 'Review',
   ComplaintCategory: 'ComplaintCategory',
   Complaint: 'Complaint',
+  Notification: 'Notification',
   AuditLog: 'AuditLog'
 } as const
 
@@ -316,6 +317,20 @@ export const ComplaintScalarFieldEnum = {
 } as const
 
 export type ComplaintScalarFieldEnum = (typeof ComplaintScalarFieldEnum)[keyof typeof ComplaintScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  restaurantId: 'restaurantId',
+  type: 'type',
+  title: 'title',
+  message: 'message',
+  link: 'link',
+  isRead: 'isRead',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
 export const AuditLogScalarFieldEnum = {

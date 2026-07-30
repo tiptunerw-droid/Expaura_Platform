@@ -114,7 +114,7 @@ export function ProfileForm({ restaurant }: Props) {
         <div className="sm:col-span-2">
           <Label>Restaurant logo</Label>
           {form.logoUrl ? (
-            <div className="flex items-center gap-3 p-3 bg-gray-900 border border-gray-800 rounded-lg">
+            <div className="flex items-center gap-3 p-3 bg-surface-alt border border-border-subtle rounded-lg">
               <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-800 shrink-0">
                 <img src={form.logoUrl} alt="Logo" className="w-full h-full object-cover" />
               </div>
@@ -139,7 +139,7 @@ export function ProfileForm({ restaurant }: Props) {
         <div className="sm:col-span-2">
           <Label>Cover image</Label>
           {form.coverImageUrl ? (
-            <div className="relative aspect-[3/1] rounded-lg overflow-hidden bg-gray-900 border border-gray-800 group">
+            <div className="relative aspect-[3/1] rounded-lg overflow-hidden bg-surface-alt border border-border-subtle group">
               <img src={form.coverImageUrl} alt="Cover" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <button

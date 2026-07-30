@@ -69,7 +69,7 @@ export function ProfileTabs({ restaurant }: Props) {
       <TabsContent value="profile">
         <Card>
           <CardHeader>
-            <CardTitle className="font-display text-lg">Restaurant profile</CardTitle>
+            <CardTitle className="font-display text-lg text-ink">Restaurant profile</CardTitle>
             <CardDescription>
               This information appears on your public page and QR menu.
             </CardDescription>
@@ -83,7 +83,7 @@ export function ProfileTabs({ restaurant }: Props) {
       <TabsContent value="subscription">
         <Card>
           <CardHeader>
-            <CardTitle className="font-display text-lg">Subscription</CardTitle>
+            <CardTitle className="font-display text-lg text-ink">Subscription</CardTitle>
             <CardDescription>
               Current plan and billing information
             </CardDescription>
@@ -162,7 +162,7 @@ export function ProfileTabs({ restaurant }: Props) {
       <TabsContent value="qr">
         <Card>
           <CardHeader>
-            <CardTitle className="font-display text-lg">QR Code</CardTitle>
+            <CardTitle className="font-display text-lg text-ink">QR Code</CardTitle>
             <CardDescription>
               Customers scan this to view your menu and leave reviews
             </CardDescription>

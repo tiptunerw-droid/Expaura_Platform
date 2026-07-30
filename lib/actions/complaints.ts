@@ -1,9 +1,11 @@
 "use server";
 
 import { z } from "zod";
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import { ComplaintStatus } from "@/generated/prisma/client";
+import { createNotification } from "@/lib/actions/notifications";
 
 const submitComplaintSchema = z.object({
   restaurantId: z.string().uuid(),
@@ -30,9 +32,9 @@ const updateStatusSchema = z.object({
   managerNote: z.string().optional(),
 });
 
-export async function getComplaintCategories() {
+export const getComplaintCategories = cache(async () => {
   return prisma.complaintCategory.findMany();
-}
+});
 
 export async function submitComplaint(form: z.infer<typeof submitComplaintSchema>) {
   const valid = submitComplaintSchema.safeParse(form);
@@ -68,10 +70,18 @@ export async function submitComplaint(form: z.infer<typeof submitComplaintSchema
     select: { id: true },
   });
 
+  await createNotification(
+    restaurantId,
+    "NEW_COMPLAINT",
+    "New Complaint Filed",
+    rest.description.slice(0, 120),
+    `/dashboard/complaints`,
+  );
+
   return { id: complaint.id };
 }
 
-export async function listRestaurantComplaints(input: z.infer<typeof listComplaintsSchema>) {
+export const listRestaurantComplaints = cache(async (input: z.infer<typeof listComplaintsSchema>) => {
   const session = await getSession();
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
@@ -105,7 +115,7 @@ export async function listRestaurantComplaints(input: z.infer<typeof listComplai
       review: true,
     },
   });
-}
+});
 
 export async function updateComplaintStatus(input: z.infer<typeof updateStatusSchema>) {
   const session = await getSession();
@@ -135,13 +145,27 @@ export async function updateComplaintStatus(input: z.infer<typeof updateStatusSc
     data.resolvedById = session.userId;
   }
 
-  return prisma.complaint.update({
+  const updated = await prisma.complaint.update({
     where: { id },
     data,
+    select: { restaurantId: true },
   });
+
+  if (status === ComplaintStatus.RESOLVED || status === ComplaintStatus.REJECTED) {
+    const actionLabel = status === ComplaintStatus.RESOLVED ? "Resolved" : "Rejected";
+    await createNotification(
+      updated.restaurantId,
+      "COMPLAINT_RESOLVED",
+      `Complaint ${actionLabel}`,
+      managerNote?.slice(0, 120),
+      `/dashboard/complaints`,
+    );
+  }
+
+  return updated;
 }
 
-export async function getComplaintDetail(id: string) {
+export const getComplaintDetail = cache(async (id: string) => {
   const session = await getSession();
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
@@ -166,4 +190,4 @@ export async function getComplaintDetail(id: string) {
   }
 
   return complaint;
-}
+});

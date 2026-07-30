@@ -54,7 +54,7 @@ export default function RestaurantOwnerRegisterPage() {
   const canSubmit = !loading && form.name && form.email && form.password && form.restaurantName;
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row-reverse bg-[#0A0A0A] text-[#F3F3F3] font-sans selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-screen flex flex-col lg:flex-row-reverse bg-surface text-text-primary font-sans selection:bg-emerald-500 selection:text-white">
       {/* Right Panel - Form */}
       <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-16 lg:px-24 py-12 relative z-10 overflow-y-auto max-h-screen">
         <div className="max-w-md w-full mx-auto pb-12">
@@ -93,7 +93,7 @@ export default function RestaurantOwnerRegisterPage() {
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   placeholder="Jean Paul"
-                  className="w-full bg-transparent border-b-2 border-gray-800 py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
+                  className="w-full bg-transparent border-b-2 border-border-subtle py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
                 />
               </div>
 
@@ -107,7 +107,7 @@ export default function RestaurantOwnerRegisterPage() {
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   placeholder="owner@restaurant.rw"
-                  className="w-full bg-transparent border-b-2 border-gray-800 py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
+                  className="w-full bg-transparent border-b-2 border-border-subtle py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
                 />
               </div>
 
@@ -122,7 +122,7 @@ export default function RestaurantOwnerRegisterPage() {
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   placeholder="••••••••"
-                  className="w-full bg-transparent border-b-2 border-gray-800 py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
+                  className="w-full bg-transparent border-b-2 border-border-subtle py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
                 />
               </div>
             </div>
@@ -142,7 +142,7 @@ export default function RestaurantOwnerRegisterPage() {
                   value={form.restaurantName}
                   onChange={(e) => setForm({ ...form, restaurantName: e.target.value })}
                   placeholder="Cafe Kigali"
-                  className="w-full bg-transparent border-b-2 border-gray-800 py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
+                  className="w-full bg-transparent border-b-2 border-border-subtle py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
                 />
               </div>
 
@@ -155,7 +155,7 @@ export default function RestaurantOwnerRegisterPage() {
                     required
                     value={form.cityName}
                     onChange={(e) => setForm({ ...form, cityName: e.target.value })}
-                    className="w-full bg-transparent border-b-2 border-gray-800 py-2 text-white focus:outline-none focus:border-emerald-500 transition-colors text-lg appearance-none rounded-none"
+                    className="w-full bg-transparent border-b-2 border-border-subtle py-2 text-white focus:outline-none focus:border-emerald-500 transition-colors text-lg appearance-none rounded-none"
                   >
                     {RWANDAN_CITIES.map((city) => (
                       <option key={city} value={city} className="bg-[#111]">
@@ -174,7 +174,7 @@ export default function RestaurantOwnerRegisterPage() {
                     value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
                     placeholder="+250 788"
-                    className="w-full bg-transparent border-b-2 border-gray-800 py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
+                    className="w-full bg-transparent border-b-2 border-border-subtle py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
                   />
                 </div>
               </div>
@@ -188,7 +188,7 @@ export default function RestaurantOwnerRegisterPage() {
                   value={form.address}
                   onChange={(e) => setForm({ ...form, address: e.target.value })}
                   placeholder="KG 7 Ave"
-                  className="w-full bg-transparent border-b-2 border-gray-800 py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
+                  className="w-full bg-transparent border-b-2 border-border-subtle py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
                 />
               </div>
             </div>

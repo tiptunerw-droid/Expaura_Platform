@@ -73,12 +73,12 @@ function DashboardNav({
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 w-64 h-screen bg-[#0A0A0A] border-r border-gray-800 z-30 text-[#F3F3F3] selection:bg-emerald-500 selection:text-white transition-transform duration-300 ease-in-out",
+        "fixed left-0 top-0 w-64 h-screen bg-surface border-r border-border-subtle z-30 text-text-primary selection:bg-emerald-500 selection:text-white transition-transform duration-300 ease-in-out",
         isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         className
       )}
     >
-      <div className="h-20 flex items-center gap-3 px-8 border-b border-gray-800 shrink-0">
+      <div className="h-20 flex items-center gap-3 px-8 border-b border-border-subtle shrink-0">
         {restaurantLogo ? (
           <div className="w-8 h-8 rounded overflow-hidden bg-gray-800 shrink-0">
             <img src={restaurantLogo} alt="" className="w-full h-full object-cover" />
@@ -108,7 +108,7 @@ function DashboardNav({
                 "flex items-center gap-4 px-4 py-3 text-xs font-bold uppercase tracking-widest transition-all",
                 isActive
                   ? "bg-white text-black"
-                  : "text-gray-500 hover:text-white hover:bg-gray-900"
+                  : "text-gray-500 hover:text-text-primary hover:bg-surface-alt"
               )}
             >
               <Icon className="w-4 h-4 shrink-0" />
@@ -118,13 +118,13 @@ function DashboardNav({
         })}
       </nav>
 
-      <div className="shrink-0 border-t border-gray-800 p-4">
-        <div className="flex items-center gap-4 p-3 bg-gray-900">
-          <div className="flex items-center justify-center w-10 h-10 bg-emerald-500 text-black text-xs font-black shrink-0">
+      <div className="shrink-0 border-t border-border-subtle p-4">
+        <div className="flex items-center gap-4 p-3 bg-surface-alt">
+          <div className="flex items-center justify-center w-10 h-10 bg-emerald-500 text-[#ffffff] text-xs font-black shrink-0">
             {initials || "U"}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-black uppercase tracking-widest text-white truncate">{userName}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-ink truncate">{userName}</p>
             <p className="text-[9px] uppercase tracking-wider text-emerald-500 truncate">{userRole}</p>
           </div>
           <form action={handleLogout}>

@@ -73,8 +73,8 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <div className="w-12 h-12 rounded-full border-4 border-gray-800 border-t-emerald-500 animate-spin" />
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full border-4 border-border-subtle border-t-emerald-500 animate-spin" />
       </div>
     );
   }
@@ -99,7 +99,7 @@ export default function DashboardLayout({
   const currentTitle = titleMap[pathname] || "Dashboard";
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#F3F3F3] selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-screen bg-surface text-text-primary selection:bg-emerald-500 selection:text-white">
       <DashboardNav
         userName={authState.userName}
         userRole={authState.userRole}

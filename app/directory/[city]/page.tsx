@@ -53,11 +53,11 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
   const hasActiveFilters = sp.minRating || sp.price || sp.open;
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#F3F3F3]">
+    <div className="min-h-screen bg-surface text-text-primary">
       <SiteHeader />
       <main className="pt-24 flex-1">
         {/* Hero */}
-        <section className="border-b border-gray-800">
+        <section className="border-b border-border-subtle">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
             <div className="flex items-start justify-between gap-6">
               <div>
@@ -65,17 +65,17 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
                   <MapPin className="w-4 h-4 text-rose-500" />
                   <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Restaurants</span>
                 </div>
-                <h1 className="font-display text-3xl sm:text-4xl text-[#F3F3F3] leading-tight">
+                <h1 className="font-display text-3xl sm:text-4xl text-text-primary leading-tight">
                   {cityTitle}
                 </h1>
                 <p className="text-sm text-gray-400 mt-1">
-                  <span className="font-bold text-[#F3F3F3]">{filtered.length}</span>{" "}
+                  <span className="font-bold text-text-primary">{filtered.length}</span>{" "}
                   {filtered.length === 1 ? "restaurant" : "restaurants"}
                 </p>
               </div>
               <div className="relative w-full max-w-xs hidden sm:block">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                <Input placeholder="Search restaurants…" className="pl-9 h-9 bg-gray-900 border-gray-700 text-[#F3F3F3] placeholder:text-gray-500 text-sm" />
+                <Input placeholder="Search restaurants…" className="pl-9 h-9 bg-surface-alt border-gray-700 text-text-primary placeholder:text-gray-500 text-sm" />
               </div>
             </div>
 
@@ -89,7 +89,7 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
                       variant={active ? "dark" : "outline"}
                       className={cn(
                         "h-7 px-3 text-xs transition-colors cursor-pointer",
-                        !active && "border-gray-700 text-gray-400 hover:border-gray-500 hover:text-[#F3F3F3]"
+                        !active && "border-gray-700 text-gray-400 hover:border-gray-500 hover:text-text-primary"
                       )}
                     >
                       {c}
@@ -101,7 +101,7 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
 
             {/* Active filter tags */}
             {hasActiveFilters && (
-              <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-gray-800">
+              <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-border-subtle">
                 <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Active filters:</span>
                 {sp.minRating && (
                   <Link href={`/directory/${city}`}>
@@ -159,7 +159,7 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
                           href={active ? `/directory/${city}` : `/directory/${city}?price=${p.id}`}
                           className={cn(
                             "flex items-center justify-between px-3 py-2 rounded text-sm transition-colors",
-                            active ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30" : "text-gray-400 hover:bg-gray-900 border border-transparent"
+                            active ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30" : "text-gray-400 hover:bg-surface-alt border border-transparent"
                           )}
                         >
                           <div>
@@ -185,7 +185,7 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
                           href={active ? `/directory/${city}` : `/directory/${city}?minRating=${star}`}
                           className={cn(
                             "flex items-center gap-2 px-3 py-2 rounded text-sm transition-colors",
-                            active ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30" : "text-gray-400 hover:bg-gray-900 border border-transparent"
+                            active ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30" : "text-gray-400 hover:bg-surface-alt border border-transparent"
                           )}
                         >
                           <div className="flex">
@@ -213,7 +213,7 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
                     href={sp.open === "true" ? `/directory/${city}` : `/directory/${city}?open=true`}
                     className={cn(
                       "flex items-center gap-3 px-3 py-2 rounded text-sm transition-colors",
-                      sp.open === "true" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30" : "text-gray-400 hover:bg-gray-900 border border-transparent"
+                      sp.open === "true" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30" : "text-gray-400 hover:bg-surface-alt border border-transparent"
                     )}
                   >
                     <span className="w-2 h-2 rounded-full bg-emerald-500" />
@@ -222,9 +222,9 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
                 </div>
 
                 {/* Sort */}
-                <div className="pt-4 border-t border-gray-800">
+                <div className="pt-4 border-t border-border-subtle">
                   <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-3">Sort by</h4>
-                  <select className="w-full h-9 px-3 text-xs bg-gray-900 border border-gray-700 rounded text-gray-300">
+                  <select className="w-full h-9 px-3 text-xs bg-surface-alt border border-gray-700 rounded text-gray-300">
                     <option>Popularity</option>
                     <option>Rating: High to Low</option>
                     <option>Rating: Low to High</option>
@@ -242,7 +242,7 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
                   href={sp.price === p.id ? `/directory/${city}` : `/directory/${city}?price=${p.id}`}
                   className={cn(
                     "shrink-0 h-8 px-3 rounded text-xs font-medium border transition-colors",
-                    sp.price === p.id ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" : "bg-gray-900 text-gray-400 border-gray-700 hover:border-gray-500"
+                    sp.price === p.id ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" : "bg-surface-alt text-gray-400 border-gray-700 hover:border-gray-500"
                   )}
                 >
                   {p.label}
@@ -252,7 +252,7 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
                 href={sp.open === "true" ? `/directory/${city}` : `/directory/${city}?open=true`}
                 className={cn(
                   "shrink-0 h-8 px-3 rounded text-xs font-medium border transition-colors flex items-center gap-1.5",
-                  sp.open === "true" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" : "bg-gray-900 text-gray-400 border-gray-700 hover:border-gray-500"
+                  sp.open === "true" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" : "bg-surface-alt text-gray-400 border-gray-700 hover:border-gray-500"
                 )}
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
@@ -301,7 +301,7 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
                       <Link
                         key={r.id}
                         href={`/r/${r.slug}`}
-                        className="group block bg-gray-900 border border-gray-800 rounded-lg overflow-hidden hover:border-gray-700 transition-colors"
+                        className="group block bg-surface-alt border border-border-subtle rounded-lg overflow-hidden hover:border-gray-700 transition-colors"
                       >
                         <div className="flex flex-col sm:flex-row">
                           {/* Image */}
@@ -335,7 +335,7 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
                               </div>
                             )}
                             {r.logoUrl && (
-                              <div className="absolute bottom-2 right-2 w-9 h-9 rounded-lg overflow-hidden bg-gray-900 border border-gray-700 shadow-lg">
+                              <div className="absolute bottom-2 right-2 w-9 h-9 rounded-lg overflow-hidden bg-surface-alt border border-gray-700 shadow-lg">
                                 <img src={r.logoUrl} alt="" className="w-full h-full object-cover" />
                               </div>
                             )}
@@ -347,7 +347,7 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
                               {/* Title + Rating row */}
                               <div className="flex items-start justify-between gap-3">
                                 <div className="min-w-0">
-                                  <h3 className="font-display text-base sm:text-lg text-[#F3F3F3] group-hover:text-emerald-400 transition-colors truncate">
+                                  <h3 className="font-display text-base sm:text-lg text-text-primary group-hover:text-emerald-400 transition-colors truncate">
                                     {r.name}
                                   </h3>
                                   <p className="text-xs text-gray-500 mt-0.5">
@@ -368,7 +368,7 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
                                         />
                                       ))}
                                     </div>
-                                    <span className="text-xs font-medium text-[#F3F3F3]">{r.averageOverall.toFixed(1)}</span>
+                                    <span className="text-xs font-medium text-text-primary">{r.averageOverall.toFixed(1)}</span>
                                     <span className="text-[10px] text-gray-500">({r.reviewCount})</span>
                                   </div>
                                 )}
@@ -397,7 +397,7 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
                             </div>
 
                             {/* Bottom */}
-                            <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-800">
+                            <div className="flex items-center justify-between mt-3 pt-3 border-t border-border-subtle">
                               <span className="text-[10px] text-gray-600">
                                 {open && label ? `Closes ${label}` : ""}
                               </span>
@@ -419,7 +419,7 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
                           key={page}
                           className={cn(
                             "w-9 h-9 flex items-center justify-center rounded text-sm font-medium cursor-pointer transition-colors",
-                            page === 1 ? "bg-emerald-500 text-black" : "text-gray-400 hover:bg-gray-900"
+                            page === 1 ? "bg-emerald-500 text-black" : "text-gray-400 hover:bg-surface-alt"
                           )}
                         >
                           {page}
@@ -428,7 +428,7 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
                       {filtered.length > 60 && (
                         <>
                           <span className="text-gray-600">…</span>
-                          <span className="w-9 h-9 flex items-center justify-center rounded text-sm font-medium text-gray-400 hover:bg-gray-900 cursor-pointer transition-colors">
+                          <span className="w-9 h-9 flex items-center justify-center rounded text-sm font-medium text-gray-400 hover:bg-surface-alt cursor-pointer transition-colors">
                             {Math.ceil(filtered.length / 20)}
                           </span>
                         </>
@@ -442,24 +442,24 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
         </div>
 
         {/* CTA */}
-        <section className="border-t border-gray-800 py-16 sm:py-20 text-center">
+        <section className="border-t border-border-subtle py-16 sm:py-20 text-center">
           <div className="max-w-lg mx-auto px-4 space-y-4">
-            <h2 className="font-display text-2xl sm:text-3xl text-[#F3F3F3]">
+            <h2 className="font-display text-2xl sm:text-3xl text-text-primary">
               Own a restaurant?
             </h2>
             <p className="text-sm text-gray-400 leading-relaxed">
               Get discovered by diners across Rwanda. List your restaurant on Expaura and grow your reputation.
             </p>
-            <button className="inline-flex items-center justify-center h-10 px-6 rounded text-sm font-medium border border-gray-700 text-[#F3F3F3] hover:bg-gray-800 transition-colors mt-2">
+            <button className="inline-flex items-center justify-center h-10 px-6 rounded text-sm font-medium border border-gray-700 text-text-primary hover:bg-gray-800 transition-colors mt-2">
               Add your restaurant
             </button>
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-gray-800 py-8">
+      <footer className="border-t border-border-subtle py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <Link href="/" className="font-display text-xl text-[#F3F3F3]">
+          <Link href="/" className="font-display text-xl text-text-primary">
             Expaura
           </Link>
           <p className="text-xs text-gray-500 text-center">

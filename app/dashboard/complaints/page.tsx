@@ -160,6 +160,7 @@ export default async function ComplaintsPage({
         <EmptyState
           icon={<CheckCircle className="w-full h-full" />}
           variant="complaint"
+          titleClassName="text-ink"
           title="No complaints"
           description={
             sp.status

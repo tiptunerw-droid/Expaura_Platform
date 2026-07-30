@@ -46,7 +46,7 @@ export default async function GalleryPage() {
               />
               {img.caption && (
                 <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-                  <p className="text-white text-xs truncate">{img.caption}</p>
+                  <p className="text-[#ffffff] text-xs truncate">{img.caption}</p>
                 </div>
               )}
               <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">

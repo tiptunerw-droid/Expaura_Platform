@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import { ComplaintStatus } from "@/generated/prisma/client";
@@ -20,7 +21,7 @@ const updateEmployeeSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
-export async function listEmployees(restaurantId: string) {
+export const listEmployees = cache(async (restaurantId: string) => {
   const valid = z.string().uuid().safeParse(restaurantId);
   if (!valid.success) throw new Error("Invalid restaurant ID");
 
@@ -41,7 +42,7 @@ export async function listEmployees(restaurantId: string) {
     ...e,
     pendingComplaints: e.complaints.length,
   }));
-}
+});
 
 export async function addEmployee(form: z.infer<typeof addEmployeeSchema>) {
   const session = await getSession();
@@ -96,7 +97,7 @@ export async function updateEmployee(id: string, form: z.infer<typeof updateEmpl
   });
 }
 
-export async function getEmployeePerformance(id: string) {
+export const getEmployeePerformance = cache(async (id: string) => {
   const session = await getSession();
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
@@ -148,4 +149,4 @@ export async function getEmployeePerformance(id: string) {
     complaintCountByCategory,
     positiveMentions,
   };
-}
+});

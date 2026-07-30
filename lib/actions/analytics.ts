@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import { SubscriptionStatus } from "@/generated/prisma/client";
@@ -15,10 +16,10 @@ function pad(n: number): string {
   return n < 10 ? `0${n}` : `${n}`;
 }
 
-export async function ratingTrendByPeriod(
+export const ratingTrendByPeriod = cache(async (
   restaurantId: string,
   period: z.infer<typeof periodSchema>
-) {
+) => {
   const ridValid = z.string().uuid().safeParse(restaurantId);
   if (!ridValid.success) throw new Error("Invalid restaurant ID");
   const periodValid = periodSchema.safeParse(period);
@@ -75,9 +76,9 @@ export async function ratingTrendByPeriod(
       count === 0 ? 0 : round1dp(inBin.reduce((s, r) => s + r.overallRating, 0) / count);
     return { periodLabel: bin.label, avgOverall, count };
   });
-}
+});
 
-export async function complaintsByCategory(restaurantId: string, lastNDays: number = 30) {
+export const complaintsByCategory = cache(async (restaurantId: string, lastNDays: number = 30) => {
   const ridValid = z.string().uuid().safeParse(restaurantId);
   if (!ridValid.success) throw new Error("Invalid restaurant ID");
   const daysValid = z.number().int().min(1).max(3650).default(30).safeParse(lastNDays);
@@ -104,9 +105,9 @@ export async function complaintsByCategory(restaurantId: string, lastNDays: numb
     categoryName: map.get(r.categoryId) || "Unknown",
     count: r._count.categoryId,
   }));
-}
+});
 
-export async function peakHours(restaurantId: string, lastNDays: number = 30) {
+export async function peakHours_fn(restaurantId: string, lastNDays: number = 30) {
   const ridValid = z.string().uuid().safeParse(restaurantId);
   if (!ridValid.success) throw new Error("Invalid restaurant ID");
   const daysValid = z.number().int().min(1).max(3650).default(30).safeParse(lastNDays);
@@ -135,6 +136,8 @@ export async function peakHours(restaurantId: string, lastNDays: number = 30) {
     .sort((a, b) => b.count - a.count);
 }
 
+export const peakHours = cache(peakHours_fn);
+
 export async function topItems(restaurantId: string) {
   const ridValid = z.string().uuid().safeParse(restaurantId);
   if (!ridValid.success) throw new Error("Invalid restaurant ID");
@@ -148,7 +151,7 @@ export async function topItems(restaurantId: string) {
   ];
 }
 
-export async function platformAnalytics() {
+export const platformAnalytics = cache(async () => {
   const session = await getSession();
   if (!session || session.platformRole !== "SUPER_ADMIN") {
     throw new Error("Unauthorized");
@@ -271,4 +274,4 @@ export async function platformAnalytics() {
     topRatedRestaurants,
     mostComplainedRestaurants,
   };
-}
+});

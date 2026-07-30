@@ -37,20 +37,20 @@ export default function SharedLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[#0A0A0A] text-[#F3F3F3] font-sans selection:bg-[#4F46E5] selection:text-white">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-surface text-text-primary font-sans selection:bg-[#4F46E5] selection:text-white">
       {/* Left Panel - Form */}
       <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-16 lg:px-24 py-12 relative z-10">
         <div className="max-w-md w-full mx-auto">
           <div className="mb-16">
-            <span className="text-xl font-bold tracking-tighter uppercase border-b-2 border-white pb-1">
+            <Link href="/" className="text-xl font-bold tracking-tighter uppercase border-b-2 border-text-primary pb-1 hover:text-emerald-500 hover:border-emerald-500 transition-colors">
               Expaura
-            </span>
+            </Link>
           </div>
           
           <h1 className="text-5xl sm:text-6xl font-black tracking-tighter leading-none mb-4 uppercase">
             Normal is<br/><span className="text-[#4F46E5]">Boring.</span>
           </h1>
-          <p className="text-lg text-gray-400 mb-12 max-w-sm">
+          <p className="text-lg text-text-secondary mb-12 max-w-sm">
             Sign in to access your restaurant dashboard and elevate your customer experience.
           </p>
 
@@ -62,7 +62,7 @@ export default function SharedLoginPage() {
             )}
 
             <div className="space-y-2 group">
-              <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 group-focus-within:text-white transition-colors">
+              <label className="block text-xs font-bold uppercase tracking-widest text-text-tertiary group-focus-within:text-text-primary transition-colors">
                 Email Address
               </label>
               <input
@@ -71,16 +71,16 @@ export default function SharedLoginPage() {
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 placeholder="you@restaurant.rw"
-                className="w-full bg-transparent border-b-2 border-gray-800 py-3 text-white placeholder-gray-700 focus:outline-none focus:border-[#4F46E5] transition-colors text-lg"
+                className="w-full bg-transparent border-b-2 border-border-subtle py-3 text-text-primary placeholder-text-tertiary focus:outline-none focus:border-[#4F46E5] transition-colors text-lg"
               />
             </div>
 
             <div className="space-y-2 group">
               <div className="flex items-center justify-between">
-                <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 group-focus-within:text-white transition-colors">
+                <label className="block text-xs font-bold uppercase tracking-widest text-text-tertiary group-focus-within:text-text-primary transition-colors">
                   Password
                 </label>
-                <Link href="/forgot-password" className="text-xs text-gray-500 hover:text-white transition-colors uppercase tracking-wider">
+                <Link href="/forgot-password" className="text-xs text-text-tertiary hover:text-text-primary transition-colors uppercase tracking-wider">
                   Forgot?
                 </Link>
               </div>
@@ -90,7 +90,7 @@ export default function SharedLoginPage() {
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 placeholder="••••••••••••"
-                className="w-full bg-transparent border-b-2 border-gray-800 py-3 text-white placeholder-gray-700 focus:outline-none focus:border-[#4F46E5] transition-colors text-lg"
+                className="w-full bg-transparent border-b-2 border-border-subtle py-3 text-text-primary placeholder-text-tertiary focus:outline-none focus:border-[#4F46E5] transition-colors text-lg"
               />
             </div>
 
@@ -103,9 +103,9 @@ export default function SharedLoginPage() {
             </button>
           </form>
 
-          <div className="mt-12 text-sm text-gray-500 font-medium">
+          <div className="mt-12 text-sm text-text-tertiary font-medium">
             Don&apos;t have an account?{" "}
-            <Link href="/register" className="text-white hover:text-[#4F46E5] transition-colors underline decoration-2 underline-offset-4">
+            <Link href="/register" className="text-text-primary hover:text-[#4F46E5] transition-colors underline decoration-2 underline-offset-4">
               Register Restaurant
             </Link>
           </div>
@@ -124,7 +124,7 @@ export default function SharedLoginPage() {
           <p className="text-5xl font-black uppercase tracking-tighter text-white opacity-80 leading-none">
             Kigali
           </p>
-          <p className="text-xl font-bold tracking-widest text-white opacity-60 uppercase mt-2">
+          <p className="text-xl font-bold tracking-widest text-white/60 uppercase mt-2">
             Rwanda
           </p>
         </div>
