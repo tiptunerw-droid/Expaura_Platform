@@ -90,7 +90,7 @@ async function RestaurantHero({ slug, initialTab, source }: { slug: string; init
         <div className="flex-1 min-w-0 flex flex-col justify-center">
           <div className="flex items-start gap-4">
             {restaurant.logoUrl && (
-              <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-800 shrink-0 border border-gray-700">
+              <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-gray-800 shrink-0 border border-gray-700">
                 <Image src={restaurant.logoUrl} alt={`${restaurant.name} logo`} fill className="object-cover" />
               </div>
             )}
@@ -266,7 +266,7 @@ async function RestaurantContentSection({ restaurantId, restaurant, initialTab, 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {similar.filter((s) => s.id !== restaurantId).slice(0, 4).map((s) => (
             <Link key={s.id} href={`/r/${s.slug}`} className="group block">
-              <div className="aspect-[4/3] bg-surface-alt rounded-lg overflow-hidden border border-border-subtle group-hover:border-gray-700 transition-colors">
+              <div className="relative aspect-[4/3] bg-surface-alt rounded-lg overflow-hidden border border-border-subtle group-hover:border-gray-700 transition-colors">
                 {s.coverImageUrl ? (
                   <Image src={s.coverImageUrl} alt={s.name} fill className="object-cover group-hover:scale-[1.03] transition-transform duration-300" sizes="(max-width: 768px) 50vw, 25vw" />
                 ) : (

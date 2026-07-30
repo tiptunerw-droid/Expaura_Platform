@@ -81,7 +81,7 @@ function DashboardNav({
     >
       <div className="h-20 flex items-center gap-3 px-8 border-b border-border-subtle shrink-0">
         {restaurantLogo ? (
-          <div className="w-8 h-8 rounded overflow-hidden bg-gray-800 shrink-0">
+          <div className="relative w-8 h-8 rounded overflow-hidden bg-gray-800 shrink-0">
             <Image src={restaurantLogo} alt="" fill className="object-cover" />
           </div>
         ) : null}
