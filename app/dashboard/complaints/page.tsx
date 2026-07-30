@@ -1,19 +1,17 @@
 import * as React from "react";
 import Link from "next/link";
 import {
-  AlertCircle, Filter, Search, Clock, CheckCircle, XCircle,
-  MessageSquare, User, Hash, ArrowUpDown,
+  AlertCircle, Search, Clock, CheckCircle,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getManagerRestaurant } from "@/lib/actions/restaurants";
-import { listRestaurantComplaints, getComplaintCategories } from "@/lib/actions/complaints";
-import { formatRelative, formatDate } from "@/lib/utils";
+import { listRestaurantComplaints } from "@/lib/actions/complaints";
+import { formatDate } from "@/lib/utils";
 import { ComplaintStatus } from "@/generated/prisma/client";
 import { UpdateComplaintStatus } from "./UpdateStatus";
 
@@ -49,14 +47,10 @@ export default async function ComplaintsPage({
     );
   }
 
-  const rid = restaurant.id;
-  const [complaints, categories] = await Promise.all([
-    listRestaurantComplaints({
-      status: sp.status as ComplaintStatus | undefined,
-      categoryId: sp.category || undefined,
-    }).catch(() => []),
-    getComplaintCategories().catch(() => []),
-  ]);
+  const complaints = await listRestaurantComplaints({
+    status: sp.status as ComplaintStatus | undefined,
+    categoryId: sp.category || undefined,
+  }).catch(() => []);
 
   const pendingCount = complaints.filter((c) => c.status === "PENDING").length;
   const inProgressCount = complaints.filter((c) => c.status === "IN_PROGRESS").length;

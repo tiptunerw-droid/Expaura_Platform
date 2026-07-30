@@ -1,10 +1,8 @@
 import * as React from "react";
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { CreditCard, Search } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CreditCard } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { formatDate, formatCurrencyRwf } from "@/lib/utils";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Search, Bell, ChevronDown, Menu } from "lucide-react";
+import { Search, ChevronDown, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationDropdown } from "@/components/dashboard/notification-dropdown";
 import { ThemeToggle } from "@/components/theme/theme-toggle";

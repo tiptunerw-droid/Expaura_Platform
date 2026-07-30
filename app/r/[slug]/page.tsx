@@ -91,7 +91,7 @@ async function RestaurantHero({ slug, initialTab, source }: { slug: string; init
           <div className="flex items-start gap-4">
             {restaurant.logoUrl && (
               <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-800 shrink-0 border border-gray-700">
-                <img src={restaurant.logoUrl} alt={`${restaurant.name} logo`} className="w-full h-full object-cover" />
+                <Image src={restaurant.logoUrl} alt={`${restaurant.name} logo`} fill className="object-cover" />
               </div>
             )}
             <div className="min-w-0">

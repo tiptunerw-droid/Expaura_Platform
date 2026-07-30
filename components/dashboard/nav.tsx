@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import * as React from "react";
 import {
@@ -81,7 +82,7 @@ function DashboardNav({
       <div className="h-20 flex items-center gap-3 px-8 border-b border-border-subtle shrink-0">
         {restaurantLogo ? (
           <div className="w-8 h-8 rounded overflow-hidden bg-gray-800 shrink-0">
-            <img src={restaurantLogo} alt="" className="w-full h-full object-cover" />
+            <Image src={restaurantLogo} alt="" fill className="object-cover" />
           </div>
         ) : null}
         <Link href="/dashboard" className="flex items-center gap-2 min-w-0">

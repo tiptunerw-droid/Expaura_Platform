@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 const RWANDAN_CITIES = [
@@ -214,10 +215,11 @@ export default function RestaurantOwnerRegisterPage() {
       {/* Left Panel - Image */}
       <div className="hidden lg:block lg:w-1/2 relative bg-black">
         <div className="absolute inset-0 bg-black/30 z-10" />
-        <img 
+        <Image 
           src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1974&auto=format&fit=crop" 
           alt="Restaurant Ambiance" 
-          className="absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 ease-in-out opacity-80"
+          fill
+          className="object-cover grayscale hover:grayscale-0 transition-all duration-700 ease-in-out opacity-80"
         />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 mix-blend-overlay w-full text-center pointer-events-none">
           <p className="text-[12rem] font-black uppercase tracking-tighter text-white opacity-20 leading-none">

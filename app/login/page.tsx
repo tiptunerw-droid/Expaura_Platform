@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function SharedLoginPage() {
@@ -115,10 +116,11 @@ export default function SharedLoginPage() {
       {/* Right Panel - Image */}
       <div className="hidden lg:block lg:w-1/2 relative">
         <div className="absolute inset-0 bg-black/40 z-10" />
-        <img 
+        <Image 
           src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1974&auto=format&fit=crop" 
           alt="Restaurant in Kigali" 
-          className="absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 ease-in-out"
+          fill
+          className="object-cover grayscale hover:grayscale-0 transition-all duration-700 ease-in-out"
         />
         <div className="absolute bottom-12 right-12 z-20 text-right mix-blend-difference">
           <p className="text-5xl font-black uppercase tracking-tighter text-white opacity-80 leading-none">

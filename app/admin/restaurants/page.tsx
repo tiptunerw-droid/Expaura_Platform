@@ -1,14 +1,12 @@
 import * as React from "react";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { Building2, Search, MapPin, CreditCard, MoreHorizontal } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Building2, Search, CreditCard } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { formatDate, formatCurrencyRwf } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 
 export const metadata = { title: "Restaurants" };
 
@@ -35,9 +33,6 @@ export default async function AdminRestaurantsPage({
     },
     orderBy: { createdAt: "desc" },
   });
-
-  const cities = await prisma.city.findMany({ orderBy: { name: "asc" } });
-  const plans = await prisma.plan.findMany({ orderBy: { priceMonthly: "asc" } });
 
   const enriched = restaurants.map((r) => ({
     ...r,

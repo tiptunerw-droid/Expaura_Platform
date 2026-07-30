@@ -21,19 +21,19 @@ export function useTheme() {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = React.useState<Theme>("dark");
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    const stored = localStorage.getItem("expaura-theme") as Theme | null;
-    if (stored === "light" || stored === "dark") {
-      setThemeState(stored);
+  const [theme, setThemeState] = React.useState<Theme>(() => {
+    try {
+      if (typeof window !== "undefined") {
+        const stored = localStorage.getItem("expaura-theme") as Theme | null;
+        if (stored === "light" || stored === "dark") return stored;
+      }
+    } catch {
+      /* localStorage unavailable */
     }
-    setMounted(true);
-  }, []);
+    return "dark";
+  });
 
   React.useEffect(() => {
-    if (!mounted) return;
     const root = document.documentElement;
     if (theme === "dark") {
       root.classList.add("dark");
@@ -41,7 +41,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       root.classList.remove("dark");
     }
     localStorage.setItem("expaura-theme", theme);
-  }, [theme, mounted]);
+  }, [theme]);
 
   const toggle = React.useCallback(() => {
     setThemeState((prev) => (prev === "dark" ? "light" : "dark"));

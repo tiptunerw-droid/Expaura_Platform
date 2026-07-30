@@ -1,7 +1,7 @@
 import * as React from "react";
 import Link from "next/link";
 import {
-  TrendingUp, TrendingDown, Minus, Star, AlertCircle, ThumbsUp,
+  Star, AlertCircle, ThumbsUp,
   Search, Users,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

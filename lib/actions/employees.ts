@@ -133,7 +133,6 @@ export const getEmployeePerformance = cache(async (id: string) => {
     complaintCountByCategory[name] = (complaintCountByCategory[name] || 0) + 1;
   }
 
-  const namePattern = `%${employee.name}%`;
   const positiveMentions = await prisma.review.count({
     where: {
       restaurantId: session.activeRestaurantId,

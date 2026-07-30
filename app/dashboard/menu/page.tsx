@@ -33,8 +33,7 @@ export default async function MenuPage() {
             {menuImages.length} page{menuImages.length !== 1 ? "s" : ""} · Customers see these when they scan the QR
           </p>
         </div>
-        <MenuImageUpload restaurantId={rid} />
-      </div>
+        <MenuImageUpload />\n      </div>
 
       {menuImages.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -68,7 +67,7 @@ export default async function MenuPage() {
           title="No menu pages yet"
           description="Upload photos of your menu — customers will see them when they scan the QR code at your restaurant."
           action={
-            <MenuImageUpload restaurantId={rid} />
+            <MenuImageUpload />
           }
         />
       )}

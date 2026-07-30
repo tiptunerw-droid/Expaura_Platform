@@ -1,6 +1,7 @@
 import React, { Suspense } from "react";
 import Link from "next/link";
-import { ArrowRight, QrCode, Star, ChefHat, Search } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, QrCode, Star, ChefHat } from "lucide-react";
 import { listFeatured } from "@/lib/actions/restaurants";
 
 export const dynamic = "force-dynamic";
@@ -85,7 +86,7 @@ async function FeaturedSection() {
       <Link href={`/r/${restaurant.slug}`} key={restaurant.id} className="group block">
         <div className="aspect-[4/5] bg-surface-alt relative mb-4 overflow-hidden border border-border-subtle group-hover:border-emerald-500 transition-colors">
           {restaurant.coverImageUrl ? (
-            <img src={restaurant.coverImageUrl} alt={restaurant.name} className="w-full h-full object-cover group-hover:scale-[1.03] transition-all duration-500" />
+            <Image src={restaurant.coverImageUrl} alt={restaurant.name} fill className="object-cover group-hover:scale-[1.03] transition-all duration-500" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <ChefHat className="w-16 h-16 text-text-tertiary" />
@@ -133,10 +134,11 @@ export default function HomePage() {
         {/* HERO SECTION */}
         <section className="relative min-h-[90vh] flex flex-col justify-center px-8 sm:px-16 lg:px-24 bg-black">
           <div className="absolute inset-0 z-0 opacity-40">
-            <img 
+            <Image 
               src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=2000&auto=format&fit=crop" 
               alt="Restaurant background" 
-              className="w-full h-full object-cover grayscale mix-blend-overlay"
+              fill
+              className="object-cover grayscale mix-blend-overlay"
             />
           </div>
           

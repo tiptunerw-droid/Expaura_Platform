@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Download, Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -60,7 +61,7 @@ export function QrDisplay({ qrCodes, slug }: Props) {
     <div className="space-y-4">
       {qrDataUrl ? (
         <div className="w-48 h-48 mx-auto bg-white rounded-xl border-2 border-line overflow-hidden">
-          <img src={qrDataUrl} alt="QR code" className="w-full h-full" />
+          <Image src={qrDataUrl} alt="QR code" fill className="object-contain" />
         </div>
       ) : (
         <div className="w-48 h-48 mx-auto bg-white rounded-xl border-2 border-line flex items-center justify-center">

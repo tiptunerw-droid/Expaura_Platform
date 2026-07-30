@@ -23,7 +23,6 @@ function RestaurantCard({
   name,
   cityName,
   coverImageUrl,
-  logoUrl,
   averageOverall,
   reviewCount,
   openingHours,

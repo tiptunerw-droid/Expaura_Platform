@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function SuperAdminRegisterPage() {
@@ -162,10 +163,11 @@ export default function SuperAdminRegisterPage() {
 
       <div className="hidden lg:block lg:w-1/2 relative bg-[#111]">
         <div className="absolute inset-0 bg-purple-900/20 mix-blend-color z-10" />
-        <img 
+        <Image 
           src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1934&auto=format&fit=crop" 
           alt="Server Hardware" 
-          className="absolute inset-0 w-full h-full object-cover grayscale contrast-125 opacity-40"
+          fill
+          className="object-cover grayscale contrast-125 opacity-40"
         />
         <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none mix-blend-difference">
           <p className="text-[12rem] font-black uppercase tracking-tighter text-white opacity-90 leading-none">

@@ -9,11 +9,10 @@ import { CloudinaryUpload } from "@/components/ui/cloudinary-upload";
 import { addMenuImage } from "@/lib/actions/menu";
 
 interface Props {
-  restaurantId: string;
   branchId?: string;
 }
 
-export function MenuImageUpload({ restaurantId, branchId }: Props) {
+export function MenuImageUpload({ branchId }: Props) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [sending, setSending] = React.useState(false);

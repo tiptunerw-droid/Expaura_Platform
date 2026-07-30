@@ -4,7 +4,6 @@ import * as React from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Shield, ChevronLeft, ChevronRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { RatingDisplay } from "@/components/ui/rating";
@@ -69,26 +68,17 @@ export function RestaurantTabs({
     ? ["menu", "reviews", "gallery", "report"]
     : ["menu", "reviews", "gallery"];
 
-  const [tab, setTabState] = React.useState(
-    tabFromUrl && availableTabs.includes(tabFromUrl)
-      ? tabFromUrl
-      : initialTab && availableTabs.includes(initialTab)
-        ? initialTab
-        : "menu"
-  );
+  const tab = tabFromUrl && availableTabs.includes(tabFromUrl)
+    ? tabFromUrl
+    : initialTab && availableTabs.includes(initialTab)
+      ? initialTab
+      : "menu";
 
-  React.useEffect(() => {
-    if (tabFromUrl && availableTabs.includes(tabFromUrl) && tabFromUrl !== tab) {
-      setTabState(tabFromUrl);
-    }
-  }, [tabFromUrl]);
-
-  const setTab = (value: string) => {
-    setTabState(value);
+  const setTab = React.useCallback((value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("tab", value);
     router.replace(`?${params.toString()}`, { scroll: false });
-  };
+  }, [router, searchParams]);
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = React.useState(0);
   const [lightbox, setLightbox] = React.useState<{ images: { id: string; imageUrl: string; caption?: string | null }[]; index: number } | null>(null);

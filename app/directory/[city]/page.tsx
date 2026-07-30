@@ -336,7 +336,7 @@ export default async function DirectoryPage({ params, searchParams }: DirectoryP
                             )}
                             {r.logoUrl && (
                               <div className="absolute bottom-2 right-2 w-9 h-9 rounded-lg overflow-hidden bg-surface-alt border border-gray-700 shadow-lg">
-                                <img src={r.logoUrl} alt="" className="w-full h-full object-cover" />
+                                <Image src={r.logoUrl} alt="" fill className="object-cover" />
                               </div>
                             )}
                           </div>
