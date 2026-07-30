@@ -60,7 +60,7 @@ export function QrDisplay({ qrCodes, slug }: Props) {
   return (
     <div className="space-y-4">
       {qrDataUrl ? (
-        <div className="w-48 h-48 mx-auto bg-white rounded-xl border-2 border-line overflow-hidden">
+        <div className="relative w-48 h-48 mx-auto bg-white rounded-xl border-2 border-line overflow-hidden">
           <Image src={qrDataUrl} alt="QR code" fill className="object-contain" />
         </div>
       ) : (

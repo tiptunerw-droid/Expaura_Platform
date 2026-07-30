@@ -116,7 +116,7 @@ export function ProfileForm({ restaurant }: Props) {
           <Label>Restaurant logo</Label>
           {form.logoUrl ? (
             <div className="flex items-center gap-3 p-3 bg-surface-alt border border-border-subtle rounded-lg">
-              <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-800 shrink-0">
+              <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-800 shrink-0">
                 <Image src={form.logoUrl} alt="Logo" fill className="object-cover" />
               </div>
               <div className="flex-1 min-w-0">
