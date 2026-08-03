@@ -44,7 +44,6 @@ interface Props {
   averageAtmosphere: number;
   averageCleanliness: number;
   initialTab?: string;
-  canInteract?: boolean;
 }
 
 export function RestaurantTabs({
@@ -58,15 +57,12 @@ export function RestaurantTabs({
   averageAtmosphere,
   averageCleanliness,
   initialTab,
-  canInteract = true,
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabFromUrl = searchParams.get("tab");
 
-  const availableTabs = canInteract
-    ? ["menu", "reviews", "gallery", "report"]
-    : ["menu", "reviews", "gallery"];
+  const availableTabs = ["menu", "reviews", "gallery", "report"];
 
   const tab = tabFromUrl && availableTabs.includes(tabFromUrl)
     ? tabFromUrl
@@ -127,7 +123,7 @@ export function RestaurantTabs({
         <TabsTrigger value="menu" className="flex-1">Menu</TabsTrigger>
         <TabsTrigger value="reviews" className="flex-1">Reviews</TabsTrigger>
         <TabsTrigger value="gallery" className="flex-1">Gallery</TabsTrigger>
-        {canInteract && <TabsTrigger value="report" className="flex-1">Report</TabsTrigger>}
+        <TabsTrigger value="report" className="flex-1">Report</TabsTrigger>
       </TabsList>
 
       <TabsContent value="menu">
@@ -218,21 +214,19 @@ export function RestaurantTabs({
             </div>
           )}
 
-          {canInteract && (
-            <Card className="bg-surface-alt border-border-subtle">
-              <CardHeader>
-                <CardTitle className="text-base font-display">
-                  Leave a review
-                </CardTitle>
-                <p className="text-xs text-gray-500">
-                  No account needed — takes 30 seconds
-                </p>
-              </CardHeader>
-              <CardContent>
-                <ReviewForm restaurantId={restaurantId} />
-              </CardContent>
-            </Card>
-          )}
+          <Card className="bg-surface-alt border-border-subtle">
+            <CardHeader>
+              <CardTitle className="text-base font-display">
+                Leave a review
+              </CardTitle>
+              <p className="text-xs text-gray-500">
+                No account needed — takes 30 seconds
+              </p>
+            </CardHeader>
+            <CardContent>
+              <ReviewForm restaurantId={restaurantId} />
+            </CardContent>
+          </Card>
 
           {reviews.length > 0 && (
             <div className="space-y-3">
@@ -317,30 +311,28 @@ export function RestaurantTabs({
         )}
       </TabsContent>
 
-      {canInteract && (
-        <TabsContent value="report">
-          <Card className="bg-surface-alt border-border-subtle">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-ember-soft flex items-center justify-center">
-                  <Shield className="w-4 h-4 text-ember" />
-                </div>
-                <div>
-                  <CardTitle className="text-base font-display">
-                    Report an issue
-                  </CardTitle>
-                  <p className="text-xs text-gray-500">
-                    Help the manager address problems quickly
-                  </p>
-                </div>
+      <TabsContent value="report">
+        <Card className="bg-surface-alt border-border-subtle">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-ember-soft flex items-center justify-center">
+                <Shield className="w-4 h-4 text-ember" />
               </div>
-            </CardHeader>
-            <CardContent>
-              <ComplaintForm restaurantId={restaurantId} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      )}
+              <div>
+                <CardTitle className="text-base font-display">
+                  Report an issue
+                </CardTitle>
+                <p className="text-xs text-gray-500">
+                  Help the manager address problems quickly
+                </p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <ComplaintForm restaurantId={restaurantId} />
+          </CardContent>
+        </Card>
+      </TabsContent>
       {lightbox && (
         <ImageLightbox
           images={lightbox.images}

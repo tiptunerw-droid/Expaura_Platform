@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { verifyPassword, hashPassword } from "@/lib/auth/password";
 import { setSessionCookie, destroySession, getSession } from "@/lib/auth/session";
 import { seedDefaultRolesForRestaurant, getUserPermissions } from "@/lib/auth/rbac";
+import { withDbRetry } from "@/lib/prisma";
 import { SignJWT, jwtVerify } from "jose";
 import { sendEmail } from "@/lib/email/brevo";
 
@@ -41,18 +42,20 @@ export async function login(
 
   const { email, password, restaurantId } = validation.data;
 
-  const user = await prisma.user.findUnique({
-    where: { email: email.toLowerCase() },
-    include: {
-      staffMemberships: {
-        where: { isActive: true },
-        include: {
-          restaurant: true,
-          role: true,
+  const user = await withDbRetry(() =>
+    prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+      include: {
+        staffMemberships: {
+          where: { isActive: true },
+          include: {
+            restaurant: true,
+            role: true,
+          },
         },
       },
-    },
-  });
+    })
+  );
 
   if (!user || !user.isActive) {
     throw new Error("Invalid email or password.");

@@ -20,7 +20,7 @@ import { isRestaurantOpen, cn } from "@/lib/utils";
 
 interface Props {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ tab?: string; source?: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }
 
 function StarBubbles({ rating, size = "sm" }: { rating: number; size?: "sm" | "md" | "lg" }) {
@@ -53,7 +53,7 @@ function RatingBreakdown({ label, value }: { label: string; value: number }) {
   );
 }
 
-async function RestaurantHero({ slug, initialTab, source }: { slug: string; initialTab?: string; source?: string }) {
+async function RestaurantHero({ slug, initialTab }: { slug: string; initialTab?: string }) {
   let restaurant;
   try {
     restaurant = await getPublicRestaurantBySlug(slug);
@@ -129,12 +129,12 @@ async function RestaurantHero({ slug, initialTab, source }: { slug: string; init
           </div>
         </div>
       </div>
-      <RestaurantContentSection restaurantId={restaurant.id} restaurant={restaurant} initialTab={initialTab} source={source} />
+      <RestaurantContentSection restaurantId={restaurant.id} restaurant={restaurant} initialTab={initialTab} />
     </>
   );
 }
 
-async function RestaurantContentSection({ restaurantId, restaurant, initialTab, source }: { restaurantId: string; restaurant: Awaited<ReturnType<typeof getPublicRestaurantBySlug>>; initialTab?: string; source?: string }) {
+async function RestaurantContentSection({ restaurantId, restaurant, initialTab }: { restaurantId: string; restaurant: Awaited<ReturnType<typeof getPublicRestaurantBySlug>>; initialTab?: string }) {
   const [reviews, menuImages, gallery, similar] = await Promise.all([
     listRestaurantReviews({ restaurantId, limit: 20 }),
     listMenuImages(restaurantId),
@@ -144,7 +144,6 @@ async function RestaurantContentSection({ restaurantId, restaurant, initialTab, 
 
   const hasReviews = restaurant.reviewCount > 0;
   const cityLower = restaurant.city?.name?.toLowerCase() || "kigali";
-  const canInteract = source === "qr";
 
   return (
     <>
@@ -181,55 +180,52 @@ async function RestaurantContentSection({ restaurantId, restaurant, initialTab, 
           averageAtmosphere={restaurant.averageAtmosphere}
           averageCleanliness={restaurant.averageCleanliness}
           initialTab={initialTab}
-          canInteract={canInteract}
         />
       </div>
 
       <aside className="lg:col-span-1">
         <div className="sticky top-24 space-y-4">
-          {canInteract && (
-            <div className="bg-surface-alt border border-border-subtle rounded-lg p-5 space-y-4">
-              <h3 className="font-display text-lg text-text-primary">Quick actions</h3>
-              <div className="space-y-2">
-                <Link href="?tab=menu" scroll={false}>
-                  <Button variant="primary" size="lg" className="w-full">
-                    View Digital Menu
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </Link>
-                <Link href="?tab=reviews" scroll={false}>
-                  <Button variant="outline" size="default" className="w-full">
-                    Leave a review
-                  </Button>
-                </Link>
-                <Link href="?tab=report" scroll={false}>
-                  <Button variant="outline" size="default" className="w-full">
-                    Report an issue
-                  </Button>
-                </Link>
-              </div>
-
-              {hasReviews && (
-                <div className="pt-3 border-t border-border-subtle space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-400">Rating</span>
-                    <StarBubbles rating={restaurant.averageOverall} size="sm" />
-                  </div>
-                  {[
-                    { label: "Food", value: restaurant.averageFood },
-                    { label: "Service", value: restaurant.averageService },
-                    { label: "Atmosphere", value: restaurant.averageAtmosphere },
-                    { label: "Cleanliness", value: restaurant.averageCleanliness },
-                  ].filter((r) => r.value > 0).map((item) => (
-                    <div key={item.label} className="flex items-center justify-between text-xs">
-                      <span className="text-gray-500">{item.label}</span>
-                      <span className="text-text-primary font-medium">{item.value.toFixed(1)}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+          <div className="bg-surface-alt border border-border-subtle rounded-lg p-5 space-y-4">
+            <h3 className="font-display text-lg text-text-primary">Quick actions</h3>
+            <div className="space-y-2">
+              <Link href="?tab=menu" scroll={false}>
+                <Button variant="primary" size="lg" className="w-full">
+                  View Digital Menu
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+              <Link href="?tab=reviews" scroll={false}>
+                <Button variant="outline" size="default" className="w-full">
+                  Leave a review
+                </Button>
+              </Link>
+              <Link href="?tab=report" scroll={false}>
+                <Button variant="outline" size="default" className="w-full">
+                  Report an issue
+                </Button>
+              </Link>
             </div>
-          )}
+
+            {hasReviews && (
+              <div className="pt-3 border-t border-border-subtle space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-400">Rating</span>
+                  <StarBubbles rating={restaurant.averageOverall} size="sm" />
+                </div>
+                {[
+                  { label: "Food", value: restaurant.averageFood },
+                  { label: "Service", value: restaurant.averageService },
+                  { label: "Atmosphere", value: restaurant.averageAtmosphere },
+                  { label: "Cleanliness", value: restaurant.averageCleanliness },
+                ].filter((r) => r.value > 0).map((item) => (
+                  <div key={item.label} className="flex items-center justify-between text-xs">
+                    <span className="text-gray-500">{item.label}</span>
+                    <span className="text-text-primary font-medium">{item.value.toFixed(1)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           <div className="bg-surface-alt border border-border-subtle rounded-lg p-4 space-y-3">
             <h4 className="text-xs uppercase tracking-wider text-gray-500">Connect</h4>
@@ -331,7 +327,7 @@ export default async function RestaurantPublicPage({ params, searchParams }: Pro
               <ContentSkeleton />
             </div>
           }>
-            <RestaurantHero slug={slug} initialTab={sp.tab} source={sp.source} />
+            <RestaurantHero slug={slug} initialTab={sp.tab} />
           </Suspense>
         </div>
       </main>

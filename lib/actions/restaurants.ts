@@ -5,6 +5,7 @@ import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import { randomUUID } from "crypto";
+import { withDbRetry } from "@/lib/prisma";
 
 const updateRestaurantProfileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").optional(),
@@ -286,22 +287,24 @@ export const getManagerRestaurant = cache(async () => {
     throw new Error("Unauthorized");
   }
 
-  const restaurant = await prisma.restaurant.findUnique({
-    where: { id: session.activeRestaurantId },
-    include: {
-      city: true,
-      branches: true,
-      qrCodes: {
-        where: { isActive: true },
-        orderBy: { createdAt: "desc" },
+  const restaurant = await withDbRetry(() =>
+    prisma.restaurant.findUnique({
+      where: { id: session.activeRestaurantId },
+      include: {
+        city: true,
+        branches: true,
+        qrCodes: {
+          where: { isActive: true },
+          orderBy: { createdAt: "desc" },
+        },
+        subscriptions: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          include: { plan: true },
+        },
       },
-      subscriptions: {
-        orderBy: { createdAt: "desc" },
-        take: 1,
-        include: { plan: true },
-      },
-    },
-  });
+    })
+  );
 
   if (!restaurant) throw new Error("Restaurant not found");
 
