@@ -16,11 +16,21 @@ import { getPublicRestaurantBySlug, listRecentlyAdded } from "@/lib/actions/rest
 import { listRestaurantReviews } from "@/lib/actions/reviews";
 import { listMenuImages } from "@/lib/actions/menu";
 import { listGallery } from "@/lib/actions/gallery";
+import { prisma } from "@/lib/prisma";
 import { isRestaurantOpen, cn } from "@/lib/utils";
+
+export const revalidate = 300;
+
+export async function generateStaticParams() {
+  const restaurants = await prisma.restaurant.findMany({
+    where: { isActive: true },
+    select: { slug: true },
+  });
+  return restaurants.map((r) => ({ slug: r.slug }));
+}
 
 interface Props {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ tab?: string }>;
 }
 
 function StarBubbles({ rating, size = "sm" }: { rating: number; size?: "sm" | "md" | "lg" }) {
@@ -53,7 +63,7 @@ function RatingBreakdown({ label, value }: { label: string; value: number }) {
   );
 }
 
-async function RestaurantHero({ slug, initialTab }: { slug: string; initialTab?: string }) {
+async function RestaurantHero({ slug }: { slug: string }) {
   let restaurant;
   try {
     restaurant = await getPublicRestaurantBySlug(slug);
@@ -129,12 +139,12 @@ async function RestaurantHero({ slug, initialTab }: { slug: string; initialTab?:
           </div>
         </div>
       </div>
-      <RestaurantContentSection restaurantId={restaurant.id} restaurant={restaurant} initialTab={initialTab} />
+      <RestaurantContentSection restaurantId={restaurant.id} restaurant={restaurant} />
     </>
   );
 }
 
-async function RestaurantContentSection({ restaurantId, restaurant, initialTab }: { restaurantId: string; restaurant: Awaited<ReturnType<typeof getPublicRestaurantBySlug>>; initialTab?: string }) {
+async function RestaurantContentSection({ restaurantId, restaurant }: { restaurantId: string; restaurant: Awaited<ReturnType<typeof getPublicRestaurantBySlug>> }) {
   const [reviews, menuImages, gallery, similar] = await Promise.all([
     listRestaurantReviews({ restaurantId, limit: 20 }),
     listMenuImages(restaurantId),
@@ -179,7 +189,6 @@ async function RestaurantContentSection({ restaurantId, restaurant, initialTab }
           averageService={restaurant.averageService}
           averageAtmosphere={restaurant.averageAtmosphere}
           averageCleanliness={restaurant.averageCleanliness}
-          initialTab={initialTab}
         />
       </div>
 
@@ -306,9 +315,8 @@ function ContentSkeleton() {
   );
 }
 
-export default async function RestaurantPublicPage({ params, searchParams }: Props) {
+export default async function RestaurantPublicPage({ params }: Props) {
   const { slug } = await params;
-  const sp = await searchParams;
 
   return (
     <div className="min-h-screen bg-surface text-text-primary">
@@ -327,7 +335,7 @@ export default async function RestaurantPublicPage({ params, searchParams }: Pro
               <ContentSkeleton />
             </div>
           }>
-            <RestaurantHero slug={slug} initialTab={sp.tab} />
+            <RestaurantHero slug={slug} />
           </Suspense>
         </div>
       </main>

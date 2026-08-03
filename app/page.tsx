@@ -4,7 +4,7 @@ import Image from "next/image";
 import { ArrowRight, QrCode, Star, ChefHat } from "lucide-react";
 import { listFeatured } from "@/lib/actions/restaurants";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 // Minimal stark header
 function Header() {

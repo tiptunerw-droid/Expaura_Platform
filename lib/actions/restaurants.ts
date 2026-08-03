@@ -46,70 +46,60 @@ type Ratings = {
   reviewCount: number;
 };
 
-function computeRatings(reviews: { overallRating: number; foodRating: number | null; serviceRating: number | null; atmosphereRating: number | null; cleanlinessRating: number | null }[]): Ratings {
-  const count = reviews.length;
-  if (count === 0) {
-    return { averageOverall: 0, averageFood: 0, averageService: 0, averageAtmosphere: 0, averageCleanliness: 0, reviewCount: 0 };
-  }
-  const sum = reviews.reduce(
-    (acc, r) => {
-      acc.overall += r.overallRating;
-      if (r.foodRating) acc.food += r.foodRating;
-      if (r.serviceRating) acc.service += r.serviceRating;
-      if (r.atmosphereRating) acc.atmosphere += r.atmosphereRating;
-      if (r.cleanlinessRating) acc.cleanliness += r.cleanlinessRating;
-      return acc;
-    },
-    { overall: 0, food: 0, service: 0, atmosphere: 0, cleanliness: 0 }
-  );
-  const foodN = reviews.filter((r) => r.foodRating != null).length;
-  const serviceN = reviews.filter((r) => r.serviceRating != null).length;
-  const atmosphereN = reviews.filter((r) => r.atmosphereRating != null).length;
-  const cleanlinessN = reviews.filter((r) => r.cleanlinessRating != null).length;
+function ratingsFromAgg(agg: {
+  _avg: {
+    overallRating: number | null;
+    foodRating: number | null;
+    serviceRating: number | null;
+    atmosphereRating: number | null;
+    cleanlinessRating: number | null;
+  };
+  _count: { overallRating: number };
+}): Ratings {
   return {
-    averageOverall: round1dp(sum.overall / count),
-    averageFood: foodN ? round1dp(sum.food / foodN) : 0,
-    averageService: serviceN ? round1dp(sum.service / serviceN) : 0,
-    averageAtmosphere: atmosphereN ? round1dp(sum.atmosphere / atmosphereN) : 0,
-    averageCleanliness: cleanlinessN ? round1dp(sum.cleanliness / cleanlinessN) : 0,
-    reviewCount: count,
+    averageOverall: round1dp(agg._avg.overallRating ?? 0),
+    averageFood: round1dp(agg._avg.foodRating ?? 0),
+    averageService: round1dp(agg._avg.serviceRating ?? 0),
+    averageAtmosphere: round1dp(agg._avg.atmosphereRating ?? 0),
+    averageCleanliness: round1dp(agg._avg.cleanlinessRating ?? 0),
+    reviewCount: agg._count.overallRating,
   };
 }
 
 const aggregateRatings = cache(async (restaurantId: string) => {
-  const reviews = await prisma.review.findMany({
+  const agg = await prisma.review.aggregate({
     where: { restaurantId },
-    select: {
+    _avg: {
       overallRating: true,
       foodRating: true,
       serviceRating: true,
       atmosphereRating: true,
       cleanlinessRating: true,
     },
+    _count: { overallRating: true },
   });
-  return computeRatings(reviews);
+  return ratingsFromAgg(agg);
 });
 
 const batchAggregateRatings = cache(async (restaurantIds: string[]) => {
-  const reviews = await prisma.review.findMany({
+  if (restaurantIds.length === 0) return new Map<string, Ratings>();
+
+  const rows = await prisma.review.groupBy({
+    by: ["restaurantId"],
     where: { restaurantId: { in: restaurantIds } },
-    select: {
-      restaurantId: true,
+    _avg: {
       overallRating: true,
       foodRating: true,
       serviceRating: true,
       atmosphereRating: true,
       cleanlinessRating: true,
     },
+    _count: { overallRating: true },
   });
+
   const grouped = new Map<string, Ratings>();
-  const map = new Map<string, typeof reviews>();
-  for (const r of reviews) {
-    if (!map.has(r.restaurantId)) map.set(r.restaurantId, []);
-    map.get(r.restaurantId)!.push(r);
-  }
-  for (const [id, revs] of map) {
-    grouped.set(id, computeRatings(revs));
+  for (const row of rows) {
+    grouped.set(row.restaurantId, ratingsFromAgg(row));
   }
   return grouped;
 });
@@ -197,7 +187,7 @@ export const listDirectory = cache(async (input: z.infer<typeof listDirectorySch
 
   const restaurants = await prisma.restaurant.findMany({
     where,
-    include: { city: true, reviews: true },
+    include: { city: true },
     orderBy: { createdAt: "desc" },
     take: 50,
   });

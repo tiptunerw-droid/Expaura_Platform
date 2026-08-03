@@ -1,130 +1,32 @@
-"use client";
-
-import * as React from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { DashboardNav } from "@/components/dashboard/nav";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { redirect } from "next/navigation";
+import { DashboardShell } from "@/components/dashboard/shell";
 import { getCurrentUser } from "@/lib/actions/auth";
-import { getManagerRestaurant } from "@/lib/actions/restaurants";
 
-interface AuthState {
-  authenticated: boolean;
-  userName: string;
-  userRole: string;
-}
-
-interface RestaurantState {
-  name: string;
-  logoUrl: string | null;
-}
-
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [authState, setAuthState] = React.useState<AuthState>({
-    authenticated: false,
-    userName: "",
-    userRole: "",
-  });
-  const [restaurantState, setRestaurantState] = React.useState<RestaurantState>({
-    name: "",
-    logoUrl: null,
-  });
-  const [loading, setLoading] = React.useState(true);
-  const [sidebarOpen, setSidebarOpen] = React.useState(false);
-  const router = useRouter();
-  const pathname = usePathname();
-
-  React.useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const [result, restaurant] = await Promise.all([
-          getCurrentUser(),
-          getManagerRestaurant().catch(() => null),
-        ]);
-        if (result.authenticated && result.user) {
-          setAuthState({
-            authenticated: true,
-            userName: result.user.name,
-            userRole:
-              result.user.platformRole === "SUPER_ADMIN"
-                ? "Super Admin"
-                : "Restaurant Manager",
-          });
-          if (restaurant) {
-            setRestaurantState({
-              name: restaurant.name,
-              logoUrl: restaurant.logoUrl ?? null,
-            });
-          }
-        } else {
-          router.push("/login");
-        }
-      } catch {
-        router.push("/login");
-      } finally {
-        setLoading(false);
-      }
-    };
-    checkAuth();
-  }, [pathname, router]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
-        <div className="w-12 h-12 rounded-full border-4 border-border-subtle border-t-emerald-500 animate-spin" />
-      </div>
-    );
+  const result = await getCurrentUser();
+  if (!result.authenticated || !result.user) {
+    redirect("/login");
   }
 
-  if (!authState.authenticated) {
-    return null;
-  }
-
-  const titleMap: Record<string, string> = {
-    "/dashboard": "Analytics",
-    "/dashboard/reviews": "Reviews",
-    "/dashboard/complaints": "Complaints",
-    "/dashboard/menu": "Menu",
-    "/dashboard/gallery": "Gallery",
-    "/dashboard/staff": "Staff",
-    "/dashboard/waiters": "Waiters",
-    "/dashboard/employees": "Employees",
-    "/dashboard/branches": "Branches",
-    "/dashboard/profile": "Profile",
-  };
-
-  const currentTitle = titleMap[pathname] || "Dashboard";
+  const userName = result.user.name;
+  const userRole =
+    result.user.platformRole === "SUPER_ADMIN"
+      ? "Super Admin"
+      : "Restaurant Manager";
+  const restaurant = result.restaurant;
 
   return (
-    <div className="min-h-screen bg-surface text-text-primary selection:bg-emerald-500 selection:text-white">
-      <DashboardNav
-        userName={authState.userName}
-        userRole={authState.userRole}
-        restaurantName={restaurantState.name}
-        restaurantLogo={restaurantState.logoUrl}
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-      />
-      
-      {/* Mobile backdrop */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/80 z-20 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      <div className="lg:pl-64">
-        <DashboardHeader
-          title={currentTitle}
-          userName={authState.userName}
-          onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
-        />
-        <main className="p-4 sm:p-8">{children}</main>
-      </div>
-    </div>
+    <DashboardShell
+      userName={userName}
+      userRole={userRole}
+      restaurantName={restaurant?.name ?? ""}
+      restaurantLogo={restaurant?.logoUrl ?? null}
+    >
+      {children}
+    </DashboardShell>
   );
 }

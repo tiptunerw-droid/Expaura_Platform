@@ -43,7 +43,6 @@ interface Props {
   averageService: number;
   averageAtmosphere: number;
   averageCleanliness: number;
-  initialTab?: string;
 }
 
 export function RestaurantTabs({
@@ -56,7 +55,6 @@ export function RestaurantTabs({
   averageService,
   averageAtmosphere,
   averageCleanliness,
-  initialTab,
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -66,9 +64,7 @@ export function RestaurantTabs({
 
   const tab = tabFromUrl && availableTabs.includes(tabFromUrl)
     ? tabFromUrl
-    : initialTab && availableTabs.includes(initialTab)
-      ? initialTab
-      : "menu";
+    : "menu";
 
   const setTab = React.useCallback((value: string) => {
     const params = new URLSearchParams(searchParams.toString());

@@ -163,8 +163,8 @@ export const platformAnalytics = cache(async () => {
     totalReviewsPlatform,
     totalComplaintsPlatform,
     restaurantsByCity,
-    allReviews,
-    allComplaints,
+    reviewAgg,
+    complaintAgg,
   ] = await Promise.all([
     prisma.restaurant.count(),
     prisma.subscription.count({ where: { status: SubscriptionStatus.ACTIVE } }),
@@ -176,11 +176,14 @@ export const platformAnalytics = cache(async () => {
       orderBy: { _count: { cityId: "desc" } },
       take: 10,
     }),
-    prisma.review.findMany({
-      select: { overallRating: true, restaurantId: true },
+    prisma.review.groupBy({
+      by: ["restaurantId"],
+      _avg: { overallRating: true },
+      _count: { overallRating: true },
     }),
-    prisma.complaint.findMany({
-      select: { restaurantId: true },
+    prisma.complaint.groupBy({
+      by: ["restaurantId"],
+      _count: { restaurantId: true },
     }),
   ]);
 
@@ -194,21 +197,9 @@ export const platformAnalytics = cache(async () => {
     restaurants: r._count.cityId,
   }));
 
-  const byRestRating: Record<string, { sum: number; n: number }> = {};
-  for (const rev of allReviews) {
-    if (!byRestRating[rev.restaurantId]) byRestRating[rev.restaurantId] = { sum: 0, n: 0 };
-    byRestRating[rev.restaurantId].sum += rev.overallRating;
-    byRestRating[rev.restaurantId].n++;
-  }
-
-  const byRestComplaint: Record<string, number> = {};
-  for (const c of allComplaints) {
-    byRestComplaint[c.restaurantId] = (byRestComplaint[c.restaurantId] || 0) + 1;
-  }
-
   const restIdsNeeded = new Set([
-    ...Object.keys(byRestRating),
-    ...Object.keys(byRestComplaint),
+    ...reviewAgg.map((r) => r.restaurantId),
+    ...complaintAgg.map((c) => c.restaurantId),
   ]);
   const restaurants = await prisma.restaurant.findMany({
     where: { id: { in: [...restIdsNeeded] } },
@@ -216,14 +207,14 @@ export const platformAnalytics = cache(async () => {
   });
   const restMap = new Map(restaurants.map((r) => [r.id, r]));
 
-  const topRatedRestaurants = Object.entries(byRestRating)
-    .map(([id, v]) => {
-      const rest = restMap.get(id);
+  const topRatedRestaurants = reviewAgg
+    .map((r) => {
+      const rest = restMap.get(r.restaurantId);
       return {
-        id,
+        id: r.restaurantId,
         name: rest?.name || "Unknown",
-        avgRating: round1dp(v.sum / v.n),
-        reviewCount: v.n,
+        avgRating: round1dp(r._avg.overallRating ?? 0),
+        reviewCount: r._count.overallRating,
         cityId: rest?.cityId,
       };
     })
@@ -236,12 +227,12 @@ export const platformAnalytics = cache(async () => {
       cityName: r.cityId ? cityMap.get(r.cityId) || "Unknown" : "Unknown",
     }));
 
-  const mostComplainedRestaurants = Object.entries(byRestComplaint)
-    .map(([id, count]) => {
-      const rest = restMap.get(id);
+  const mostComplainedRestaurants = complaintAgg
+    .map((c) => {
+      const rest = restMap.get(c.restaurantId);
       return {
         name: rest?.name || "Unknown",
-        complaintCount: count,
+        complaintCount: c._count.restaurantId,
         cityId: rest?.cityId,
       };
     })

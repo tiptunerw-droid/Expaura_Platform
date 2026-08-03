@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { getCities } from "@/lib/actions/data";
 import { getCityRestaurantCounts, listRecentlyAdded } from "@/lib/actions/restaurants";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 async function CityGrid() {
   const [{ cities }, cityCounts] = await Promise.all([

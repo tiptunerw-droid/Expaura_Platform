@@ -121,61 +121,52 @@ export const getRestaurantReviewsStats = cache(async (restaurantId: string) => {
   const idValid = z.string().uuid().safeParse(restaurantId);
   if (!idValid.success) throw new Error("Invalid restaurant ID");
 
-  const reviews = await prisma.review.findMany({
-    where: { restaurantId: idValid.data },
-    select: {
-      overallRating: true,
-      foodRating: true,
-      serviceRating: true,
-      atmosphereRating: true,
-      cleanlinessRating: true,
-      wouldRecommend: true,
-      createdAt: true,
-    },
-  });
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-  const totalReviews = reviews.length;
-  if (totalReviews === 0) {
-    return {
-      averageOverall: 0,
-      averageFood: 0,
-      averageService: 0,
-      averageAtmosphere: 0,
-      averageCleanliness: 0,
-      recommendRate: 0,
-      totalReviews: 0,
-      reviewsByStar: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
-      reviewsLast30Days: 0,
-    };
-  }
+  const [agg, byStar, recommended, withOpinion, last30] = await Promise.all([
+    prisma.review.aggregate({
+      where: { restaurantId: idValid.data },
+      _avg: {
+        overallRating: true,
+        foodRating: true,
+        serviceRating: true,
+        atmosphereRating: true,
+        cleanlinessRating: true,
+      },
+      _count: { overallRating: true },
+    }),
+    prisma.review.groupBy({
+      by: ["overallRating"],
+      where: { restaurantId: idValid.data },
+      _count: { overallRating: true },
+    }),
+    prisma.review.count({
+      where: { restaurantId: idValid.data, wouldRecommend: true },
+    }),
+    prisma.review.count({
+      where: { restaurantId: idValid.data, wouldRecommend: { not: null } },
+    }),
+    prisma.review.count({
+      where: { restaurantId: idValid.data, createdAt: { gte: thirtyDaysAgo } },
+    }),
+  ]);
 
-  const avg = (vals: (number | null | undefined)[]) => {
-    const valid = vals.filter((v): v is number => typeof v === "number");
-    return valid.length ? Math.round((valid.reduce((a, b) => a + b, 0) / valid.length) * 10) / 10 : 0;
-  };
+  const round1dp = (n: number): number => Math.round(n * 10) / 10;
 
   const reviewsByStar: Record<string, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-  reviews.forEach((r) => {
-    reviewsByStar[r.overallRating] = (reviewsByStar[r.overallRating] || 0) + 1;
-  });
-
-  const recommendVals = reviews.filter((r) => r.wouldRecommend !== undefined);
-  const recommendRate = recommendVals.length
-    ? Math.round((recommendVals.filter((r) => r.wouldRecommend).length / recommendVals.length) * 100)
-    : 0;
-
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-  const reviewsLast30Days = reviews.filter((r) => r.createdAt >= thirtyDaysAgo).length;
+  for (const row of byStar) {
+    reviewsByStar[row.overallRating] = row._count.overallRating;
+  }
 
   return {
-    averageOverall: avg(reviews.map((r) => r.overallRating)),
-    averageFood: avg(reviews.map((r) => r.foodRating)),
-    averageService: avg(reviews.map((r) => r.serviceRating)),
-    averageAtmosphere: avg(reviews.map((r) => r.atmosphereRating)),
-    averageCleanliness: avg(reviews.map((r) => r.cleanlinessRating)),
-    recommendRate,
-    totalReviews,
+    averageOverall: round1dp(agg._avg.overallRating ?? 0),
+    averageFood: round1dp(agg._avg.foodRating ?? 0),
+    averageService: round1dp(agg._avg.serviceRating ?? 0),
+    averageAtmosphere: round1dp(agg._avg.atmosphereRating ?? 0),
+    averageCleanliness: round1dp(agg._avg.cleanlinessRating ?? 0),
+    recommendRate: withOpinion > 0 ? Math.round((recommended / withOpinion) * 100) : 0,
+    totalReviews: agg._count.overallRating,
     reviewsByStar,
-    reviewsLast30Days,
+    reviewsLast30Days: last30,
   };
 });
