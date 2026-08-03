@@ -17,46 +17,65 @@ export async function createNotification(
   });
 }
 
+function isPlatformAdmin(session: NonNullable<Awaited<ReturnType<typeof getSession>>>) {
+  return session.platformRole === "SUPER_ADMIN" || session.platformRole === "ADMIN";
+}
+
 export async function getNotifications(limit = 10) {
   const session = await getSession();
-  if (!session?.activeRestaurantId) return [];
+  if (!session) return [];
+  if (!session.activeRestaurantId && !isPlatformAdmin(session)) return [];
+
+  const where = session.activeRestaurantId
+    ? { restaurantId: session.activeRestaurantId }
+    : {};
 
   return prisma.notification.findMany({
-    where: { restaurantId: session.activeRestaurantId },
+    where,
     orderBy: { createdAt: "desc" },
     take: limit,
+    include: { restaurant: { select: { name: true } } },
   });
 }
 
 export async function getUnreadCount() {
   const session = await getSession();
-  if (!session?.activeRestaurantId) return 0;
+  if (!session) return 0;
+  if (!session.activeRestaurantId && !isPlatformAdmin(session)) return 0;
 
-  return prisma.notification.count({
-    where: { restaurantId: session.activeRestaurantId, isRead: false },
-  });
+  const where = session.activeRestaurantId
+    ? { restaurantId: session.activeRestaurantId }
+    : {};
+
+  return prisma.notification.count({ where: { ...where, isRead: false } });
 }
 
 export async function markAsRead(id: string) {
   const session = await getSession();
-  if (!session?.activeRestaurantId) return;
+  if (!session) return;
+  if (!session.activeRestaurantId && !isPlatformAdmin(session)) return;
 
   await prisma.notification.updateMany({
-    where: { id, restaurantId: session.activeRestaurantId },
+    where: session.activeRestaurantId
+      ? { id, restaurantId: session.activeRestaurantId }
+      : { id },
     data: { isRead: true },
   });
 
-  revalidatePath("/dashboard", "layout");
+  revalidatePath("/", "layout");
 }
 
 export async function markAllAsRead() {
   const session = await getSession();
-  if (!session?.activeRestaurantId) return;
+  if (!session) return;
+  if (!session.activeRestaurantId && !isPlatformAdmin(session)) return;
 
   await prisma.notification.updateMany({
-    where: { restaurantId: session.activeRestaurantId, isRead: false },
+    where: session.activeRestaurantId
+      ? { restaurantId: session.activeRestaurantId, isRead: false }
+      : { isRead: false },
     data: { isRead: true },
   });
 
-  revalidatePath("/dashboard", "layout");
+  revalidatePath("/", "layout");
 }

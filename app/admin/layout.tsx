@@ -12,13 +12,13 @@ import {
   Settings,
   LogOut,
   Search,
-  Bell,
   ChevronDown,
   Menu,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getCurrentUser, logout } from "@/lib/actions/auth";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { NotificationDropdown } from "@/components/dashboard/notification-dropdown";
 
 interface NavItem {
   href: string;
@@ -179,13 +179,7 @@ function AdminHeader({
 
         <ThemeToggle />
 
-        <button
-          className="relative p-2 text-gray-500 hover:text-white transition-colors"
-          aria-label="Notifications"
-        >
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-purple-500" />
-        </button>
+        <NotificationDropdown />
 
         <div className="relative">
           <button

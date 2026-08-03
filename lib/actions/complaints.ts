@@ -32,9 +32,139 @@ const updateStatusSchema = z.object({
   managerNote: z.string().optional(),
 });
 
-export const getComplaintCategories = cache(async () => {
-  return prisma.complaintCategory.findMany();
+const categorySchema = z.object({
+  name: z.string().trim().min(2, "Category name must be at least 2 characters").max(60),
+  icon: z.string().trim().max(40).nullable().optional(),
 });
+
+const categoryUpdateSchema = categorySchema.extend({
+  id: z.string().uuid(),
+});
+
+const categoryDeleteSchema = z.object({
+  id: z.string().uuid(),
+});
+
+export const getComplaintCategories = cache(async () => {
+  return prisma.complaintCategory.findMany({
+    orderBy: { name: "asc" },
+  });
+});
+
+async function requireSuperAdmin() {
+  const session = await getSession();
+  if (!session || session.platformRole !== "SUPER_ADMIN") {
+    throw new Error("Unauthorized");
+  }
+  return session;
+}
+
+export async function createComplaintCategory(input: z.infer<typeof categorySchema>) {
+  const session = await requireSuperAdmin();
+  const valid = categorySchema.safeParse(input);
+  if (!valid.success) {
+    throw new Error(valid.error.issues[0]?.message || "Validation failed");
+  }
+
+  const existing = await prisma.complaintCategory.findUnique({
+    where: { name: valid.data.name },
+    select: { id: true },
+  });
+  if (existing) {
+    throw new Error("A category with that name already exists");
+  }
+
+  const category = await prisma.complaintCategory.create({
+    data: { name: valid.data.name, icon: valid.data.icon ?? null },
+    select: { id: true, name: true },
+  });
+
+  await prisma.auditLog.create({
+    data: {
+      userId: session.userId,
+      action: "CATEGORY_CREATE",
+      entity: "ComplaintCategory",
+      entityId: category.id,
+      changes: { name: valid.data.name, icon: valid.data.icon ?? null },
+    },
+  });
+
+  return category;
+}
+
+export async function updateComplaintCategory(input: z.infer<typeof categoryUpdateSchema>) {
+  const session = await requireSuperAdmin();
+  const valid = categoryUpdateSchema.safeParse(input);
+  if (!valid.success) {
+    throw new Error(valid.error.issues[0]?.message || "Validation failed");
+  }
+
+  const existing = await prisma.complaintCategory.findUnique({
+    where: { id: valid.data.id },
+    select: { id: true },
+  });
+  if (!existing) {
+    throw new Error("Category not found");
+  }
+
+  const duplicate = await prisma.complaintCategory.findFirst({
+    where: { name: valid.data.name, NOT: { id: valid.data.id } },
+    select: { id: true },
+  });
+  if (duplicate) {
+    throw new Error("A category with that name already exists");
+  }
+
+  const updated = await prisma.complaintCategory.update({
+    where: { id: valid.data.id },
+    data: { name: valid.data.name, icon: valid.data.icon ?? null },
+    select: { id: true, name: true },
+  });
+
+  await prisma.auditLog.create({
+    data: {
+      userId: session.userId,
+      action: "CATEGORY_UPDATE",
+      entity: "ComplaintCategory",
+      entityId: updated.id,
+      changes: { name: valid.data.name, icon: valid.data.icon ?? null },
+    },
+  });
+
+  return updated;
+}
+
+export async function deleteComplaintCategory(input: z.infer<typeof categoryDeleteSchema>) {
+  const session = await requireSuperAdmin();
+  const valid = categoryDeleteSchema.safeParse(input);
+  if (!valid.success) {
+    throw new Error(valid.error.issues[0]?.message || "Validation failed");
+  }
+
+  const existing = await prisma.complaintCategory.findUnique({
+    where: { id: valid.data.id },
+    include: { _count: { select: { complaints: true } } },
+  });
+  if (!existing) {
+    throw new Error("Category not found");
+  }
+  if (existing._count.complaints > 0) {
+    throw new Error(
+      `Cannot delete — ${existing._count.complaints} complaint(s) still use this category. Reassign or remove them first.`
+    );
+  }
+
+  await prisma.complaintCategory.delete({ where: { id: valid.data.id } });
+
+  await prisma.auditLog.create({
+    data: {
+      userId: session.userId,
+      action: "CATEGORY_DELETE",
+      entity: "ComplaintCategory",
+      entityId: valid.data.id,
+    },
+  });
+}
 
 export async function submitComplaint(form: z.infer<typeof submitComplaintSchema>) {
   const valid = submitComplaintSchema.safeParse(form);

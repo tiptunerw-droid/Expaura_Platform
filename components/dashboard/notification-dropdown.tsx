@@ -14,6 +14,7 @@ type Notification = {
   link: string | null;
   isRead: boolean;
   createdAt: Date;
+  restaurantName?: string | null;
 };
 
 const iconMap: Record<NotificationType, typeof MessageSquare> = {
@@ -44,7 +45,18 @@ export function NotificationDropdown() {
         getNotifications(8),
         getUnreadCount(),
       ]);
-      setNotifications(items as Notification[]);
+      setNotifications(
+        items.map((n) => ({
+          id: n.id,
+          type: n.type,
+          title: n.title,
+          message: n.message,
+          link: n.link,
+          isRead: n.isRead,
+          createdAt: n.createdAt,
+          restaurantName: n.restaurant?.name ?? null,
+        })),
+      );
       setUnread(count);
     }
     setOpen((v) => !v);
@@ -136,6 +148,11 @@ export function NotificationDropdown() {
                         {n.message && (
                           <p className="text-[10px] text-text-tertiary mt-0.5 line-clamp-2">
                             {n.message}
+                          </p>
+                        )}
+                        {n.restaurantName && (
+                          <p className="text-[9px] font-bold uppercase tracking-widest text-emerald-500 mt-0.5">
+                            {n.restaurantName}
                           </p>
                         )}
                         <p className="text-[9px] text-text-tertiary mt-1 font-bold uppercase tracking-widest">
