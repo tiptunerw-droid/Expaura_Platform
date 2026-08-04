@@ -4,6 +4,7 @@ import { z } from "zod";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/permissions";
 import { ComplaintStatus } from "@/generated/prisma/client";
 
 const addEmployeeSchema = z.object({
@@ -56,7 +57,7 @@ export const listActiveEmployees = cache(async (restaurantId: string) => {
 });
 
 export async function addEmployee(form: z.infer<typeof addEmployeeSchema>) {
-  const session = await getSession();
+  const session = await requirePermission("MANAGE_EMPLOYEES");
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
   }
@@ -75,7 +76,7 @@ export async function addEmployee(form: z.infer<typeof addEmployeeSchema>) {
 }
 
 export async function updateEmployee(id: string, form: z.infer<typeof updateEmployeeSchema>) {
-  const session = await getSession();
+  const session = await requirePermission("MANAGE_EMPLOYEES");
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
   }

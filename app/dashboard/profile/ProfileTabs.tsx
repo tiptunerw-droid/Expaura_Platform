@@ -50,9 +50,11 @@ interface RestaurantData {
 
 interface Props {
   restaurant: RestaurantData;
+  canManageSettings: boolean;
+  canManageQr: boolean;
 }
 
-export function ProfileTabs({ restaurant }: Props) {
+export function ProfileTabs({ restaurant, canManageSettings, canManageQr }: Props) {
   const [tab, setTab] = React.useState("profile");
   const sub = restaurant.currentSubscription;
   const plan = sub?.plan;
@@ -74,7 +76,28 @@ export function ProfileTabs({ restaurant }: Props) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ProfileForm restaurant={restaurant} />
+            {canManageSettings ? (
+              <ProfileForm restaurant={restaurant} />
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-ink-muted text-xs">Restaurant name</p>
+                  <p className="font-medium">{restaurant.name}</p>
+                </div>
+                <div>
+                  <p className="text-ink-muted text-xs">City</p>
+                  <p className="font-medium">{restaurant.city?.name || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-ink-muted text-xs">Phone</p>
+                  <p className="font-medium">{restaurant.phone || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-ink-muted text-xs">Address</p>
+                  <p className="font-medium">{restaurant.address || "—"}</p>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </TabsContent>
@@ -167,7 +190,7 @@ export function ProfileTabs({ restaurant }: Props) {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-center">
-            <QrDisplay qrCodes={restaurant.qrCodes ?? []} slug={restaurant.slug} />
+            <QrDisplay qrCodes={restaurant.qrCodes ?? []} slug={restaurant.slug} canGenerate={canManageQr} />
             <p className="text-xs text-ink-muted">
               Print this QR and place it on tables. Customers scan with their phone camera.
             </p>

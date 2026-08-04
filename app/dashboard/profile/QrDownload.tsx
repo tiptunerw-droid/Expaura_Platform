@@ -17,9 +17,10 @@ interface QrCodeData {
 interface Props {
   qrCodes: QrCodeData[];
   slug: string;
+  canGenerate?: boolean;
 }
 
-export function QrDisplay({ qrCodes, slug }: Props) {
+export function QrDisplay({ qrCodes, slug, canGenerate = true }: Props) {
   const router = useRouter();
   const [generating, setGenerating] = React.useState(false);
   const [qrDataUrl, setQrDataUrl] = React.useState<string | null>(null);
@@ -79,14 +80,16 @@ export function QrDisplay({ qrCodes, slug }: Props) {
             Download PNG
           </Button>
         )}
-        <Button variant="outline" size="sm" onClick={handleGenerate} disabled={generating}>
-          {generating ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <RefreshCw className="w-4 h-4" />
-          )}
-          {qrCodes.length ? "Regenerate" : "Generate QR"}
-        </Button>
+        {canGenerate ? (
+          <Button variant="outline" size="sm" onClick={handleGenerate} disabled={generating}>
+            {generating ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <RefreshCw className="w-4 h-4" />
+            )}
+            {qrCodes.length ? "Regenerate" : "Generate QR"}
+          </Button>
+        ) : null}
       </div>
     </div>
   );

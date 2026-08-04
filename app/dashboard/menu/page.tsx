@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getManagerRestaurant } from "@/lib/actions/restaurants";
 import { listMenuImages } from "@/lib/actions/menu";
+import { hasPermission } from "@/lib/auth/permissions";
 import { MenuImageUpload } from "./MenuImageUpload";
 import { DeleteMenuImage } from "./DeleteMenuImage";
 
@@ -21,6 +22,8 @@ export default async function MenuPage() {
     return <div className="flex flex-col items-center justify-center py-20"><Link href="/login"><Button>Log in</Button></Link></div>;
   }
 
+  const canManageMenu = await hasPermission("MANAGE_MENU");
+
   const rid = restaurant.id;
   const menuImages = await listMenuImages(rid).catch(() => []);
 
@@ -33,7 +36,8 @@ export default async function MenuPage() {
             {menuImages.length} page{menuImages.length !== 1 ? "s" : ""} · Customers see these when they scan the QR
           </p>
         </div>
-        <MenuImageUpload />\n      </div>
+        {canManageMenu ? <MenuImageUpload /> : null}
+      </div>
 
       {menuImages.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -53,9 +57,11 @@ export default async function MenuPage() {
                     Page {idx + 1}
                   </Badge>
                 </div>
-                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <DeleteMenuImage imageId={img.id} />
-                </div>
+                {canManageMenu ? (
+                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <DeleteMenuImage imageId={img.id} />
+                  </div>
+                ) : null}
               </div>
             </Card>
           ))}
@@ -67,7 +73,7 @@ export default async function MenuPage() {
           title="No menu pages yet"
           description="Upload photos of your menu — customers will see them when they scan the QR code at your restaurant."
           action={
-            <MenuImageUpload />
+            canManageMenu ? <MenuImageUpload /> : undefined
           }
         />
       )}

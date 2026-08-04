@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/permissions";
 
 const addBranchSchema = z.object({
   name: z.string().min(2, "Branch name must be at least 2 characters"),
@@ -39,7 +39,7 @@ export const listBranches = cache(async (restaurantId: string) => {
 });
 
 export async function addBranch(form: z.infer<typeof addBranchSchema>) {
-  const session = await getSession();
+  const session = await requirePermission("MANAGE_BRANCHES");
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
   }
@@ -58,7 +58,7 @@ export async function addBranch(form: z.infer<typeof addBranchSchema>) {
 }
 
 export async function updateBranch(id: string, form: z.infer<typeof updateBranchSchema>) {
-  const session = await getSession();
+  const session = await requirePermission("MANAGE_BRANCHES");
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
   }
@@ -92,7 +92,7 @@ export async function updateBranch(id: string, form: z.infer<typeof updateBranch
 }
 
 export async function assignStaffToBranch(form: z.infer<typeof assignStaffSchema>) {
-  const session = await getSession();
+  const session = await requirePermission("MANAGE_BRANCHES");
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
   }

@@ -7,6 +7,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { EmptyState } from "@/components/ui/empty-state";
 import { getManagerRestaurant } from "@/lib/actions/restaurants";
 import { listBranches } from "@/lib/actions/branches";
+import { hasPermission } from "@/lib/auth/permissions";
 import { formatDate } from "@/lib/utils";
 import { AddBranchDialog } from "./AddBranchDialog";
 
@@ -19,6 +20,8 @@ export default async function BranchesPage() {
   } catch {
     return <div className="flex flex-col items-center justify-center py-20"><Link href="/login"><Button>Log in</Button></Link></div>;
   }
+
+  const canManageBranches = await hasPermission("MANAGE_BRANCHES");
 
   const branches = await listBranches(restaurant.id).catch(() => []);
   const plan = restaurant.currentSubscription?.plan;
@@ -34,13 +37,15 @@ export default async function BranchesPage() {
             {branches.length} of {maxBranches} branches used
           </p>
         </div>
-        {canAdd ? (
-          <AddBranchDialog />
-        ) : (
-          <Link href="/dashboard/profile#subscription">
-            <Button variant="brass" size="sm">Upgrade for more</Button>
-          </Link>
-        )}
+        {canManageBranches ? (
+          canAdd ? (
+            <AddBranchDialog />
+          ) : (
+            <Link href="/dashboard/profile#subscription">
+              <Button variant="brass" size="sm">Upgrade for more</Button>
+            </Link>
+          )
+        ) : null}
       </div>
 
       {branches.length > 0 ? (
@@ -79,7 +84,7 @@ export default async function BranchesPage() {
           title="No branches yet"
           titleClassName="text-ink"
           description="Add multiple locations to manage them all from one dashboard."
-          action={canAdd ? <AddBranchDialog /> : undefined}
+          action={canManageBranches && canAdd ? <AddBranchDialog /> : undefined}
         />
       )}
     </div>

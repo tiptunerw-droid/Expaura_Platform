@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { getManagerRestaurant } from "@/lib/actions/restaurants";
 import { getManagerPlanFeatures } from "@/lib/actions/restaurants";
 import { listEmployees } from "@/lib/actions/employees";
+import { hasPermission } from "@/lib/auth/permissions";
 import { formatDate } from "@/lib/utils";
 import { AddEmployeeDialog } from "./AddEmployeeDialog";
 import { FeatureLock } from "@/components/dashboard/feature-lock";
@@ -21,6 +22,8 @@ export default async function EmployeesPage() {
   } catch {
     return <div className="flex flex-col items-center justify-center py-20"><Link href="/login"><Button>Log in</Button></Link></div>;
   }
+
+  const canManageEmployees = await hasPermission("MANAGE_EMPLOYEES");
 
   const features = await getManagerPlanFeatures();
   if (!features.employeeTrackingEnabled) {
@@ -43,7 +46,7 @@ export default async function EmployeesPage() {
             {employees.length} employee{employees.length !== 1 ? "s" : ""} · Track service performance
           </p>
         </div>
-        <AddEmployeeDialog />
+        {canManageEmployees ? <AddEmployeeDialog /> : null}
       </div>
 
       {employees.length > 0 ? (
@@ -85,7 +88,7 @@ export default async function EmployeesPage() {
           variant="neutral"
           title="No employees yet"
           description="Add waiters, chefs, and other staff to track service performance over time."
-          action={<AddEmployeeDialog />}
+          action={canManageEmployees ? <AddEmployeeDialog /> : undefined}
         />
       )}
     </div>

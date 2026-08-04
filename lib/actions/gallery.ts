@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/permissions";
 
 const addGallerySchema = z.object({
   imageUrl: z.string().min(1, "Image URL is required"),
@@ -25,7 +25,7 @@ export const listGallery = cache(async (restaurantId: string) => {
 });
 
 export async function addGalleryImage(form: z.infer<typeof addGallerySchema>) {
-  const session = await getSession();
+  const session = await requirePermission("MANAGE_GALLERY");
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
   }
@@ -44,7 +44,7 @@ export async function addGalleryImage(form: z.infer<typeof addGallerySchema>) {
 }
 
 export async function updateGalleryImage(id: string, form: z.infer<typeof updateGallerySchema>) {
-  const session = await getSession();
+  const session = await requirePermission("MANAGE_GALLERY");
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
   }
@@ -76,7 +76,7 @@ export async function updateGalleryImage(id: string, form: z.infer<typeof update
 }
 
 export async function deleteGalleryImage(id: string) {
-  const session = await getSession();
+  const session = await requirePermission("MANAGE_GALLERY");
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
   }

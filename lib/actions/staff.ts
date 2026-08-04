@@ -2,10 +2,12 @@
 
 import { z } from "zod";
 import { cache } from "react";
+import { revalidatePath } from "next/cache";
 import { SignJWT, jwtVerify } from "jose";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth/password";
 import { setSessionCookie, getSession } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/permissions";
 import { getUserPermissions } from "@/lib/auth/rbac";
 import { sendEmail } from "@/lib/email/brevo";
 
@@ -34,7 +36,7 @@ export const listRestaurantRoles = cache(async () => {
 export async function inviteStaff(
   input: z.infer<typeof inviteSchema>
 ): Promise<{ message: string; inviteUrl: string }> {
-  const session = await getSession();
+  const session = await requirePermission("MANAGE_STAFF");
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized access.");
   }
@@ -115,6 +117,65 @@ export async function inviteStaff(
     message: `Invitation email sent to ${email}`,
     inviteUrl,
   };
+}
+
+const setStaffStatusSchema = z.object({
+  staffId: z.string().uuid(),
+  isActive: z.boolean(),
+});
+
+export async function setStaffStatus(
+  input: z.infer<typeof setStaffStatusSchema>
+): Promise<{ message: string }> {
+  const session = await requirePermission("MANAGE_STAFF");
+  if (!session || !session.activeRestaurantId) {
+    throw new Error("Unauthorized");
+  }
+
+  const valid = setStaffStatusSchema.safeParse(input);
+  if (!valid.success) {
+    throw new Error(valid.error.issues[0]?.message || "Validation failed");
+  }
+
+  const { staffId, isActive } = valid.data;
+
+  const record = await prisma.restaurantStaff.findUnique({
+    where: { id: staffId },
+    select: {
+      id: true,
+      userId: true,
+      restaurantId: true,
+      user: { select: { name: true } },
+      role: { select: { name: true } },
+    },
+  });
+
+  if (!record || record.restaurantId !== session.activeRestaurantId) {
+    throw new Error("Staff member not found");
+  }
+  if (record.userId === session.userId) {
+    throw new Error("You cannot change your own access.");
+  }
+
+  await prisma.restaurantStaff.update({
+    where: { id: record.id },
+    data: { isActive },
+  });
+
+  await prisma.auditLog.create({
+    data: {
+      userId: session.userId,
+      restaurantId: session.activeRestaurantId,
+      action: isActive ? "STAFF_ACCESS_GRANTED" : "STAFF_ACCESS_REVOKED",
+      entity: "RestaurantStaff",
+      entityId: record.id,
+      changes: { name: record.user.name, role: record.role.name, isActive },
+    },
+  });
+
+  revalidatePath("/dashboard/staff");
+
+  return { message: isActive ? "Access granted." : "Access revoked." };
 }
 
 const acceptInviteSchema = z.object({

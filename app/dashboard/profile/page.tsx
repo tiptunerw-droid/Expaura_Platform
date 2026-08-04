@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getManagerRestaurant } from "@/lib/actions/restaurants";
 import { getCurrentUser } from "@/lib/actions/auth";
+import { hasPermission } from "@/lib/auth/permissions";
 import { ProfileTabs } from "./ProfileTabs";
 import { UserProfileForm } from "./UserProfileForm";
 
@@ -21,13 +22,19 @@ export default async function ProfilePage() {
   }
 
   const auth = await getCurrentUser();
+  const canManageSettings = await hasPermission("MANAGE_SETTINGS");
+  const canManageQr = await hasPermission("MANAGE_QR");
 
   return (
     <div className="space-y-6 max-w-3xl">
       {auth.authenticated && auth.user ? (
         <UserProfileForm user={{ name: auth.user.name, email: auth.user.email }} />
       ) : null}
-      <ProfileTabs restaurant={restaurant} />
+      <ProfileTabs
+        restaurant={restaurant}
+        canManageSettings={canManageSettings}
+        canManageQr={canManageQr}
+      />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getManagerRestaurant } from "@/lib/actions/restaurants";
 import { listGallery } from "@/lib/actions/gallery";
+import { hasPermission } from "@/lib/auth/permissions";
 import { GalleryImageUpload } from "./GalleryImageUpload";
 import { DeleteGalleryImage } from "./DeleteGalleryImage";
 
@@ -19,6 +20,8 @@ export default async function GalleryPage() {
     return <div className="flex flex-col items-center justify-center py-20"><Link href="/login"><Button>Log in</Button></Link></div>;
   }
 
+  const canManageGallery = await hasPermission("MANAGE_GALLERY");
+
   const gallery = await listGallery(restaurant.id).catch(() => []);
 
   return (
@@ -30,7 +33,7 @@ export default async function GalleryPage() {
             {gallery.length} photo{gallery.length !== 1 ? "s" : ""} · Displayed on your public page
           </p>
         </div>
-        <GalleryImageUpload />
+        {canManageGallery ? <GalleryImageUpload /> : null}
       </div>
 
       {gallery.length > 0 ? (
@@ -49,9 +52,11 @@ export default async function GalleryPage() {
                   <p className="text-[#ffffff] text-xs truncate">{img.caption}</p>
                 </div>
               )}
-              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <DeleteGalleryImage imageId={img.id} />
-              </div>
+              {canManageGallery ? (
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <DeleteGalleryImage imageId={img.id} />
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
@@ -61,7 +66,7 @@ export default async function GalleryPage() {
           variant="neutral"
           title="No photos yet"
           description="Show off your restaurant's ambiance, dishes, and vibe with photos."
-          action={<GalleryImageUpload />}
+          action={canManageGallery ? <GalleryImageUpload /> : undefined}
         />
       )}
     </div>

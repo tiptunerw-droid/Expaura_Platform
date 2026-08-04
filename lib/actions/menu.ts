@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/permissions";
 
 const addMenuImageSchema = z.object({
   imageUrl: z.string().min(1, "Image URL is required"),
@@ -39,7 +39,7 @@ export const listMenuImages = cache(async (restaurantId: string, branchId?: stri
 });
 
 export async function addMenuImage(form: z.infer<typeof addMenuImageSchema>) {
-  const session = await getSession();
+  const session = await requirePermission("MANAGE_MENU");
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
   }
@@ -74,7 +74,7 @@ export async function addMenuImage(form: z.infer<typeof addMenuImageSchema>) {
 }
 
 export async function updateMenuImageOrder(order: z.infer<typeof updateMenuImageOrderSchema>) {
-  const session = await getSession();
+  const session = await requirePermission("MANAGE_MENU");
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
   }
@@ -100,7 +100,7 @@ export async function updateMenuImageOrder(order: z.infer<typeof updateMenuImage
 }
 
 export async function deleteMenuImage(id: string) {
-  const session = await getSession();
+  const session = await requirePermission("MANAGE_MENU");
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
   }

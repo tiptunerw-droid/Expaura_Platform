@@ -4,6 +4,7 @@ import { z } from "zod";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/permissions";
 import { randomUUID } from "crypto";
 import { withDbRetry } from "@/lib/prisma";
 
@@ -345,7 +346,7 @@ export const getManagerPlanFeatures = cache(async () => {
 });
 
 export async function updateRestaurantProfile(form: z.infer<typeof updateRestaurantProfileSchema>) {
-  const session = await getSession();
+  const session = await requirePermission("MANAGE_SETTINGS");
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
   }
@@ -368,7 +369,7 @@ export async function updateRestaurantProfile(form: z.infer<typeof updateRestaur
 }
 
 export async function generateRestaurantQr(form: z.infer<typeof generateQrSchema>) {
-  const session = await getSession();
+  const session = await requirePermission("MANAGE_QR");
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
   }

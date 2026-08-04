@@ -12,6 +12,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { getManagerRestaurant } from "@/lib/actions/restaurants";
 import { getManagerPlanFeatures } from "@/lib/actions/restaurants";
 import { listRestaurantComplaints } from "@/lib/actions/complaints";
+import { hasPermission } from "@/lib/auth/permissions";
 import { formatDate } from "@/lib/utils";
 import { ComplaintStatus } from "@/generated/prisma/client";
 import { UpdateComplaintStatus } from "./UpdateStatus";
@@ -62,6 +63,8 @@ export default async function ComplaintsPage({
     status: sp.status as ComplaintStatus | undefined,
     categoryId: sp.category || undefined,
   }).catch(() => []);
+
+  const canManageComplaints = await hasPermission("MANAGE_COMPLAINTS");
 
   const pendingCount = complaints.filter((c) => c.status === "PENDING").length;
   const inProgressCount = complaints.filter((c) => c.status === "IN_PROGRESS").length;
@@ -128,7 +131,7 @@ export default async function ComplaintsPage({
               <TableHead>Employee</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Date</TableHead>
-              <TableHead className="w-32">Actions</TableHead>
+              {canManageComplaints ? <TableHead className="w-32">Actions</TableHead> : null}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -151,12 +154,14 @@ export default async function ComplaintsPage({
                 <TableCell className="font-tabular text-xs">
                   {formatDate(c.createdAt)}
                 </TableCell>
-                <TableCell>
-                  <UpdateComplaintStatus
-                    complaintId={c.id}
-                    currentStatus={c.status}
-                  />
-                </TableCell>
+                {canManageComplaints ? (
+                  <TableCell>
+                    <UpdateComplaintStatus
+                      complaintId={c.id}
+                      currentStatus={c.status}
+                    />
+                  </TableCell>
+                ) : null}
               </TableRow>
             ))}
           </TableBody>

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/permissions";
 import { ComplaintStatus } from "@/generated/prisma/client";
 import { createNotification } from "@/lib/actions/notifications";
 
@@ -256,7 +257,7 @@ export const listRestaurantComplaints = cache(async (input: z.infer<typeof listC
 });
 
 export async function updateComplaintStatus(input: z.infer<typeof updateStatusSchema>) {
-  const session = await getSession();
+  const session = await requirePermission("MANAGE_COMPLAINTS");
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
   }
