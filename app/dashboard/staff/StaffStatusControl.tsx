@@ -31,9 +31,10 @@ export function StaffStatusControl({ staffId, isActive, memberName }: Props) {
     setError("");
     try {
       await setStaffStatus({ staffId, isActive: !isActive });
-      router.refresh();
+      await router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Action failed");
+    } finally {
       setSending(false);
     }
   };

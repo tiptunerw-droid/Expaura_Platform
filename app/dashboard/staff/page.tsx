@@ -10,6 +10,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatDate } from "@/lib/utils";
 import { InviteStaffDialog } from "./InviteStaffDialog";
+import { EditStaffDialog } from "./EditStaffDialog";
 import { StaffStatusControl } from "./StaffStatusControl";
 
 export const metadata = { title: "Staff" };
@@ -78,11 +79,19 @@ export default async function StaffPage() {
                 {canManageStaff ? (
                   <TableCell>
                     {s.userId !== session.userId ? (
-                      <StaffStatusControl
-                        staffId={s.id}
-                        isActive={s.isActive}
-                        memberName={s.user.name}
-                      />
+                      <div className="flex items-center gap-2">
+                        <EditStaffDialog
+                          staffId={s.id}
+                          name={s.user.name}
+                          email={s.user.email}
+                          roleId={s.roleId}
+                        />
+                        <StaffStatusControl
+                          staffId={s.id}
+                          isActive={s.isActive}
+                          memberName={s.user.name}
+                        />
+                      </div>
                     ) : null}
                   </TableCell>
                 ) : null}

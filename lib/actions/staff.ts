@@ -178,6 +178,91 @@ export async function setStaffStatus(
   return { message: isActive ? "Access granted." : "Access revoked." };
 }
 
+const updateStaffSchema = z.object({
+  staffId: z.string().uuid(),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  roleId: z.string().uuid("Please select a valid role"),
+});
+
+export async function updateStaff(
+  input: z.infer<typeof updateStaffSchema>
+): Promise<{ message: string }> {
+  const session = await requirePermission("MANAGE_STAFF");
+  if (!session || !session.activeRestaurantId) {
+    throw new Error("Unauthorized");
+  }
+
+  const valid = updateStaffSchema.safeParse(input);
+  if (!valid.success) {
+    throw new Error(valid.error.issues[0]?.message || "Validation failed");
+  }
+
+  const { staffId, name, email, roleId } = valid.data;
+
+  const record = await prisma.restaurantStaff.findUnique({
+    where: { id: staffId },
+    select: {
+      id: true,
+      userId: true,
+      restaurantId: true,
+      user: { select: { name: true, email: true } },
+      role: { select: { name: true } },
+    },
+  });
+
+  if (!record || record.restaurantId !== session.activeRestaurantId) {
+    throw new Error("Staff member not found");
+  }
+  if (record.userId === session.userId) {
+    throw new Error("You cannot edit your own record.");
+  }
+
+  const role = await prisma.role.findFirst({
+    where: { id: roleId, restaurantId: session.activeRestaurantId },
+    select: { id: true, name: true },
+  });
+  if (!role) {
+    throw new Error("Role not found");
+  }
+
+  const emailTaken = await prisma.user.findFirst({
+    where: { email, NOT: { id: record.userId } },
+    select: { id: true },
+  });
+  if (emailTaken) {
+    throw new Error("That email is already in use by another account");
+  }
+
+  await prisma.user.update({
+    where: { id: record.userId },
+    data: { name, email },
+  });
+  await prisma.restaurantStaff.update({
+    where: { id: record.id },
+    data: { roleId: role.id },
+  });
+
+  await prisma.auditLog.create({
+    data: {
+      userId: session.userId,
+      restaurantId: session.activeRestaurantId,
+      action: "STAFF_UPDATED",
+      entity: "RestaurantStaff",
+      entityId: record.id,
+      changes: {
+        name: { from: record.user.name, to: name },
+        email: { from: record.user.email, to: email },
+        role: { from: record.role.name, to: role.name },
+      },
+    },
+  });
+
+  revalidatePath("/dashboard/staff");
+
+  return { message: "Staff member updated." };
+}
+
 const acceptInviteSchema = z.object({
   token: z.string().min(1, "Invite token is required"),
   name: z.string().min(2, "Name must be at least 2 characters"),
