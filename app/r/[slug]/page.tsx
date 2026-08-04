@@ -159,6 +159,18 @@ async function RestaurantContentSection({ restaurantId, restaurant }: { restaura
     <>
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <div className="lg:col-span-2 space-y-8">
+        <RestaurantTabs
+          restaurantId={restaurantId}
+          menuImages={menuImages}
+          reviews={reviews}
+          gallery={gallery}
+          hasReviews={hasReviews}
+          averageFood={restaurant.averageFood}
+          averageService={restaurant.averageService}
+          averageAtmosphere={restaurant.averageAtmosphere}
+          averageCleanliness={restaurant.averageCleanliness}
+        />
+
         {hasReviews && (
           <div className="bg-surface-alt border border-border-subtle rounded-lg p-5 sm:p-6 space-y-4">
             <div className="flex items-center justify-between">
@@ -178,18 +190,6 @@ async function RestaurantContentSection({ restaurantId, restaurant }: { restaura
             </div>
           </div>
         )}
-
-        <RestaurantTabs
-          restaurantId={restaurantId}
-          menuImages={menuImages}
-          reviews={reviews}
-          gallery={gallery}
-          hasReviews={hasReviews}
-          averageFood={restaurant.averageFood}
-          averageService={restaurant.averageService}
-          averageAtmosphere={restaurant.averageAtmosphere}
-          averageCleanliness={restaurant.averageCleanliness}
-        />
       </div>
 
       <aside className="lg:col-span-1">
@@ -197,12 +197,12 @@ async function RestaurantContentSection({ restaurantId, restaurant }: { restaura
           <div className="bg-surface-alt border border-border-subtle rounded-lg p-5 space-y-4">
             <h3 className="font-display text-lg text-text-primary">Quick actions</h3>
             <div className="space-y-2">
-              <Link href="?tab=menu" scroll={false}>
+              <a href="#menu">
                 <Button variant="primary" size="lg" className="w-full">
                   View Digital Menu
                   <ArrowRight className="w-4 h-4" />
                 </Button>
-              </Link>
+              </a>
               <Link href="?tab=reviews" scroll={false}>
                 <Button variant="outline" size="default" className="w-full">
                   Leave a review

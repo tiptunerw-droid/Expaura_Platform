@@ -60,11 +60,11 @@ export function RestaurantTabs({
   const searchParams = useSearchParams();
   const tabFromUrl = searchParams.get("tab");
 
-  const availableTabs = ["menu", "reviews", "gallery", "report"];
+  const availableTabs = ["reviews", "gallery", "report"];
 
   const tab = tabFromUrl && availableTabs.includes(tabFromUrl)
     ? tabFromUrl
-    : "menu";
+    : "reviews";
 
   const setTab = React.useCallback((value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -113,76 +113,80 @@ export function RestaurantTabs({
     return () => container.removeEventListener("scroll", onScroll);
   }, [menuImages.length]);
 
-  return (
-    <Tabs value={tab} onValueChange={setTab}>
-      <TabsList className="w-full">
-        <TabsTrigger value="menu" className="flex-1">Menu</TabsTrigger>
-        <TabsTrigger value="reviews" className="flex-1">Reviews</TabsTrigger>
-        <TabsTrigger value="gallery" className="flex-1">Gallery</TabsTrigger>
-        <TabsTrigger value="report" className="flex-1">Report</TabsTrigger>
-      </TabsList>
+  const menuSection =
+    menuImages.length > 0 ? (
+      <section id="menu" aria-label="Menu" className="scroll-mt-24">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-display text-xl text-text-primary">Menu</h2>
+          <span className="text-[10px] uppercase tracking-wider text-gray-500">
+            {menuImages.length} {menuImages.length === 1 ? "photo" : "photos"}
+          </span>
+        </div>
+        <div className="relative group">
+          <div
+            ref={scrollRef}
+            className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 scroll-smooth scrollbar-hide"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {menuImages.map((img, i) => (
+              <div key={img.id} className="snap-center shrink-0 w-[80vw] sm:w-[380px] first:ml-0 last:mr-0">
+                <button
+                  onClick={() => setLightbox({ images: menuImages, index: i })}
+                  className="relative aspect-[3/4] bg-surface-alt rounded-lg border border-border-subtle overflow-hidden w-full cursor-pointer group"
+                >
+                  <Image
+                    src={img.imageUrl}
+                    alt="Menu page"
+                    fill
+                    className="object-contain transition-transform duration-200 group-hover:scale-[1.02]"
+                    sizes="380px"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                </button>
+              </div>
+            ))}
+          </div>
+          {menuImages.length > 1 && (
+            <>
+              <button
+                onClick={scrollPrev}
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-surface-alt/90 border border-gray-700 flex items-center justify-center text-gray-300 hover:bg-gray-800 hover:text-white transition-all opacity-0 group-hover:opacity-100 z-10"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={scrollNext}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-surface-alt/90 border border-gray-700 flex items-center justify-center text-gray-300 hover:bg-gray-800 hover:text-white transition-all opacity-0 group-hover:opacity-100 z-10"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </>
+          )}
+          <div className="flex justify-center gap-1.5 mt-3">
+            {menuImages.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => scrollTo(i)}
+                className={cn(
+                  "w-2 h-2 rounded-full transition-all",
+                  i === activeIndex ? "bg-emerald-400 w-4" : "bg-gray-700 hover:bg-gray-600"
+                )}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    ) : null;
 
-      <TabsContent value="menu">
-        {menuImages.length > 0 ? (
-          <div className="relative group">
-            <div
-              ref={scrollRef}
-              className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 scroll-smooth scrollbar-hide"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-            >
-              {menuImages.map((img, i) => (
-                <div key={img.id} className="snap-center shrink-0 w-[80vw] sm:w-[380px] first:ml-0 last:mr-0">
-                  <button
-                    onClick={() => setLightbox({ images: menuImages, index: i })}
-                    className="relative aspect-[3/4] bg-surface-alt rounded-lg border border-border-subtle overflow-hidden w-full cursor-pointer group"
-                  >
-                    <Image
-                      src={img.imageUrl}
-                      alt="Menu page"
-                      fill
-                      className="object-contain transition-transform duration-200 group-hover:scale-[1.02]"
-                      sizes="380px"
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-                  </button>
-                </div>
-              ))}
-            </div>
-            {menuImages.length > 1 && (
-              <>
-                <button
-                  onClick={scrollPrev}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-surface-alt/90 border border-gray-700 flex items-center justify-center text-gray-300 hover:bg-gray-800 hover:text-white transition-all opacity-0 group-hover:opacity-100 z-10"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={scrollNext}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-surface-alt/90 border border-gray-700 flex items-center justify-center text-gray-300 hover:bg-gray-800 hover:text-white transition-all opacity-0 group-hover:opacity-100 z-10"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </>
-            )}
-            <div className="flex justify-center gap-1.5 mt-3">
-              {menuImages.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => scrollTo(i)}
-                  className={cn(
-                    "w-2 h-2 rounded-full transition-all",
-                    i === activeIndex ? "bg-emerald-400 w-4" : "bg-gray-700 hover:bg-gray-600"
-                  )}
-                />
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="text-center py-12 text-gray-500">
-            <p className="text-sm">Menu not yet available online.</p>
-          </div>
-        )}
-      </TabsContent>
+  return (
+    <>
+      {menuSection}
+      <Tabs value={tab} onValueChange={setTab}>
+        <TabsList className="w-full">
+          <TabsTrigger value="reviews" className="flex-1">Reviews</TabsTrigger>
+          <TabsTrigger value="gallery" className="flex-1">Gallery</TabsTrigger>
+          <TabsTrigger value="report" className="flex-1">Report</TabsTrigger>
+        </TabsList>
 
       <TabsContent value="reviews">
         <div className="space-y-6">
@@ -336,6 +340,7 @@ export function RestaurantTabs({
           onClose={() => setLightbox(null)}
         />
       )}
-    </Tabs>
+      </Tabs>
+    </>
   );
 }

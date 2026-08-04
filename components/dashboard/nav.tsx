@@ -89,7 +89,7 @@ function DashboardNav({
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 w-64 h-screen bg-surface border-r border-border-subtle z-30 text-text-primary selection:bg-emerald-500 selection:text-white transition-transform duration-300 ease-in-out",
+        "fixed left-0 top-0 w-64 h-screen flex flex-col bg-surface border-r border-border-subtle z-30 text-text-primary selection:bg-emerald-500 selection:text-white transition-transform duration-300 ease-in-out",
         isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         className
       )}

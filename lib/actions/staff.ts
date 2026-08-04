@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { cache } from "react";
 import { SignJWT, jwtVerify } from "jose";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth/password";
@@ -15,6 +16,19 @@ const JWT_SECRET = new TextEncoder().encode(
 const inviteSchema = z.object({
   email: z.string().email("Invalid email address"),
   roleId: z.string().uuid("Please select a valid role"),
+});
+
+export const listRestaurantRoles = cache(async () => {
+  const session = await getSession();
+  if (!session || !session.activeRestaurantId) {
+    throw new Error("Unauthorized");
+  }
+
+  return prisma.role.findMany({
+    where: { restaurantId: session.activeRestaurantId },
+    select: { id: true, name: true, description: true },
+    orderBy: { name: "asc" },
+  });
 });
 
 export async function inviteStaff(

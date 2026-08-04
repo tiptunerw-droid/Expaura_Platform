@@ -369,6 +369,8 @@ model Complaint {
   employeeId   String?         @map("employee_id") @db.Uuid
   categoryId   String          @map("category_id") @db.Uuid
   description  String
+  tableNumber  String?         @map("table_number")
+  receiptNumber String?        @map("receipt_number")
   status       ComplaintStatus @default(PENDING)
   managerNote  String?         @map("manager_note")
   resolvedById String?         @map("resolved_by") @db.Uuid

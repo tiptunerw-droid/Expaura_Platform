@@ -8,26 +8,55 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
-import { inviteStaff } from "@/lib/actions/staff";
+import { inviteStaff, listRestaurantRoles } from "@/lib/actions/staff";
+
+interface RoleOption {
+  id: string;
+  name: string;
+  description: string | null;
+}
 
 export function InviteStaffDialog() {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
-  const [role, setRole] = React.useState("manager");
+  const [roles, setRoles] = React.useState<RoleOption[]>([]);
+  const [role, setRole] = React.useState("");
   const [sending, setSending] = React.useState(false);
   const [error, setError] = React.useState("");
   const [done, setDone] = React.useState(false);
 
+  React.useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    listRestaurantRoles()
+      .then((loadedRoles) => {
+        if (cancelled) return;
+        setRoles(loadedRoles);
+        setRole((current) => {
+          if (current && loadedRoles.some((r) => r.id === current)) return current;
+          const manager = loadedRoles.find((r) => r.name === "Manager");
+          return manager ? manager.id : (loadedRoles[0]?.id ?? "");
+        });
+      })
+      .catch(() => {
+        if (!cancelled) setError("Failed to load roles. Try again.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!role) {
+      setError("Please select a role");
+      return;
+    }
     setSending(true);
     setError("");
     try {
-      const roleId = role === "manager"
-        ? "00000000-0000-0000-0000-000000000000"
-        : "00000000-0000-0000-0000-000000000001";
-      await inviteStaff({ email, roleId });
+      await inviteStaff({ email, roleId: role });
       setDone(true);
       router.refresh();
     } catch (err) {
@@ -71,8 +100,16 @@ export function InviteStaffDialog() {
             <div>
               <Label htmlFor="invite-role">Role</Label>
               <Select id="invite-role" value={role} onChange={(e) => setRole(e.target.value)}>
-                <option value="manager">Manager</option>
-                <option value="viewer">Viewer (read-only)</option>
+                {roles.length === 0 ? (
+                  <option value="">No roles available</option>
+                ) : (
+                  roles.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name}
+                      {r.description ? ` — ${r.description}` : ""}
+                    </option>
+                  ))
+                )}
               </Select>
             </div>
             {error && <p className="text-xs text-rose">{error}</p>}

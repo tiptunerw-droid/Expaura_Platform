@@ -297,9 +297,20 @@ export const getManagerRestaurant = cache(async () => {  const session = await g
 
   if (!restaurant) throw new Error("Restaurant not found");
 
+  const { subscriptions, ...restaurantData } = restaurant;
+  const currentSubscription = subscriptions[0] ?? null;
+
   return {
-    ...restaurant,
-    currentSubscription: restaurant.subscriptions[0] || null,
+    ...restaurantData,
+    currentSubscription: currentSubscription
+      ? {
+          ...currentSubscription,
+          plan: {
+            ...currentSubscription.plan,
+            priceMonthly: Number(currentSubscription.plan.priceMonthly),
+          },
+        }
+      : null,
   };
 });
 

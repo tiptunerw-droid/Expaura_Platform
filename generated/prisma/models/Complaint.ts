@@ -32,6 +32,8 @@ export type ComplaintMinAggregateOutputType = {
   employeeId: string | null
   categoryId: string | null
   description: string | null
+  tableNumber: string | null
+  receiptNumber: string | null
   status: $Enums.ComplaintStatus | null
   managerNote: string | null
   resolvedById: string | null
@@ -47,6 +49,8 @@ export type ComplaintMaxAggregateOutputType = {
   employeeId: string | null
   categoryId: string | null
   description: string | null
+  tableNumber: string | null
+  receiptNumber: string | null
   status: $Enums.ComplaintStatus | null
   managerNote: string | null
   resolvedById: string | null
@@ -62,6 +66,8 @@ export type ComplaintCountAggregateOutputType = {
   employeeId: number
   categoryId: number
   description: number
+  tableNumber: number
+  receiptNumber: number
   status: number
   managerNote: number
   resolvedById: number
@@ -79,6 +85,8 @@ export type ComplaintMinAggregateInputType = {
   employeeId?: true
   categoryId?: true
   description?: true
+  tableNumber?: true
+  receiptNumber?: true
   status?: true
   managerNote?: true
   resolvedById?: true
@@ -94,6 +102,8 @@ export type ComplaintMaxAggregateInputType = {
   employeeId?: true
   categoryId?: true
   description?: true
+  tableNumber?: true
+  receiptNumber?: true
   status?: true
   managerNote?: true
   resolvedById?: true
@@ -109,6 +119,8 @@ export type ComplaintCountAggregateInputType = {
   employeeId?: true
   categoryId?: true
   description?: true
+  tableNumber?: true
+  receiptNumber?: true
   status?: true
   managerNote?: true
   resolvedById?: true
@@ -197,6 +209,8 @@ export type ComplaintGroupByOutputType = {
   employeeId: string | null
   categoryId: string
   description: string
+  tableNumber: string | null
+  receiptNumber: string | null
   status: $Enums.ComplaintStatus
   managerNote: string | null
   resolvedById: string | null
@@ -233,6 +247,8 @@ export type ComplaintWhereInput = {
   employeeId?: Prisma.UuidNullableFilter<"Complaint"> | string | null
   categoryId?: Prisma.UuidFilter<"Complaint"> | string
   description?: Prisma.StringFilter<"Complaint"> | string
+  tableNumber?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  receiptNumber?: Prisma.StringNullableFilter<"Complaint"> | string | null
   status?: Prisma.EnumComplaintStatusFilter<"Complaint"> | $Enums.ComplaintStatus
   managerNote?: Prisma.StringNullableFilter<"Complaint"> | string | null
   resolvedById?: Prisma.UuidNullableFilter<"Complaint"> | string | null
@@ -254,6 +270,8 @@ export type ComplaintOrderByWithRelationInput = {
   employeeId?: Prisma.SortOrderInput | Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  tableNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  receiptNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   managerNote?: Prisma.SortOrderInput | Prisma.SortOrder
   resolvedById?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -278,6 +296,8 @@ export type ComplaintWhereUniqueInput = Prisma.AtLeast<{
   employeeId?: Prisma.UuidNullableFilter<"Complaint"> | string | null
   categoryId?: Prisma.UuidFilter<"Complaint"> | string
   description?: Prisma.StringFilter<"Complaint"> | string
+  tableNumber?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  receiptNumber?: Prisma.StringNullableFilter<"Complaint"> | string | null
   status?: Prisma.EnumComplaintStatusFilter<"Complaint"> | $Enums.ComplaintStatus
   managerNote?: Prisma.StringNullableFilter<"Complaint"> | string | null
   resolvedById?: Prisma.UuidNullableFilter<"Complaint"> | string | null
@@ -299,6 +319,8 @@ export type ComplaintOrderByWithAggregationInput = {
   employeeId?: Prisma.SortOrderInput | Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  tableNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  receiptNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   managerNote?: Prisma.SortOrderInput | Prisma.SortOrder
   resolvedById?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -320,6 +342,8 @@ export type ComplaintScalarWhereWithAggregatesInput = {
   employeeId?: Prisma.UuidNullableWithAggregatesFilter<"Complaint"> | string | null
   categoryId?: Prisma.UuidWithAggregatesFilter<"Complaint"> | string
   description?: Prisma.StringWithAggregatesFilter<"Complaint"> | string
+  tableNumber?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
+  receiptNumber?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
   status?: Prisma.EnumComplaintStatusWithAggregatesFilter<"Complaint"> | $Enums.ComplaintStatus
   managerNote?: Prisma.StringNullableWithAggregatesFilter<"Complaint"> | string | null
   resolvedById?: Prisma.UuidNullableWithAggregatesFilter<"Complaint"> | string | null
@@ -330,6 +354,8 @@ export type ComplaintScalarWhereWithAggregatesInput = {
 export type ComplaintCreateInput = {
   id?: string
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   createdAt?: Date | string
@@ -350,6 +376,8 @@ export type ComplaintUncheckedCreateInput = {
   employeeId?: string | null
   categoryId: string
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   resolvedById?: string | null
@@ -360,6 +388,8 @@ export type ComplaintUncheckedCreateInput = {
 export type ComplaintUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -380,6 +410,8 @@ export type ComplaintUncheckedUpdateInput = {
   employeeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -395,6 +427,8 @@ export type ComplaintCreateManyInput = {
   employeeId?: string | null
   categoryId: string
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   resolvedById?: string | null
@@ -405,6 +439,8 @@ export type ComplaintCreateManyInput = {
 export type ComplaintUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -419,6 +455,8 @@ export type ComplaintUncheckedUpdateManyInput = {
   employeeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -449,6 +487,8 @@ export type ComplaintCountOrderByAggregateInput = {
   employeeId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  tableNumber?: Prisma.SortOrder
+  receiptNumber?: Prisma.SortOrder
   status?: Prisma.SortOrder
   managerNote?: Prisma.SortOrder
   resolvedById?: Prisma.SortOrder
@@ -464,6 +504,8 @@ export type ComplaintMaxOrderByAggregateInput = {
   employeeId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  tableNumber?: Prisma.SortOrder
+  receiptNumber?: Prisma.SortOrder
   status?: Prisma.SortOrder
   managerNote?: Prisma.SortOrder
   resolvedById?: Prisma.SortOrder
@@ -479,6 +521,8 @@ export type ComplaintMinOrderByAggregateInput = {
   employeeId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  tableNumber?: Prisma.SortOrder
+  receiptNumber?: Prisma.SortOrder
   status?: Prisma.SortOrder
   managerNote?: Prisma.SortOrder
   resolvedById?: Prisma.SortOrder
@@ -735,6 +779,8 @@ export type EnumComplaintStatusFieldUpdateOperationsInput = {
 export type ComplaintCreateWithoutResolverInput = {
   id?: string
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   createdAt?: Date | string
@@ -754,6 +800,8 @@ export type ComplaintUncheckedCreateWithoutResolverInput = {
   employeeId?: string | null
   categoryId: string
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   createdAt?: Date | string
@@ -797,6 +845,8 @@ export type ComplaintScalarWhereInput = {
   employeeId?: Prisma.UuidNullableFilter<"Complaint"> | string | null
   categoryId?: Prisma.UuidFilter<"Complaint"> | string
   description?: Prisma.StringFilter<"Complaint"> | string
+  tableNumber?: Prisma.StringNullableFilter<"Complaint"> | string | null
+  receiptNumber?: Prisma.StringNullableFilter<"Complaint"> | string | null
   status?: Prisma.EnumComplaintStatusFilter<"Complaint"> | $Enums.ComplaintStatus
   managerNote?: Prisma.StringNullableFilter<"Complaint"> | string | null
   resolvedById?: Prisma.UuidNullableFilter<"Complaint"> | string | null
@@ -807,6 +857,8 @@ export type ComplaintScalarWhereInput = {
 export type ComplaintCreateWithoutRestaurantInput = {
   id?: string
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   createdAt?: Date | string
@@ -825,6 +877,8 @@ export type ComplaintUncheckedCreateWithoutRestaurantInput = {
   employeeId?: string | null
   categoryId: string
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   resolvedById?: string | null
@@ -861,6 +915,8 @@ export type ComplaintUpdateManyWithWhereWithoutRestaurantInput = {
 export type ComplaintCreateWithoutBranchInput = {
   id?: string
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   createdAt?: Date | string
@@ -879,6 +935,8 @@ export type ComplaintUncheckedCreateWithoutBranchInput = {
   employeeId?: string | null
   categoryId: string
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   resolvedById?: string | null
@@ -915,6 +973,8 @@ export type ComplaintUpdateManyWithWhereWithoutBranchInput = {
 export type ComplaintCreateWithoutEmployeeInput = {
   id?: string
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   createdAt?: Date | string
@@ -933,6 +993,8 @@ export type ComplaintUncheckedCreateWithoutEmployeeInput = {
   branchId?: string | null
   categoryId: string
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   resolvedById?: string | null
@@ -969,6 +1031,8 @@ export type ComplaintUpdateManyWithWhereWithoutEmployeeInput = {
 export type ComplaintCreateWithoutReviewInput = {
   id?: string
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   createdAt?: Date | string
@@ -987,6 +1051,8 @@ export type ComplaintUncheckedCreateWithoutReviewInput = {
   employeeId?: string | null
   categoryId: string
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   resolvedById?: string | null
@@ -1013,6 +1079,8 @@ export type ComplaintUpdateToOneWithWhereWithoutReviewInput = {
 export type ComplaintUpdateWithoutReviewInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1031,6 +1099,8 @@ export type ComplaintUncheckedUpdateWithoutReviewInput = {
   employeeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1041,6 +1111,8 @@ export type ComplaintUncheckedUpdateWithoutReviewInput = {
 export type ComplaintCreateWithoutCategoryInput = {
   id?: string
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   createdAt?: Date | string
@@ -1059,6 +1131,8 @@ export type ComplaintUncheckedCreateWithoutCategoryInput = {
   branchId?: string | null
   employeeId?: string | null
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   resolvedById?: string | null
@@ -1100,6 +1174,8 @@ export type ComplaintCreateManyResolverInput = {
   employeeId?: string | null
   categoryId: string
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   createdAt?: Date | string
@@ -1109,6 +1185,8 @@ export type ComplaintCreateManyResolverInput = {
 export type ComplaintUpdateWithoutResolverInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1128,6 +1206,8 @@ export type ComplaintUncheckedUpdateWithoutResolverInput = {
   employeeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1142,6 +1222,8 @@ export type ComplaintUncheckedUpdateManyWithoutResolverInput = {
   employeeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1155,6 +1237,8 @@ export type ComplaintCreateManyRestaurantInput = {
   employeeId?: string | null
   categoryId: string
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   resolvedById?: string | null
@@ -1165,6 +1249,8 @@ export type ComplaintCreateManyRestaurantInput = {
 export type ComplaintUpdateWithoutRestaurantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1183,6 +1269,8 @@ export type ComplaintUncheckedUpdateWithoutRestaurantInput = {
   employeeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1197,6 +1285,8 @@ export type ComplaintUncheckedUpdateManyWithoutRestaurantInput = {
   employeeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1211,6 +1301,8 @@ export type ComplaintCreateManyBranchInput = {
   employeeId?: string | null
   categoryId: string
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   resolvedById?: string | null
@@ -1221,6 +1313,8 @@ export type ComplaintCreateManyBranchInput = {
 export type ComplaintUpdateWithoutBranchInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1239,6 +1333,8 @@ export type ComplaintUncheckedUpdateWithoutBranchInput = {
   employeeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1253,6 +1349,8 @@ export type ComplaintUncheckedUpdateManyWithoutBranchInput = {
   employeeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1267,6 +1365,8 @@ export type ComplaintCreateManyEmployeeInput = {
   branchId?: string | null
   categoryId: string
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   resolvedById?: string | null
@@ -1277,6 +1377,8 @@ export type ComplaintCreateManyEmployeeInput = {
 export type ComplaintUpdateWithoutEmployeeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1295,6 +1397,8 @@ export type ComplaintUncheckedUpdateWithoutEmployeeInput = {
   branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1309,6 +1413,8 @@ export type ComplaintUncheckedUpdateManyWithoutEmployeeInput = {
   branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1323,6 +1429,8 @@ export type ComplaintCreateManyCategoryInput = {
   branchId?: string | null
   employeeId?: string | null
   description: string
+  tableNumber?: string | null
+  receiptNumber?: string | null
   status?: $Enums.ComplaintStatus
   managerNote?: string | null
   resolvedById?: string | null
@@ -1333,6 +1441,8 @@ export type ComplaintCreateManyCategoryInput = {
 export type ComplaintUpdateWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1351,6 +1461,8 @@ export type ComplaintUncheckedUpdateWithoutCategoryInput = {
   branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   employeeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1365,6 +1477,8 @@ export type ComplaintUncheckedUpdateManyWithoutCategoryInput = {
   branchId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   employeeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  tableNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiptNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumComplaintStatusFieldUpdateOperationsInput | $Enums.ComplaintStatus
   managerNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1382,6 +1496,8 @@ export type ComplaintSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   employeeId?: boolean
   categoryId?: boolean
   description?: boolean
+  tableNumber?: boolean
+  receiptNumber?: boolean
   status?: boolean
   managerNote?: boolean
   resolvedById?: boolean
@@ -1403,6 +1519,8 @@ export type ComplaintSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   employeeId?: boolean
   categoryId?: boolean
   description?: boolean
+  tableNumber?: boolean
+  receiptNumber?: boolean
   status?: boolean
   managerNote?: boolean
   resolvedById?: boolean
@@ -1424,6 +1542,8 @@ export type ComplaintSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   employeeId?: boolean
   categoryId?: boolean
   description?: boolean
+  tableNumber?: boolean
+  receiptNumber?: boolean
   status?: boolean
   managerNote?: boolean
   resolvedById?: boolean
@@ -1445,6 +1565,8 @@ export type ComplaintSelectScalar = {
   employeeId?: boolean
   categoryId?: boolean
   description?: boolean
+  tableNumber?: boolean
+  receiptNumber?: boolean
   status?: boolean
   managerNote?: boolean
   resolvedById?: boolean
@@ -1452,7 +1574,7 @@ export type ComplaintSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ComplaintOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reviewId" | "restaurantId" | "branchId" | "employeeId" | "categoryId" | "description" | "status" | "managerNote" | "resolvedById" | "createdAt" | "updatedAt", ExtArgs["result"]["complaint"]>
+export type ComplaintOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reviewId" | "restaurantId" | "branchId" | "employeeId" | "categoryId" | "description" | "tableNumber" | "receiptNumber" | "status" | "managerNote" | "resolvedById" | "createdAt" | "updatedAt", ExtArgs["result"]["complaint"]>
 export type ComplaintInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   review?: boolean | Prisma.Complaint$reviewArgs<ExtArgs>
   restaurant?: boolean | Prisma.RestaurantDefaultArgs<ExtArgs>
@@ -1496,6 +1618,8 @@ export type $ComplaintPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     employeeId: string | null
     categoryId: string
     description: string
+    tableNumber: string | null
+    receiptNumber: string | null
     status: $Enums.ComplaintStatus
     managerNote: string | null
     resolvedById: string | null
@@ -1937,6 +2061,8 @@ export interface ComplaintFieldRefs {
   readonly employeeId: Prisma.FieldRef<"Complaint", 'String'>
   readonly categoryId: Prisma.FieldRef<"Complaint", 'String'>
   readonly description: Prisma.FieldRef<"Complaint", 'String'>
+  readonly tableNumber: Prisma.FieldRef<"Complaint", 'String'>
+  readonly receiptNumber: Prisma.FieldRef<"Complaint", 'String'>
   readonly status: Prisma.FieldRef<"Complaint", 'ComplaintStatus'>
   readonly managerNote: Prisma.FieldRef<"Complaint", 'String'>
   readonly resolvedById: Prisma.FieldRef<"Complaint", 'String'>

@@ -97,6 +97,12 @@ export async function login(
   const activeRestaurant = activeMembership.restaurant;
   const activeRole = activeMembership.role;
 
+  if (!activeRestaurant.isActive) {
+    throw new Error(
+      "This account has been deactivated by the Expaura team. Please contact support at +250792548195."
+    );
+  }
+
   const { permissions } = await getUserPermissions(user.id, activeRestaurant.id);
 
   await prisma.user.update({
