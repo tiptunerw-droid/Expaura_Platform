@@ -20,21 +20,29 @@ import {
 import { cn } from "@/lib/utils";
 import { logout } from "@/lib/actions/auth";
 
+export interface PlanFeatures {
+  analyticsEnabled: boolean;
+  aiSummaryEnabled: boolean;
+  complaintsEnabled: boolean;
+  employeeTrackingEnabled: boolean;
+}
+
 interface NavItem {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
+  feature?: keyof PlanFeatures;
 }
 
 const navItems: NavItem[] = [
-  { href: "/dashboard", label: "Analytics", icon: BarChart3 },
+  { href: "/dashboard", label: "Analytics", icon: BarChart3, feature: "analyticsEnabled" },
   { href: "/dashboard/reviews", label: "Reviews", icon: MessageSquare },
-  { href: "/dashboard/complaints", label: "Complaints", icon: AlertCircle },
+  { href: "/dashboard/complaints", label: "Complaints", icon: AlertCircle, feature: "complaintsEnabled" },
   { href: "/dashboard/menu", label: "Menu", icon: UtensilsCrossed },
   { href: "/dashboard/gallery", label: "Gallery", icon: Images },
   { href: "/dashboard/staff", label: "Staff", icon: Users },
-  { href: "/dashboard/waiters", label: "Waiters", icon: User },
-  { href: "/dashboard/employees", label: "Employees", icon: UsersRound },
+  { href: "/dashboard/waiters", label: "Waiters", icon: User, feature: "employeeTrackingEnabled" },
+  { href: "/dashboard/employees", label: "Employees", icon: UsersRound, feature: "employeeTrackingEnabled" },
   { href: "/dashboard/branches", label: "Branches", icon: Building2 },
   { href: "/dashboard/profile", label: "Profile", icon: Settings },
 ];
@@ -47,6 +55,7 @@ interface DashboardNavProps {
   onClose?: () => void;
   restaurantName?: string;
   restaurantLogo?: string | null;
+  planFeatures?: PlanFeatures;
 }
 
 function DashboardNav({
@@ -57,12 +66,18 @@ function DashboardNav({
   onClose,
   restaurantName,
   restaurantLogo,
+  planFeatures,
 }: DashboardNavProps) {
   const pathname = usePathname();
 
   const handleLogout = async () => {
     await logout();
   };
+
+  const visibleNavItems = navItems.filter((item) => {
+    if (!item.feature) return true;
+    return planFeatures?.[item.feature] ?? false;
+  });
 
   const initials = userName
     .split(" ")
@@ -93,7 +108,7 @@ function DashboardNav({
       </div>
 
       <nav className="flex-1 overflow-y-auto px-4 py-8 space-y-2">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const isActive =
             item.href === "/dashboard"
               ? pathname === "/dashboard"

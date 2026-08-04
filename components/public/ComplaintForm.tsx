@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { submitComplaint, getComplaintCategories } from "@/lib/actions/complaints";
+import { listActiveEmployees } from "@/lib/actions/employees";
 
 interface ComplaintFormProps {
   restaurantId: string;
@@ -18,9 +19,10 @@ interface ComplaintFormProps {
 export function ComplaintForm({ restaurantId, branchId }: ComplaintFormProps) {
   const router = useRouter();
   const [categories, setCategories] = React.useState<{ id: string; name: string }[]>([]);
+  const [employees, setEmployees] = React.useState<{ id: string; name: string }[]>([]);
   const [categoryId, setCategoryId] = React.useState("");
   const [description, setDescription] = React.useState("");
-  const [employeeName, setEmployeeName] = React.useState("");
+  const [employeeId, setEmployeeId] = React.useState("");
   const [tableNumber, setTableNumber] = React.useState("");
   const [receiptNumber, setReceiptNumber] = React.useState("");
   const [step, setStep] = React.useState<"form" | "done">("form");
@@ -29,7 +31,8 @@ export function ComplaintForm({ restaurantId, branchId }: ComplaintFormProps) {
 
   React.useEffect(() => {
     getComplaintCategories().then(setCategories).catch(() => {});
-  }, []);
+    listActiveEmployees(restaurantId).then(setEmployees).catch(() => {});
+  }, [restaurantId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +52,7 @@ export function ComplaintForm({ restaurantId, branchId }: ComplaintFormProps) {
         branchId,
         categoryId,
         description: description.trim(),
-        employeeName: employeeName.trim() || undefined,
+        employeeId: employeeId || undefined,
         tableNumber: tableNumber.trim() || undefined,
         receiptNumber: receiptNumber.trim() || undefined,
       });
@@ -109,13 +112,21 @@ export function ComplaintForm({ restaurantId, branchId }: ComplaintFormProps) {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
-          <Label htmlFor="employeeName">Staff name (optional)</Label>
-          <Input
-            id="employeeName"
-            value={employeeName}
-            onChange={(e) => setEmployeeName(e.target.value)}
-            placeholder="e.g. Jean"
-          />
+          <Label htmlFor="employeeId">Waiter / staff (optional)</Label>
+          <Select
+            id="employeeId"
+            value={employeeId}
+            onChange={(e) => setEmployeeId(e.target.value)}
+          >
+            <option value="">
+              {employees.length > 0 ? "Select staff…" : "No staff listed"}
+            </option>
+            {employees.map((emp) => (
+              <option key={emp.id} value={emp.id}>
+                {emp.name}
+              </option>
+            ))}
+          </Select>
         </div>
         <div>
           <Label htmlFor="tableNumber">Table (optional)</Label>

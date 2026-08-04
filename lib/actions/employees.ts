@@ -44,6 +44,17 @@ export const listEmployees = cache(async (restaurantId: string) => {
   }));
 });
 
+export const listActiveEmployees = cache(async (restaurantId: string) => {
+  const valid = z.string().uuid().safeParse(restaurantId);
+  if (!valid.success) throw new Error("Invalid restaurant ID");
+
+  return prisma.employee.findMany({
+    where: { restaurantId: valid.data, isActive: true },
+    select: { id: true, name: true, jobTitle: true },
+    orderBy: { name: "asc" },
+  });
+});
+
 export async function addEmployee(form: z.infer<typeof addEmployeeSchema>) {
   const session = await getSession();
   if (!session || !session.activeRestaurantId) {

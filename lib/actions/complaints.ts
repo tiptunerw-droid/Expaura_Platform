@@ -12,6 +12,7 @@ const submitComplaintSchema = z.object({
   branchId: z.string().uuid().optional(),
   categoryId: z.string().uuid(),
   description: z.string().min(3, "Description must be at least 3 characters"),
+  employeeId: z.string().uuid().optional(),
   employeeName: z.string().optional(),
   tableNumber: z.string().optional(),
   receiptNumber: z.string().optional(),
@@ -172,10 +173,17 @@ export async function submitComplaint(form: z.infer<typeof submitComplaintSchema
     throw new Error(valid.error.issues[0]?.message || "Validation failed");
   }
 
-  const { employeeName, restaurantId, ...rest } = valid.data;
+  const { employeeId, employeeName, restaurantId, ...rest } = valid.data;
 
-  let employeeId: string | undefined;
-  if (employeeName && employeeName.trim()) {
+  let resolvedEmployeeId: string | undefined;
+  if (employeeId) {
+    const employee = await prisma.employee.findFirst({
+      where: { id: employeeId, restaurantId },
+      select: { id: true },
+    });
+    if (employee) resolvedEmployeeId = employee.id;
+  }
+  if (!resolvedEmployeeId && employeeName && employeeName.trim()) {
     const trimmedName = employeeName.trim();
     let employee = await prisma.employee.findFirst({
       where: {
@@ -188,14 +196,14 @@ export async function submitComplaint(form: z.infer<typeof submitComplaintSchema
         data: { name: trimmedName, restaurantId },
       });
     }
-    employeeId = employee.id;
+    resolvedEmployeeId = employee.id;
   }
 
   const complaint = await prisma.complaint.create({
     data: {
       ...rest,
       restaurantId,
-      employeeId,
+      employeeId: resolvedEmployeeId,
     },
     select: { id: true },
   });

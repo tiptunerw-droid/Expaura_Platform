@@ -1,11 +1,14 @@
 import * as React from "react";
 import { Suspense } from "react";
+import Link from "next/link";
 import { TrendingUp, Star, AlertCircle } from "lucide-react";
 import { SatisfactionAura } from "@/components/signature/SatisfactionAura";
 import { getManagerRestaurant } from "@/lib/actions/restaurants";
+import { getManagerPlanFeatures } from "@/lib/actions/restaurants";
 import { getRestaurantReviewsStats } from "@/lib/actions/reviews";
 import { ratingTrendByPeriod, complaintsByCategory, peakHours } from "@/lib/actions/analytics";
 import { summarizeReviews } from "@/lib/actions/ai";
+import { FeatureLock } from "@/components/dashboard/feature-lock";
 
 /* ---------- Skeleton fallbacks ---------- */
 
@@ -267,7 +270,17 @@ export default async function AnalyticsDashboard() {
   }
 
   const rid = restaurant.id;
-  const planName = restaurant.currentSubscription?.plan?.name || "Free";
+  const features = await getManagerPlanFeatures();
+  const planName = features.planName;
+
+  if (!features.analyticsEnabled) {
+    return (
+      <FeatureLock
+        title="Analytics"
+        description="Detailed satisfaction, trend and incident analytics are included in the Standard and Premium plans. Upgrade to unlock."
+      />
+    );
+  }
 
   return (
     <div className="space-y-8 font-sans selection:bg-emerald-500 selection:text-white">
@@ -296,9 +309,26 @@ export default async function AnalyticsDashboard() {
           </Suspense>
         </div>
         <div className="space-y-6">
-          <Suspense fallback={<AiSkeleton />}>
-            <AiTelemetry rid={rid} />
-          </Suspense>
+          {features.aiSummaryEnabled ? (
+            <Suspense fallback={<AiSkeleton />}>
+              <AiTelemetry rid={rid} />
+            </Suspense>
+          ) : (
+            <div className="bg-surface-alt border border-border-subtle p-6 text-center">
+              <h3 className="text-sm font-black uppercase tracking-widest mb-4 text-text-tertiary">
+                AI Telemetry
+              </h3>
+              <p className="text-xs text-text-tertiary mb-4">
+                AI summaries of guest feedback are not included in your plan.
+              </p>
+              <Link
+                href="/dashboard/profile#subscription"
+                className="text-xs font-bold uppercase tracking-widest text-emerald-400 hover:text-emerald-300 transition-colors"
+              >
+                Upgrade to unlock
+              </Link>
+            </div>
+          )}
           <Suspense fallback={<MatrixSkeleton />}>
             <RatingDistribution rid={rid} />
           </Suspense>

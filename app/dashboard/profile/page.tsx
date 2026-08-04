@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getManagerRestaurant } from "@/lib/actions/restaurants";
+import { getCurrentUser } from "@/lib/actions/auth";
 import { ProfileTabs } from "./ProfileTabs";
+import { UserProfileForm } from "./UserProfileForm";
 
 export const metadata = { title: "Profile" };
 
@@ -18,8 +20,13 @@ export default async function ProfilePage() {
     );
   }
 
+  const auth = await getCurrentUser();
+
   return (
     <div className="space-y-6 max-w-3xl">
+      {auth.authenticated && auth.user ? (
+        <UserProfileForm user={{ name: auth.user.name, email: auth.user.email }} />
+      ) : null}
       <ProfileTabs restaurant={restaurant} />
     </div>
   );

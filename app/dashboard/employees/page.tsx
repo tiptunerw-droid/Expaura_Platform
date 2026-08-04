@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getManagerRestaurant } from "@/lib/actions/restaurants";
+import { getManagerPlanFeatures } from "@/lib/actions/restaurants";
 import { listEmployees } from "@/lib/actions/employees";
 import { formatDate } from "@/lib/utils";
 import { AddEmployeeDialog } from "./AddEmployeeDialog";
+import { FeatureLock } from "@/components/dashboard/feature-lock";
 
 export const metadata = { title: "Employees" };
 
@@ -18,6 +20,16 @@ export default async function EmployeesPage() {
     restaurant = await getManagerRestaurant();
   } catch {
     return <div className="flex flex-col items-center justify-center py-20"><Link href="/login"><Button>Log in</Button></Link></div>;
+  }
+
+  const features = await getManagerPlanFeatures();
+  if (!features.employeeTrackingEnabled) {
+    return (
+      <FeatureLock
+        title="Employee tracking"
+        description="Tracking waiters and staff performance is included in the Premium plan. Upgrade to unlock."
+      />
+    );
   }
 
   const employees = await listEmployees(restaurant.id).catch(() => []);

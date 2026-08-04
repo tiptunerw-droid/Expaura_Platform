@@ -271,8 +271,7 @@ export const listFeatured = cache(async (limit: number = 6) => {
   }));
 });
 
-export const getManagerRestaurant = cache(async () => {
-  const session = await getSession();
+export const getManagerRestaurant = cache(async () => {  const session = await getSession();
   if (!session || !session.activeRestaurantId) {
     throw new Error("Unauthorized");
   }
@@ -301,6 +300,36 @@ export const getManagerRestaurant = cache(async () => {
   return {
     ...restaurant,
     currentSubscription: restaurant.subscriptions[0] || null,
+  };
+});
+
+export const getManagerPlanFeatures = cache(async () => {
+  const session = await getSession();
+  if (!session || !session.activeRestaurantId) {
+    throw new Error("Unauthorized");
+  }
+
+  const restaurant = await withDbRetry(() =>
+    prisma.restaurant.findUnique({
+      where: { id: session.activeRestaurantId },
+      select: {
+        subscriptions: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          include: { plan: true },
+        },
+      },
+    })
+  );
+
+  const plan = restaurant?.subscriptions[0]?.plan ?? null;
+
+  return {
+    planName: plan?.name ?? "Free",
+    analyticsEnabled: plan?.analyticsEnabled ?? false,
+    aiSummaryEnabled: plan?.aiSummaryEnabled ?? false,
+    complaintsEnabled: plan?.complaintsEnabled ?? false,
+    employeeTrackingEnabled: plan?.employeeTrackingEnabled ?? false,
   };
 });
 

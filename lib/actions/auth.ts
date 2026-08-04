@@ -16,7 +16,7 @@ const JWT_SECRET = new TextEncoder().encode(
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
-  password: z.string().min(1, "Password is required"),
+  password: z.string().min(8, "Password must be at least 8 characters long"),
   restaurantId: z.string().optional(),
 });
 
@@ -292,6 +292,64 @@ export async function getCurrentUser(): Promise<{
     user: session,
     restaurant,
   };
+}
+
+const updateProfileSchema = z.object({
+  name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
+  email: z.string().email("Invalid email address"),
+});
+
+export async function updateUserProfile(
+  input: z.infer<typeof updateProfileSchema>
+): Promise<{ message: string }> {
+  const session = await getSession();
+  if (!session?.userId) {
+    throw new Error("Unauthorized");
+  }
+
+  const valid = updateProfileSchema.safeParse(input);
+  if (!valid.success) {
+    throw new Error(valid.error.issues[0]?.message || "Validation failed");
+  }
+
+  const name = valid.data.name.trim();
+  const email = valid.data.email.toLowerCase();
+
+  const existing = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true },
+  });
+  if (existing && existing.id !== session.userId) {
+    throw new Error("That email is already in use by another account.");
+  }
+
+  await prisma.user.update({
+    where: { id: session.userId },
+    data: { name, email },
+  });
+
+  await setSessionCookie({
+    userId: session.userId,
+    email,
+    name,
+    platformRole: session.platformRole,
+    activeRestaurantId: session.activeRestaurantId,
+    roleId: session.roleId,
+    roleName: session.roleName,
+    permissions: session.permissions,
+  });
+
+  await prisma.auditLog.create({
+    data: {
+      userId: session.userId,
+      action: "PROFILE_UPDATE",
+      entity: "User",
+      entityId: session.userId,
+      changes: { name, email },
+    },
+  });
+
+  return { message: "Profile updated successfully." };
 }
 
 export async function logout(): Promise<void> {

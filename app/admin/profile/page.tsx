@@ -1,15 +1,19 @@
 "use client";
 
 import * as React from "react";
-import { getCurrentUser } from "@/lib/actions/auth";
+import { useRouter } from "next/navigation";
+import { getCurrentUser, updateUserProfile } from "@/lib/actions/auth";
 import { Loader2 } from "lucide-react";
 
 export default function ProfilePage() {
+  const router = useRouter();
   const [user, setUser] = React.useState<{ name: string; email: string; platformRole: string } | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
   const [name, setName] = React.useState("");
+  const [email, setEmail] = React.useState("");
   const [message, setMessage] = React.useState("");
+  const [error, setError] = React.useState("");
 
   React.useEffect(() => {
     getCurrentUser().then((result) => {
@@ -20,6 +24,7 @@ export default function ProfilePage() {
           platformRole: result.user.platformRole,
         });
         setName(result.user.name);
+        setEmail(result.user.email);
       }
       setLoading(false);
     });
@@ -29,9 +34,17 @@ export default function ProfilePage() {
     e.preventDefault();
     setSaving(true);
     setMessage("");
-    await new Promise((r) => setTimeout(r, 300));
-    setSaving(false);
-    setMessage("Profile updated successfully.");
+    setError("");
+    try {
+      await updateUserProfile({ name, email });
+      setUser((prev) => (prev ? { ...prev, name: name.trim(), email: email.trim() } : prev));
+      setMessage("Profile updated successfully.");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update profile");
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -68,7 +81,7 @@ export default function ProfilePage() {
       </div>
 
       <form onSubmit={handleSubmit} className="bg-surface-alt border border-border-subtle rounded-lg p-6 space-y-4">
-        <h2 className="text-lg font-bold uppercase tracking-tighter text-primary">Update Name</h2>
+        <h2 className="text-lg font-bold uppercase tracking-tighter text-primary">Update Profile</h2>
         <div>
           <label htmlFor="name" className="block text-text-secondary uppercase tracking-widest text-xs mb-1">
             Name
@@ -78,11 +91,28 @@ export default function ProfilePage() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            required
+            className="w-full bg-surface border border-border-subtle rounded px-3 py-2 text-sm text-primary focus:outline-none focus:border-purple-500"
+          />
+        </div>
+        <div>
+          <label htmlFor="email" className="block text-text-secondary uppercase tracking-widest text-xs mb-1">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
             className="w-full bg-surface border border-border-subtle rounded px-3 py-2 text-sm text-primary focus:outline-none focus:border-purple-500"
           />
         </div>
         {message && (
           <p className="text-herb text-sm">{message}</p>
+        )}
+        {error && (
+          <p className="text-rose text-sm">{error}</p>
         )}
         <button
           type="submit"

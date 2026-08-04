@@ -10,10 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getManagerRestaurant } from "@/lib/actions/restaurants";
+import { getManagerPlanFeatures } from "@/lib/actions/restaurants";
 import { listRestaurantComplaints } from "@/lib/actions/complaints";
 import { formatDate } from "@/lib/utils";
 import { ComplaintStatus } from "@/generated/prisma/client";
 import { UpdateComplaintStatus } from "./UpdateStatus";
+import { FeatureLock } from "@/components/dashboard/feature-lock";
 
 const statusLabel: Record<string, string> = {
   PENDING: "Pending",
@@ -35,15 +37,24 @@ export default async function ComplaintsPage({
   searchParams: Promise<{ status?: string; category?: string }>;
 }) {
   const sp = await searchParams;
-  let restaurant;
   try {
-    restaurant = await getManagerRestaurant();
+    await getManagerRestaurant();
   } catch {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <p className="text-ink-muted">Unauthorized. Please log in.</p>
         <Link href="/login"><Button variant="primary" className="mt-4">Log in</Button></Link>
       </div>
+    );
+  }
+
+  const features = await getManagerPlanFeatures();
+  if (!features.complaintsEnabled) {
+    return (
+      <FeatureLock
+        title="Complaint management"
+        description="Reviewing and resolving customer complaints is included in the Standard and Premium plans. Upgrade to unlock."
+      />
     );
   }
 

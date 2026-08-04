@@ -4,6 +4,7 @@ import * as React from "react";
 import { usePathname } from "next/navigation";
 import { DashboardNav } from "@/components/dashboard/nav";
 import { DashboardHeader } from "@/components/dashboard/header";
+import type { PlanFeatures } from "@/components/dashboard/nav";
 
 interface DashboardShellProps {
   children: React.ReactNode;
@@ -11,6 +12,7 @@ interface DashboardShellProps {
   userRole: string;
   restaurantName: string;
   restaurantLogo: string | null;
+  planFeatures: PlanFeatures;
 }
 
 const titleMap: Record<string, string> = {
@@ -32,6 +34,7 @@ function DashboardShell({
   userRole,
   restaurantName,
   restaurantLogo,
+  planFeatures,
 }: DashboardShellProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -45,6 +48,7 @@ function DashboardShell({
         userRole={userRole}
         restaurantName={restaurantName}
         restaurantLogo={restaurantLogo}
+        planFeatures={planFeatures}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
