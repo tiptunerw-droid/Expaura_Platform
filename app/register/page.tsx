@@ -55,10 +55,10 @@ export default function RestaurantOwnerRegisterPage() {
   const canSubmit = !loading && form.name && form.email && form.password && form.restaurantName;
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row-reverse bg-surface text-text-primary font-sans selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-screen lg:h-screen flex flex-col lg:flex-row-reverse bg-surface text-text-primary font-sans selection:bg-emerald-500 selection:text-white">
       {/* Right Panel - Form */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-16 lg:px-24 py-12 relative z-10 overflow-y-auto max-h-screen">
-        <div className="max-w-md w-full mx-auto pb-12">
+      <div className="w-full lg:w-1/2 flex flex-col px-8 sm:px-16 lg:px-24 py-12 relative z-10 lg:overflow-y-auto">
+        <div className="max-w-md w-full mx-auto my-auto pb-12">
           <div className="mb-12 mt-8 lg:mt-0">
             <span className="text-xl font-bold tracking-tighter uppercase border-b-2 border-emerald-500 pb-1">
               Expaura
@@ -68,11 +68,11 @@ export default function RestaurantOwnerRegisterPage() {
           <h1 className="text-4xl sm:text-5xl font-black tracking-tighter leading-none mb-4 uppercase">
             Start<br/><span className="text-emerald-500">Different.</span>
           </h1>
-          <p className="text-lg text-gray-400 mb-10 max-w-sm">
+          <p className="text-lg text-gray-400 mb-8 max-w-sm">
             Register your restaurant to digitize your menu and track customer experiences.
           </p>
 
-          <form className="space-y-10" onSubmit={handleSubmit}>
+          <form className="space-y-8" onSubmit={handleSubmit}>
             {error && (
               <div className="bg-red-500/10 border-l-4 border-red-500 text-red-400 px-4 py-3 text-sm font-medium">
                 {error}
@@ -197,13 +197,13 @@ export default function RestaurantOwnerRegisterPage() {
             <button
               type="submit"
               disabled={!canSubmit}
-              className="w-full bg-white text-black font-bold uppercase tracking-widest py-4 hover:bg-emerald-500 hover:text-white transition-all duration-300 disabled:opacity-50 mt-8"
+              className="w-full bg-white text-black font-bold uppercase tracking-widest py-4 hover:bg-emerald-500 hover:text-white transition-all duration-300 disabled:opacity-50 mt-6"
             >
               {loading ? "Creating..." : "Initialize"}
             </button>
           </form>
 
-          <div className="mt-12 text-sm text-gray-500 font-medium">
+          <div className="mt-8 text-sm text-gray-500 font-medium">
             Already registered?{" "}
             <Link href="/login" className="text-white hover:text-emerald-500 transition-colors underline decoration-2 underline-offset-4">
               Enter Dashboard
@@ -213,7 +213,7 @@ export default function RestaurantOwnerRegisterPage() {
       </div>
 
       {/* Left Panel - Image */}
-      <div className="hidden lg:block lg:w-1/2 relative bg-black">
+      <div className="hidden lg:block lg:w-1/2 lg:h-full relative bg-black">
         <div className="absolute inset-0 bg-black/30 z-10" />
         <Image 
           src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1974&auto=format&fit=crop" 

@@ -143,11 +143,11 @@ export default function HomePage() {
           </div>
           
           <div className="relative z-10 max-w-4xl mix-blend-difference">
-            <h1 className="text-[12vw] sm:text-[8rem] font-black tracking-tighter leading-[0.8] uppercase mb-8">
-              The<br/><span className="text-emerald-500">Standard.</span>
+            <h1 className="text-[clamp(1.5rem,7.5vw,6.5rem)] font-black tracking-tighter leading-[0.8] uppercase mb-8">
+              Discover Your<br/><span className="text-emerald-500">Next Great Meal.</span>
             </h1>
             <p className="text-xl sm:text-2xl text-gray-300 font-medium max-w-2xl mb-12">
-              Elevate your dining experience. Explore curated venues, digital menus, and authentic reviews.
+              Search 500+ venue menus, read reviews from verified diners, and skip the wait.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6">
@@ -171,9 +171,9 @@ export default function HomePage() {
         <section className="py-24 border-y border-border-subtle">
           <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border-subtle">
             {[
-              { icon: QrCode, title: "Scan & Dine", desc: "Instant access to digital menus via QR. No apps, no waiting." },
-              { icon: Star, title: "Authentic Reviews", desc: "Real feedback from verified diners shaping the culinary landscape." },
-              { icon: ChefHat, title: "Curated Venues", desc: "Discover the finest spots in the city, handpicked and vetted." }
+              { icon: QrCode, title: "Scan, Order & Review", desc: "Access the live menu and leave a verified review instantly by scanning any venue's unique QR code—no app download required." },
+              { icon: Star, title: "Verified Diner Reviews", desc: "All reviews are linked to a completed dine-in session, ensuring honest, timely, and trustworthy feedback." },
+              { icon: ChefHat, title: "Curated City Venues", desc: "Our team personally evaluates each venue for quality, service, and atmosphere so you always find the best spots." }
             ].map((feat, idx) => (
               <div key={idx} className="p-12 hover:bg-surface-alt/50 transition-colors group">
                 <feat.icon className="w-12 h-12 text-text-tertiary group-hover:text-emerald-500 transition-colors mb-8" />

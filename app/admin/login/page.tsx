@@ -103,7 +103,7 @@ export default function SuperAdminLoginPage() {
           <div className="mt-12 text-sm text-gray-500 font-medium">
             System uninitialized?{" "}
             <Link href="/admin/register" className="text-white hover:text-purple-500 transition-colors underline decoration-2 underline-offset-4">
-              Bootstrap Core
+              Initialize System
             </Link>
           </div>
         </div>
