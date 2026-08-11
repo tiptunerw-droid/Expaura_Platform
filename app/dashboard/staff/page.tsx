@@ -59,11 +59,11 @@ export default async function StaffPage() {
           <TableBody>
             {staff.map((s) => (
               <TableRow key={s.id}>
-                <TableCell className="font-medium text-ink">
+                <TableCell className="font-medium text-black">
                   {s.user.name}
                   {s.userId === session.userId ? <span className="ml-1.5 text-xs text-ink-muted">(you)</span> : null}
                 </TableCell>
-                <TableCell className="text-sm">{s.user.email}</TableCell>
+                <TableCell className="text-sm text-black">{s.user.email}</TableCell>
                 <TableCell>
                   <Badge variant="outline" size="sm">{s.role.name}</Badge>
                 </TableCell>
@@ -72,8 +72,8 @@ export default async function StaffPage() {
                     {s.isActive ? "Active" : "Inactive"}
                   </Badge>
                 </TableCell>
-                <TableCell className="font-tabular text-xs">{formatDate(s.joinedAt)}</TableCell>
-                <TableCell className="font-tabular text-xs">
+                <TableCell className="font-tabular text-xs text-black">{formatDate(s.joinedAt)}</TableCell>
+                <TableCell className="font-tabular text-xs text-black">
                   {s.user.lastLogin ? formatDate(s.user.lastLogin) : "Never"}
                 </TableCell>
                 {canManageStaff ? (

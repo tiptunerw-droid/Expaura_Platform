@@ -55,7 +55,7 @@ function EmptyState({
           {icon}
         </div>
       </div>
-      <h3 className={cn("font-display text-xl mb-2", titleClassName || "text-ink")}>{title}</h3>
+      <h3 className={cn("font-display text-xl text-ink mb-2", titleClassName)}>{title}</h3>
       <p className="text-sm text-ink-muted max-w-sm mb-6">{description}</p>
       {action && <div className="flex items-center gap-2">{action}</div>}
     </div>

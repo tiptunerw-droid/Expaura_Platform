@@ -5,6 +5,8 @@ import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { ComplaintStatus } from "@/generated/prisma/client";
 import { createNotification } from "@/lib/actions/notifications";
+import { errors } from "@/lib/errors";
+import { enforceRateLimit, enforceContentAnomaly } from "@/lib/rate-limit";
 
 const rating15 = z.number().int().min(1, "Rating must be at least 1").max(5, "Rating must be at most 5");
 
@@ -30,15 +32,27 @@ const listReviewsSchema = z.object({
 });
 
 export async function submitReview(form: z.infer<typeof submitReviewSchema>) {
+  await enforceRateLimit({ scope: "review", limit: 3, windowMs: 60_000 });
+
   const valid = submitReviewSchema.safeParse(form);
   if (!valid.success) {
-    throw new Error(valid.error.issues[0]?.message || "Validation failed");
+    throw errors.validation(valid.error.issues[0]?.message || "Validation failed");
+  }
+
+  const comment = valid.data.comment?.trim();
+  if (comment) {
+    await enforceContentAnomaly({
+      scope: "review",
+      fingerprint: comment.toLowerCase(),
+      limit: 10,
+      windowMs: 60 * 60 * 1000,
+    });
   }
 
   const restaurant = await prisma.restaurant.findUnique({
     where: { id: valid.data.restaurantId },
   });
-  if (!restaurant) throw new Error("Restaurant not found");
+  if (!restaurant) throw errors.notFound("Restaurant not found");
 
   const result = await prisma.$transaction(async (tx) => {
     const review = await tx.review.create({
@@ -96,7 +110,7 @@ export async function submitReview(form: z.infer<typeof submitReviewSchema>) {
 export const listRestaurantReviews = cache(async (input: z.infer<typeof listReviewsSchema>) => {
   const valid = listReviewsSchema.safeParse(input);
   if (!valid.success) {
-    throw new Error(valid.error.issues[0]?.message || "Validation failed");
+    throw errors.validation(valid.error.issues[0]?.message || "Validation failed");
   }
 
   const { restaurantId, minRating, from, to, limit } = valid.data;
@@ -119,7 +133,7 @@ export const listRestaurantReviews = cache(async (input: z.infer<typeof listRevi
 
 export const getRestaurantReviewsStats = cache(async (restaurantId: string) => {
   const idValid = z.string().uuid().safeParse(restaurantId);
-  if (!idValid.success) throw new Error("Invalid restaurant ID");
+  if (!idValid.success) throw errors.validation("Invalid restaurant ID");
 
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 

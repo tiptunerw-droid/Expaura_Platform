@@ -7,6 +7,8 @@ import { getSession } from "@/lib/auth/session";
 import { requirePermission } from "@/lib/auth/permissions";
 import { randomUUID } from "crypto";
 import { withDbRetry } from "@/lib/prisma";
+import { errors } from "@/lib/errors";
+import { enforceRateLimit } from "@/lib/rate-limit";
 
 const updateRestaurantProfileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").optional(),
@@ -108,7 +110,7 @@ const batchAggregateRatings = cache(async (restaurantIds: string[]) => {
 export const getPublicRestaurantBySlug = cache(async (slug: string) => {
   const slugSchema = z.string().min(1, "Slug is required");
   const valid = slugSchema.safeParse(slug);
-  if (!valid.success) throw new Error(valid.error.issues[0]?.message || "Invalid slug");
+  if (!valid.success) throw errors.validation(valid.error.issues[0]?.message || "Invalid slug");
 
   const restaurant = await prisma.restaurant.findUnique({
     where: { slug: valid.data, isActive: true },
@@ -117,7 +119,7 @@ export const getPublicRestaurantBySlug = cache(async (slug: string) => {
     },
   });
 
-  if (!restaurant) throw new Error("Restaurant not found");
+  if (!restaurant) throw errors.notFound("Restaurant not found");
 
   const ratings = await aggregateRatings(restaurant.id);
 
@@ -128,9 +130,11 @@ export const getPublicRestaurantBySlug = cache(async (slug: string) => {
 });
 
 export const getPublicRestaurantByQr = cache(async (code: string) => {
+  await enforceRateLimit({ scope: "qr", limit: 30, windowMs: 60_000 });
+
   const codeSchema = z.string().min(1, "QR code is required");
   const valid = codeSchema.safeParse(code);
-  if (!valid.success) throw new Error(valid.error.issues[0]?.message || "Invalid QR code");
+  if (!valid.success) throw errors.validation(valid.error.issues[0]?.message || "Invalid QR code");
 
   const qr = await prisma.qrCode.findUnique({
     where: { code: valid.data, isActive: true },
@@ -142,7 +146,7 @@ export const getPublicRestaurantByQr = cache(async (code: string) => {
     },
   });
 
-  if (!qr || !qr.restaurant.isActive) throw new Error("Restaurant not found");
+  if (!qr || !qr.restaurant.isActive) throw errors.notFound("Restaurant not found");
 
   const ratings = await aggregateRatings(qr.restaurantId);
 
@@ -177,7 +181,7 @@ export const getCityRestaurantCounts = cache(async (): Promise<Record<string, nu
 
 export const listDirectory = cache(async (input: z.infer<typeof listDirectorySchema>) => {
   const valid = listDirectorySchema.safeParse(input);
-  if (!valid.success) throw new Error(valid.error.issues[0]?.message || "Invalid filters");
+  if (!valid.success) throw errors.validation(valid.error.issues[0]?.message || "Invalid filters");
 
   const { cityName, search, minRating } = valid.data;
 
@@ -217,7 +221,7 @@ export const listDirectory = cache(async (input: z.infer<typeof listDirectorySch
 export const listRecentlyAdded = cache(async (limit: number = 12) => {
   const limitSchema = z.number().min(1).max(100).default(12);
   const valid = limitSchema.safeParse(limit);
-  if (!valid.success) throw new Error("Invalid limit");
+  if (!valid.success) throw errors.validation("Invalid limit");
 
   const restaurants = await prisma.restaurant.findMany({
     where: { isActive: true },
@@ -238,7 +242,7 @@ export const listRecentlyAdded = cache(async (limit: number = 12) => {
 export const listFeatured = cache(async (limit: number = 6) => {
   const limitSchema = z.number().min(1).max(100).default(6);
   const valid = limitSchema.safeParse(limit);
-  if (!valid.success) throw new Error("Invalid limit");
+  if (!valid.success) throw errors.validation("Invalid limit");
 
   const subscribed = await prisma.restaurant.findMany({
     where: {

@@ -7,6 +7,8 @@ import { getSession } from "@/lib/auth/session";
 import { requirePermission } from "@/lib/auth/permissions";
 import { ComplaintStatus } from "@/generated/prisma/client";
 import { createNotification } from "@/lib/actions/notifications";
+import { errors } from "@/lib/errors";
+import { enforceRateLimit, enforceContentAnomaly } from "@/lib/rate-limit";
 
 const submitComplaintSchema = z.object({
   restaurantId: z.string().uuid(),
@@ -169,10 +171,20 @@ export async function deleteComplaintCategory(input: z.infer<typeof categoryDele
 }
 
 export async function submitComplaint(form: z.infer<typeof submitComplaintSchema>) {
+  await enforceRateLimit({ scope: "complaint", limit: 5, windowMs: 60_000 });
+
   const valid = submitComplaintSchema.safeParse(form);
   if (!valid.success) {
-    throw new Error(valid.error.issues[0]?.message || "Validation failed");
+    throw errors.validation(valid.error.issues[0]?.message || "Validation failed");
   }
+
+  const description = valid.data.description.trim();
+  await enforceContentAnomaly({
+    scope: "complaint",
+    fingerprint: description.toLowerCase(),
+    limit: 10,
+    windowMs: 60 * 60 * 1000,
+  });
 
   const { employeeId, employeeName, restaurantId, ...rest } = valid.data;
 
