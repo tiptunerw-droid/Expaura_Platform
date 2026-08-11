@@ -45,7 +45,7 @@ export function MenuImageUpload({ branchId }: Props) {
         <div className="space-y-4">
           <CloudinaryUpload onUploaded={handleUploaded} />
           {sending && (
-            <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
+            <div className="flex items-center justify-center gap-2 text-sm text-text-tertiary">
               <Loader2 className="w-4 h-4 animate-spin" />
               Saving…
             </div>

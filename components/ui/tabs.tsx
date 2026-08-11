@@ -79,7 +79,7 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
         className={cn(
           "inline-flex items-center justify-center px-3 py-1.5 rounded-sm text-sm font-medium transition-all",
           "text-ink-muted hover:text-ink-soft",
-          "data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-ink",
+          "data-[state=active]:bg-surface data-[state=active]:shadow-sm data-[state=active]:text-ink",
           className
         )}
         {...props}

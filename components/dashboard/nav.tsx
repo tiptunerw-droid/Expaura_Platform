@@ -123,8 +123,8 @@ function DashboardNav({
               className={cn(
                 "flex items-center gap-4 px-4 py-3 text-xs font-bold uppercase tracking-widest transition-all",
                 isActive
-                  ? "bg-white text-black"
-                  : "text-gray-500 hover:text-text-primary hover:bg-surface-alt"
+                  ? "bg-ink text-ceramic"
+                  : "text-text-secondary hover:text-text-primary hover:bg-surface-alt"
               )}
             >
               <Icon className="w-4 h-4 shrink-0" />
@@ -146,7 +146,7 @@ function DashboardNav({
           <form action={handleLogout}>
             <button
               type="submit"
-              className="h-8 w-8 text-gray-500 hover:text-red-500 transition-colors flex items-center justify-center"
+              className="h-8 w-8 text-text-secondary hover:text-red-500 transition-colors flex items-center justify-center"
               aria-label="Logout"
             >
               <LogOut className="w-4 h-4" />

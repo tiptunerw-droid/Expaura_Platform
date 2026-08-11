@@ -36,7 +36,7 @@ function RestaurantCard({
     <Link
       href={`/r/${slug}`}
       className={cn(
-        "group block bg-white border border-line rounded-lg overflow-hidden transition-all",
+        "group block bg-surface border border-line rounded-lg overflow-hidden transition-all",
         "hover:border-line-strong",
         className
       )}

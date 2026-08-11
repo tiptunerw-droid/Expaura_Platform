@@ -179,7 +179,7 @@ html, body {
 
 /* Card hairline-border helper — no shadow, just a 1px line */
 .card-hairline {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
 }
@@ -207,9 +207,13 @@ table.data-dense thead th {
   padding: 12px 16px;
   border-bottom: 1px solid var(--line);
   background: var(--ceramic-deep);
-  position: sticky;
-  top: 0;
-  z-index: 1;
+  position: relative;
+}
+table.data-dense thead th:first-child {
+  border-top-left-radius: var(--radius-lg);
+}
+table.data-dense thead th:last-child {
+  border-top-right-radius: var(--radius-lg);
 }
 table.data-dense tbody td {
   padding: 14px 16px;
@@ -218,7 +222,7 @@ table.data-dense tbody td {
   color: var(--ink-soft);
 }
 table.data-dense tbody tr:hover td {
-  background: #ffffff70;
+  background: var(--surface-hover);
 }
 
 @media (prefers-reduced-motion: reduce) {

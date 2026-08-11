@@ -74,7 +74,7 @@ export function CloudinaryUpload({ onUploaded, className }: Props) {
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="w-full h-32 rounded-lg border-2 border-dashed border-border-subtle flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-emerald-500 hover:text-emerald-400 transition-colors bg-surface-alt"
+          className="w-full h-32 rounded-lg border-2 border-dashed border-border-subtle flex flex-col items-center justify-center gap-2 text-text-tertiary hover:border-emerald-500 hover:text-emerald-400 transition-colors bg-surface-alt"
         >
           <Upload className="w-6 h-6" />
           <span className="text-sm">Click to upload an image</span>
@@ -85,7 +85,7 @@ export function CloudinaryUpload({ onUploaded, className }: Props) {
       {status === "uploading" && (
         <div className="w-full h-32 rounded-lg border-2 border-dashed border-border-subtle flex flex-col items-center justify-center gap-2 bg-surface-alt">
           <Loader2 className="w-6 h-6 animate-spin text-emerald-400" />
-          <span className="text-sm text-gray-400">Uploading…</span>
+          <span className="text-sm text-text-tertiary">Uploading…</span>
         </div>
       )}
 
@@ -104,7 +104,7 @@ export function CloudinaryUpload({ onUploaded, className }: Props) {
           <button
             type="button"
             onClick={() => { setStatus("idle"); setError(""); }}
-            className="text-xs text-gray-400 underline hover:text-rose-300 mt-1"
+            className="text-xs text-text-tertiary underline hover:text-rose-300 mt-1"
           >
             Try again
           </button>

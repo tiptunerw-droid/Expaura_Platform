@@ -120,7 +120,7 @@ export function ProfileForm({ restaurant }: Props) {
                 <Image src={form.logoUrl} alt="Logo" fill className="object-cover" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-gray-400 truncate">{form.logoUrl}</p>
+                <p className="text-xs text-text-tertiary truncate">{form.logoUrl}</p>
               </div>
               <button
                 type="button"

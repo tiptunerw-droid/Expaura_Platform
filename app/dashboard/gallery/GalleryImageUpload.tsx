@@ -49,7 +49,7 @@ export function GalleryImageUpload() {
             <Input id="caption" value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Interior, patio, signature dish…" />
           </div>
           {sending && (
-            <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
+            <div className="flex items-center justify-center gap-2 text-sm text-text-tertiary">
               <Loader2 className="w-4 h-4 animate-spin" />
               Saving…
             </div>

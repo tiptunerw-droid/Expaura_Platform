@@ -31,8 +31,30 @@ interface Props {
 export function UpdateComplaintStatus({ complaintId, currentStatus }: Props) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
+  const [openUp, setOpenUp] = React.useState(false);
   const [sending, setSending] = React.useState(false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
   const currentIdx = statusFlow.indexOf(currentStatus);
+
+  const toggleMenu = () => {
+    const el = containerRef.current;
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      setOpenUp(window.innerHeight - rect.bottom < 150);
+    }
+    setOpen((v) => !v);
+  };
+
+  React.useEffect(() => {
+    if (!open) return;
+    const close = () => setOpen(false);
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+    return () => {
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    };
+  }, [open]);
 
   const handleUpdate = async (status: string) => {
     setSending(true);
@@ -50,12 +72,12 @@ export function UpdateComplaintStatus({ complaintId, currentStatus }: Props) {
   const nextStatuses = statusFlow.slice(currentIdx + 1);
 
   return (
-    <div className="relative">
+    <div className="relative" ref={containerRef}>
       <Button
         variant="ghost"
         size="sm"
         className="h-7 text-xs gap-1"
-        onClick={() => setOpen((v) => !v)}
+        onClick={toggleMenu}
         disabled={sending}
       >
         {sending ? (
@@ -69,7 +91,13 @@ export function UpdateComplaintStatus({ complaintId, currentStatus }: Props) {
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 mt-1 w-40 bg-white rounded-lg shadow-lg border border-line py-1 z-20">
+          <div
+            className={
+              openUp
+                ? "absolute right-0 bottom-full mb-1 w-40 bg-surface rounded-lg shadow-lg border border-line py-1 z-20"
+                : "absolute right-0 mt-1 w-40 bg-surface rounded-lg shadow-lg border border-line py-1 z-20"
+            }
+          >
             {nextStatuses.length > 0 ? (
               nextStatuses.map((s) => (
                 <button

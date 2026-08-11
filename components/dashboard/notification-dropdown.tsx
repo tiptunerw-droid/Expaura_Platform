@@ -88,7 +88,7 @@ export function NotificationDropdown() {
   return (
     <div className="relative">
       <button
-        className="relative p-2 text-gray-500 hover:text-text-primary transition-colors"
+        className="relative p-2 text-text-secondary hover:text-text-primary transition-colors"
         onClick={toggle}
         aria-label={`Notifications (${unread} unread)`}
       >
