@@ -1,35 +1,24 @@
 import * as React from "react";
 import Link from "next/link";
 import {
-  AlertCircle, Search, Clock, CheckCircle,
+  AlertCircle, Clock, CheckCircle,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { EmptyState } from "@/components/ui/empty-state";
 import { getManagerRestaurant } from "@/lib/actions/restaurants";
 import { getManagerPlanFeatures } from "@/lib/actions/restaurants";
 import { listRestaurantComplaints } from "@/lib/actions/complaints";
 import { hasPermission } from "@/lib/auth/permissions";
-import { formatDate } from "@/lib/utils";
 import { ComplaintStatus } from "@/generated/prisma/client";
-import { UpdateComplaintStatus } from "./UpdateStatus";
 import { FeatureLock } from "@/components/dashboard/feature-lock";
+import { ComplaintsList } from "./ComplaintsList";
 
 const statusLabel: Record<string, string> = {
   PENDING: "Pending",
   IN_PROGRESS: "In Progress",
   RESOLVED: "Resolved",
   REJECTED: "Closed",
-};
-
-const statusColor: Record<string, "ember" | "brass" | "herb" | "rose"> = {
-  PENDING: "ember",
-  IN_PROGRESS: "brass",
-  RESOLVED: "herb",
-  REJECTED: "rose",
 };
 
 export default async function ComplaintsPage({
@@ -102,83 +91,30 @@ export default async function ComplaintsPage({
         </Card>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[200px] max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-muted pointer-events-none" />
-          <Input placeholder="Search complaints…" className="pl-9 h-9" />
-        </div>
-        <div className="flex gap-2">
-          {["", "PENDING", "IN_PROGRESS", "RESOLVED", "REJECTED"].map((s) => (
-            <Link key={s} href={`/dashboard/complaints${s ? `?status=${s}` : ""}`}>
-              <Badge
-                variant={sp.status === s || (!sp.status && !s) ? "default" : "outline"}
-                size="sm"
-                className="cursor-pointer"
-              >
-                {s ? statusLabel[s] : "All"}
-              </Badge>
-            </Link>
-          ))}
-        </div>
+      <div className="flex flex-wrap items-center gap-2">
+        {["", "PENDING", "IN_PROGRESS", "RESOLVED", "REJECTED"].map((s) => (
+          <Link key={s} href={`/dashboard/complaints${s ? `?status=${s}` : ""}`}>
+            <Badge
+              variant={sp.status === s || (!sp.status && !s) ? "default" : "outline"}
+              size="sm"
+              className="cursor-pointer"
+            >
+              {s ? statusLabel[s] : "All"}
+            </Badge>
+          </Link>
+        ))}
       </div>
 
-      {complaints.length > 0 ? (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Category</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Employee</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
-              {canManageComplaints ? <TableHead className="w-32">Actions</TableHead> : null}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {complaints.map((c) => (
-              <TableRow key={c.id}>
-                <TableCell>
-                  <Badge variant="outline" size="sm">{c.category?.name || "—"}</Badge>
-                </TableCell>
-                <TableCell className="max-w-xs truncate">
-                  {c.description}
-                </TableCell>
-                <TableCell className="text-sm">
-                  {c.employee?.name || "—"}
-                </TableCell>
-                <TableCell>
-                  <Badge variant={statusColor[c.status]} size="sm">
-                    {statusLabel[c.status]}
-                  </Badge>
-                </TableCell>
-                <TableCell className="font-tabular text-xs">
-                  {formatDate(c.createdAt)}
-                </TableCell>
-                {canManageComplaints ? (
-                  <TableCell>
-                    <UpdateComplaintStatus
-                      complaintId={c.id}
-                      currentStatus={c.status}
-                    />
-                  </TableCell>
-                ) : null}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      ) : (
-        <EmptyState
-          icon={<CheckCircle className="w-full h-full" />}
-          variant="complaint"
-          titleClassName="text-ink"
-          title="No complaints"
-          description={
-            sp.status
-              ? `No complaints with status "${statusLabel[sp.status] || sp.status}".`
-              : "No complaints yet. When customers report issues, they appear here."
-          }
-        />
-      )}
+      <ComplaintsList
+        complaints={complaints}
+        canManageComplaints={canManageComplaints}
+        emptyTitle="No complaints"
+        emptyDescription={
+          sp.status
+            ? `No complaints with status "${statusLabel[sp.status] || sp.status}".`
+            : "No complaints yet. When customers report issues, they appear here."
+        }
+      />
     </div>
   );
 }

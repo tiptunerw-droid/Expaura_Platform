@@ -134,7 +134,9 @@ function AdminHeader({
   userName,
   onMenuToggle,
 }: AdminHeaderProps) {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const [search, setSearch] = React.useState("");
 
   const initials = userName
     .split(" ")
@@ -168,14 +170,25 @@ function AdminHeader({
       </div>
 
       <div className="flex items-center gap-4 px-8">
-        <div className="hidden md:block relative w-64 group">
+        <form
+          className="hidden md:block relative w-64 group"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const params = new URLSearchParams();
+            if (search.trim()) params.set("search", search.trim());
+            router.push(`/admin/restaurants${params.toString() ? `?${params.toString()}` : ""}`);
+          }}
+        >
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary group-focus-within:text-purple-500 transition-colors" />
           <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             type="search"
             placeholder="SEARCH..."
+            aria-label="Search restaurants"
             className="w-full pl-10 pr-4 py-2 bg-transparent border-b-2 border-border-subtle focus:outline-none focus:border-purple-500 text-text-primary placeholder-text-tertiary text-xs font-bold uppercase tracking-widest transition-colors"
           />
-        </div>
+        </form>
 
         <ThemeToggle />
 

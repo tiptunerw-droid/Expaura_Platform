@@ -1,10 +1,31 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Search, ChevronDown, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationDropdown } from "@/components/dashboard/notification-dropdown";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+
+const SECTION_ROUTES = [
+  { keywords: ["analytics", "overview", "dashboard", "stats", "home"], path: "/dashboard" },
+  { keywords: ["review", "reviews", "feedback", "rating", "ratings", "stars", "star"], path: "/dashboard/reviews" },
+  { keywords: ["complaint", "complaints", "issue", "issues", "report", "reports", "reported"], path: "/dashboard/complaints" },
+  { keywords: ["menu", "dish", "dishes", "food", "items", "item"], path: "/dashboard/menu" },
+  { keywords: ["gallery", "photo", "photos", "image", "images"], path: "/dashboard/gallery" },
+  { keywords: ["staff", "team", "member", "members", "people"], path: "/dashboard/staff" },
+  { keywords: ["waiter", "waiters", "employee", "employees", "performance", "tracking"], path: "/dashboard/waiters" },
+  { keywords: ["branch", "branches", "location", "locations"], path: "/dashboard/branches" },
+  { keywords: ["profile", "settings", "plan", "subscription", "billing", "account", "password"], path: "/dashboard/profile" },
+];
+
+function matchSection(raw: string): string {
+  const q = raw.trim().toLowerCase();
+  const match = SECTION_ROUTES.find(({ keywords }) =>
+    keywords.some((k) => k.includes(q) || q.includes(k))
+  );
+  return match?.path ?? "/dashboard";
+}
 
 interface BreadcrumbItem {
   label: string;
@@ -26,7 +47,9 @@ function DashboardHeader({
   className,
   onMenuToggle,
 }: DashboardHeaderProps) {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const [search, setSearch] = React.useState("");
 
   const initials = userName
     .split(" ")
@@ -65,14 +88,24 @@ function DashboardHeader({
       </div>
 
       <div className="flex items-center gap-2 px-8">
-        <div className="hidden md:block relative w-64 group">
+        <form
+          className="hidden md:block relative w-64 group"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!search.trim()) return;
+            router.push(matchSection(search));
+          }}
+        >
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary group-focus-within:text-emerald-500 transition-colors" />
           <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             type="search"
             placeholder="SEARCH..."
+            aria-label="Search dashboard"
             className="w-full pl-10 pr-4 py-2 bg-transparent border-b-2 border-border-subtle focus:outline-none focus:border-emerald-500 text-text-primary placeholder-text-tertiary text-xs font-bold uppercase tracking-widest transition-colors"
           />
-        </div>
+        </form>
 
         <NotificationDropdown />
 
