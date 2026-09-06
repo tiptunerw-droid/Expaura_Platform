@@ -81,7 +81,7 @@ model Restaurant {
   slug          String   @unique
   phone         String?
   whatsapp      String?
-  email         String?
+  email         String?   @unique
   address       String?
   cityId        String   @map("city_id") @db.Uuid
   latitude      Float?

@@ -275,6 +275,9 @@ CREATE INDEX "cities_name_idx" ON "cities"("name");
 CREATE UNIQUE INDEX "restaurants_slug_key" ON "restaurants"("slug");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "restaurants_email_key" ON "restaurants"("email");
+
+-- CreateIndex
 CREATE INDEX "restaurants_is_active_idx" ON "restaurants"("is_active");
 
 -- CreateIndex

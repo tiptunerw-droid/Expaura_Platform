@@ -395,6 +395,23 @@ export async function updateRestaurantProfile(form: z.infer<typeof updateRestaur
     if (value !== undefined) data[key] = value;
   }
 
+  if (data.email !== undefined) {
+    const email = String(data.email).trim().toLowerCase();
+    data.email = email;
+
+    const existing = await prisma.restaurant.findFirst({
+      where: {
+        email: { equals: email, mode: "insensitive" },
+        NOT: { id: session.activeRestaurantId },
+      },
+      select: { id: true },
+    });
+
+    if (existing) {
+      throw new Error("That email is already in use by another restaurant.");
+    }
+  }
+
   return prisma.restaurant.update({
     where: { id: session.activeRestaurantId },
     data,
