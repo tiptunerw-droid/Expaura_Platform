@@ -7,6 +7,7 @@ import { ComplaintStatus } from "@/generated/prisma/client";
 import { createNotification } from "@/lib/actions/notifications";
 import { errors } from "@/lib/errors";
 import { enforceRateLimit, enforceContentAnomaly } from "@/lib/rate-limit";
+import { isDbUnavailable } from "@/lib/graceful";
 
 const rating15 = z.number().int().min(1, "Rating must be at least 1").max(5, "Rating must be at most 5");
 
@@ -124,11 +125,16 @@ export const listRestaurantReviews = cache(async (input: z.infer<typeof listRevi
     if (to) where.createdAt.lte = new Date(to);
   }
 
-  return prisma.review.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-    take: limit || 100,
-  });
+  try {
+    return await prisma.review.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      take: limit || 100,
+    });
+  } catch (err) {
+    if (isDbUnavailable(err)) return [];
+    throw err;
+  }
 });
 
 export const getRestaurantReviewsStats = cache(async (restaurantId: string) => {

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/auth/permissions";
+import { isDbUnavailable } from "@/lib/graceful";
 
 const addGallerySchema = z.object({
   imageUrl: z.string().min(1, "Image URL is required"),
@@ -18,10 +19,15 @@ export const listGallery = cache(async (restaurantId: string) => {
   const valid = z.string().uuid().safeParse(restaurantId);
   if (!valid.success) throw new Error("Invalid restaurant ID");
 
-  return prisma.gallery.findMany({
-    where: { restaurantId: valid.data },
-    orderBy: { createdAt: "desc" },
-  });
+  try {
+    return await prisma.gallery.findMany({
+      where: { restaurantId: valid.data },
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (err) {
+    if (isDbUnavailable(err)) return [];
+    throw err;
+  }
 });
 
 export async function addGalleryImage(form: z.infer<typeof addGallerySchema>) {

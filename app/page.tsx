@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, QrCode, Star, ChefHat } from "lucide-react";
 import { listFeatured } from "@/lib/actions/restaurants";
+import { DataUnavailableNotice } from "@/components/public/data-unavailable-notice";
 
 export const revalidate = 300;
 
@@ -70,7 +71,15 @@ function Footer() {
 }
 
 async function FeaturedSection() {
-  const featured = await listFeatured(6);
+  const { restaurants: featured, dbError } = await listFeatured(6);
+
+  if (dbError) {
+    return (
+      <div className="col-span-full">
+        <DataUnavailableNotice label="featured venues" />
+      </div>
+    );
+  }
 
   if (featured.length === 0) {
     return (

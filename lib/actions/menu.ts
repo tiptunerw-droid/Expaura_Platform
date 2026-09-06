@@ -4,6 +4,7 @@ import { z } from "zod";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/auth/permissions";
+import { isDbUnavailable } from "@/lib/graceful";
 
 const addMenuImageSchema = z.object({
   imageUrl: z.string().min(1, "Image URL is required"),
@@ -32,10 +33,15 @@ export const listMenuImages = cache(async (restaurantId: string, branchId?: stri
   if (branchId) where.branchId = branchId;
   if (!branchId) where.branchId = null;
 
-  return prisma.menuImage.findMany({
-    where,
-    orderBy: { position: "asc" },
-  });
+  try {
+    return await prisma.menuImage.findMany({
+      where,
+      orderBy: { position: "asc" },
+    });
+  } catch (err) {
+    if (isDbUnavailable(err)) return [];
+    throw err;
+  }
 });
 
 export async function addMenuImage(form: z.infer<typeof addMenuImageSchema>) {

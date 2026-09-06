@@ -4,11 +4,12 @@ import { z } from "zod";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
-import { requirePermission } from "@/lib/auth/permissions";
 import { randomUUID } from "crypto";
 import { withDbRetry } from "@/lib/prisma";
+import { graceful, isDbUnavailable } from "@/lib/graceful";
 import { errors } from "@/lib/errors";
 import { enforceRateLimit } from "@/lib/rate-limit";
+import { requirePermission } from "@/lib/auth/permissions";
 
 const updateRestaurantProfileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").optional(),
@@ -112,21 +113,25 @@ export const getPublicRestaurantBySlug = cache(async (slug: string) => {
   const valid = slugSchema.safeParse(slug);
   if (!valid.success) throw errors.validation(valid.error.issues[0]?.message || "Invalid slug");
 
-  const restaurant = await prisma.restaurant.findUnique({
-    where: { slug: valid.data, isActive: true },
-    include: {
-      city: true,
-    },
+  const result = await graceful(async () => {
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { slug: valid.data, isActive: true },
+      include: {
+        city: true,
+      },
+    });
+
+    if (!restaurant) throw errors.notFound("Restaurant not found");
+
+    const ratings = await aggregateRatings(restaurant.id);
+
+    return {
+      ...restaurant,
+      ...ratings,
+    };
   });
 
-  if (!restaurant) throw errors.notFound("Restaurant not found");
-
-  const ratings = await aggregateRatings(restaurant.id);
-
-  return {
-    ...restaurant,
-    ...ratings,
-  };
+  return result.data;
 });
 
 export const getPublicRestaurantByQr = cache(async (code: string) => {
@@ -136,28 +141,32 @@ export const getPublicRestaurantByQr = cache(async (code: string) => {
   const valid = codeSchema.safeParse(code);
   if (!valid.success) throw errors.validation(valid.error.issues[0]?.message || "Invalid QR code");
 
-  const qr = await prisma.qrCode.findUnique({
-    where: { code: valid.data, isActive: true },
-    include: {
-      restaurant: {
-        include: { city: true },
+  const result = await graceful(async () => {
+    const qr = await prisma.qrCode.findUnique({
+      where: { code: valid.data, isActive: true },
+      include: {
+        restaurant: {
+          include: { city: true },
+        },
+        branch: true,
       },
-      branch: true,
-    },
+    });
+
+    if (!qr || !qr.restaurant.isActive) throw errors.notFound("Restaurant not found");
+
+    const ratings = await aggregateRatings(qr.restaurantId);
+
+    return {
+      ...qr.restaurant,
+      branch: qr.branch,
+      ...ratings,
+    };
   });
 
-  if (!qr || !qr.restaurant.isActive) throw errors.notFound("Restaurant not found");
-
-  const ratings = await aggregateRatings(qr.restaurantId);
-
-  return {
-    ...qr.restaurant,
-    branch: qr.branch,
-    ...ratings,
-  };
+  return result.data;
 });
 
-export const getCityRestaurantCounts = cache(async (): Promise<Record<string, number>> => {
+export const getCityRestaurantCounts = cache(async (): Promise<{ counts: Record<string, number>; dbError: boolean }> => {
   try {
     const [counts, cities] = await Promise.all([
       prisma.restaurant.groupBy({
@@ -173,9 +182,10 @@ export const getCityRestaurantCounts = cache(async (): Promise<Record<string, nu
       const name = cityMap.get(c.cityId);
       if (name) result[name] = c._count.id;
     }
-    return result;
-  } catch {
-    return {};
+    return { counts: result, dbError: false };
+  } catch (err) {
+    if (isDbUnavailable(err)) return { counts: {}, dbError: true };
+    return { counts: {}, dbError: false };
   }
 });
 
@@ -183,39 +193,44 @@ export const listDirectory = cache(async (input: z.infer<typeof listDirectorySch
   const valid = listDirectorySchema.safeParse(input);
   if (!valid.success) throw errors.validation(valid.error.issues[0]?.message || "Invalid filters");
 
-  const { cityName, search, minRating } = valid.data;
+  try {
+    const { cityName, search, minRating } = valid.data;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const where: any = { isActive: true };
-  if (cityName) where.city = { name: { contains: cityName, mode: "insensitive" } };
-  if (search) where.name = { contains: search, mode: "insensitive" };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const where: any = { isActive: true };
+    if (cityName) where.city = { name: { contains: cityName, mode: "insensitive" } };
+    if (search) where.name = { contains: search, mode: "insensitive" };
 
-  const restaurants = await prisma.restaurant.findMany({
-    where,
-    include: { city: true },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-  });
+    const restaurants = await prisma.restaurant.findMany({
+      where,
+      include: { city: true },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    });
 
-  const ids = restaurants.map((r) => r.id);
-  const ratingsMap = ids.length > 0 ? await batchAggregateRatings(ids) : new Map();
+    const ids = restaurants.map((r) => r.id);
+    const ratingsMap = ids.length > 0 ? await batchAggregateRatings(ids) : new Map();
 
-  const enriched = restaurants.map((r) => ({
-    ...r,
-    ...(ratingsMap.get(r.id) ?? { averageOverall: 0, averageFood: 0, averageService: 0, averageAtmosphere: 0, averageCleanliness: 0, reviewCount: 0 }),
-  }));
+    const enriched = restaurants.map((r) => ({
+      ...r,
+      ...(ratingsMap.get(r.id) ?? { averageOverall: 0, averageFood: 0, averageService: 0, averageAtmosphere: 0, averageCleanliness: 0, reviewCount: 0 }),
+    }));
 
-  let filtered = enriched;
-  if (minRating != null) {
-    filtered = enriched.filter((r) => r.averageOverall >= minRating);
+    let filtered = enriched;
+    if (minRating != null) {
+      filtered = enriched.filter((r) => r.averageOverall >= minRating);
+    }
+
+    filtered.sort((a, b) => {
+      if (b.reviewCount !== a.reviewCount) return b.reviewCount - a.reviewCount;
+      return b.averageOverall - a.averageOverall;
+    });
+
+    return { restaurants: filtered, dbError: false };
+  } catch (err) {
+    if (isDbUnavailable(err)) return { restaurants: [], dbError: true };
+    throw err;
   }
-
-  filtered.sort((a, b) => {
-    if (b.reviewCount !== a.reviewCount) return b.reviewCount - a.reviewCount;
-    return b.averageOverall - a.averageOverall;
-  });
-
-  return filtered;
 });
 
 export const listRecentlyAdded = cache(async (limit: number = 12) => {
@@ -223,20 +238,27 @@ export const listRecentlyAdded = cache(async (limit: number = 12) => {
   const valid = limitSchema.safeParse(limit);
   if (!valid.success) throw errors.validation("Invalid limit");
 
-  const restaurants = await prisma.restaurant.findMany({
-    where: { isActive: true },
-    include: { city: true },
-    orderBy: { createdAt: "desc" },
-    take: valid.data,
-  });
+  try {
+    const restaurants = await prisma.restaurant.findMany({
+      where: { isActive: true },
+      include: { city: true },
+      orderBy: { createdAt: "desc" },
+      take: valid.data,
+    });
 
-  const ids = restaurants.map((r) => r.id);
-  const ratingsMap = ids.length > 0 ? await batchAggregateRatings(ids) : new Map();
+    const ids = restaurants.map((r) => r.id);
+    const ratingsMap = ids.length > 0 ? await batchAggregateRatings(ids) : new Map();
 
-  return restaurants.map((r) => ({
-    ...r,
-    ...(ratingsMap.get(r.id) ?? { averageOverall: 0, averageFood: 0, averageService: 0, averageAtmosphere: 0, averageCleanliness: 0, reviewCount: 0 }),
-  }));
+    const items = restaurants.map((r) => ({
+      ...r,
+      ...(ratingsMap.get(r.id) ?? { averageOverall: 0, averageFood: 0, averageService: 0, averageAtmosphere: 0, averageCleanliness: 0, reviewCount: 0 }),
+    }));
+
+    return { restaurants: items, dbError: false };
+  } catch (err) {
+    if (isDbUnavailable(err)) return { restaurants: [], dbError: true };
+    throw err;
+  }
 });
 
 export const listFeatured = cache(async (limit: number = 6) => {
@@ -244,36 +266,43 @@ export const listFeatured = cache(async (limit: number = 6) => {
   const valid = limitSchema.safeParse(limit);
   if (!valid.success) throw errors.validation("Invalid limit");
 
-  const subscribed = await prisma.restaurant.findMany({
-    where: {
-      isActive: true,
-      subscriptions: {
-        some: { status: "ACTIVE" },
+  try {
+    const subscribed = await prisma.restaurant.findMany({
+      where: {
+        isActive: true,
+        subscriptions: {
+          some: { status: "ACTIVE" },
+        },
       },
-    },
-    include: { city: true },
-    take: valid.data * 3,
-  });
-
-  let picks = subscribed;
-  if (picks.length > 0) {
-    picks = picks.sort(() => Math.random() - 0.5).slice(0, valid.data);
-  } else {
-    picks = await prisma.restaurant.findMany({
-      where: { isActive: true },
       include: { city: true },
-      orderBy: { createdAt: "desc" },
-      take: valid.data,
+      take: valid.data * 3,
     });
+
+    let picks = subscribed;
+    if (picks.length > 0) {
+      picks = picks.sort(() => Math.random() - 0.5).slice(0, valid.data);
+    } else {
+      picks = await prisma.restaurant.findMany({
+        where: { isActive: true },
+        include: { city: true },
+        orderBy: { createdAt: "desc" },
+        take: valid.data,
+      });
+    }
+
+    const ids = picks.map((r) => r.id);
+    const ratingsMap = ids.length > 0 ? await batchAggregateRatings(ids) : new Map();
+
+    const restaurants = picks.map((r) => ({
+      ...r,
+      ...(ratingsMap.get(r.id) ?? { averageOverall: 0, averageFood: 0, averageService: 0, averageAtmosphere: 0, averageCleanliness: 0, reviewCount: 0 }),
+    }));
+
+    return { restaurants, dbError: false };
+  } catch (err) {
+    if (isDbUnavailable(err)) return { restaurants: [], dbError: true };
+    throw err;
   }
-
-  const ids = picks.map((r) => r.id);
-  const ratingsMap = ids.length > 0 ? await batchAggregateRatings(ids) : new Map();
-
-  return picks.map((r) => ({
-    ...r,
-    ...(ratingsMap.get(r.id) ?? { averageOverall: 0, averageFood: 0, averageService: 0, averageAtmosphere: 0, averageCleanliness: 0, reviewCount: 0 }),
-  }));
 });
 
 export const getManagerRestaurant = cache(async () => {  const session = await getSession();

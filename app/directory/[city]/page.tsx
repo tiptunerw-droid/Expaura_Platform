@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { listDirectory } from "@/lib/actions/restaurants";
 import { cn } from "@/lib/utils";
 import { DirectoryBrowser } from "./DirectoryBrowser";
+import { DataUnavailableNotice } from "@/components/public/data-unavailable-notice";
 
 export const revalidate = 300;
 
@@ -24,7 +25,7 @@ export default async function DirectoryPage({ params }: DirectoryPageProps) {
   const { city } = await params;
   const cityTitle = city.charAt(0).toUpperCase() + city.slice(1);
 
-  const allRestaurants = await listDirectory({ cityName: cityTitle });
+  const { restaurants: allRestaurants, dbError } = await listDirectory({ cityName: cityTitle });
 
   return (
     <div className="min-h-screen bg-surface text-text-primary">
@@ -76,9 +77,15 @@ export default async function DirectoryPage({ params }: DirectoryPageProps) {
         </section>
 
         {/* Filterable content — hydrates client-side */}
-        <Suspense fallback={<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8"><div className="h-72 bg-surface-alt border border-border-subtle animate-pulse" /></div>}>
-          <DirectoryBrowser city={cityTitle} restaurants={allRestaurants} />
-        </Suspense>
+        {dbError ? (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            <DataUnavailableNotice label="restaurants" />
+          </div>
+        ) : (
+          <Suspense fallback={<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8"><div className="h-72 bg-surface-alt border border-border-subtle animate-pulse" /></div>}>
+            <DirectoryBrowser city={cityTitle} restaurants={allRestaurants} />
+          </Suspense>
+        )}
 
         {/* CTA */}
         <section className="border-t border-border-subtle py-16 sm:py-20 text-center">

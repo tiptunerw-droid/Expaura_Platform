@@ -2,6 +2,7 @@
 
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
+import { isDbUnavailable } from "@/lib/graceful";
 
 export interface City {
   id: string;
@@ -10,7 +11,7 @@ export interface City {
   country: string;
 }
 
-export const getCities = cache(async (): Promise<{ cities: City[] }> => {
+export const getCities = cache(async (): Promise<{ cities: City[]; dbError: boolean }> => {
   try {
     const cities = await prisma.city.findMany({
       orderBy: { name: "asc" },
@@ -22,9 +23,10 @@ export const getCities = cache(async (): Promise<{ cities: City[] }> => {
       },
     });
 
-    return { cities };
+    return { cities, dbError: false };
   } catch (error) {
+    if (isDbUnavailable(error)) return { cities: [], dbError: true };
     console.error("[Get Cities Error]", error);
-    return { cities: [] };
+    return { cities: [], dbError: false };
   }
 });

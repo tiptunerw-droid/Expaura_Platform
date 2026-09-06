@@ -7,23 +7,34 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getCities } from "@/lib/actions/data";
 import { getCityRestaurantCounts, listRecentlyAdded } from "@/lib/actions/restaurants";
+import { DataUnavailableNotice } from "@/components/public/data-unavailable-notice";
 
 export const revalidate = 300;
 
 async function CityGrid() {
-  const [{ cities }, cityCounts] = await Promise.all([
+  const [{ cities, dbError: citiesDbError }, { counts, dbError: countsDbError }] = await Promise.all([
     getCities(),
     getCityRestaurantCounts(),
   ]);
+  const dbError = citiesDbError || countsDbError;
+
+  if (dbError) {
+    return (
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+        <h2 className="font-display text-xl text-text-primary mb-6">Browse by city</h2>
+        <DataUnavailableNotice label="cities" />
+      </section>
+    );
+  }
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
       <h2 className="font-display text-xl text-text-primary mb-6">Browse by city</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {cities
-          .sort((a, b) => (cityCounts[b.name] || 0) - (cityCounts[a.name] || 0))
+          .sort((a, b) => (counts[b.name] || 0) - (counts[a.name] || 0))
           .map((c) => {
-            const count = cityCounts[c.name] || 0;
+            const count = counts[c.name] || 0;
             return (
               <Link
                 key={c.id}
@@ -73,7 +84,18 @@ function CityGridSkeleton() {
 }
 
 async function RecentlyAdded() {
-  const recent = await listRecentlyAdded(6);
+  const { restaurants: recent, dbError } = await listRecentlyAdded(6);
+
+  if (dbError) {
+    return (
+      <section className="border-t border-border-subtle py-10 sm:py-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="font-display text-xl text-text-primary mb-6">Recently added</h2>
+          <DataUnavailableNotice label="recently added restaurants" />
+        </div>
+      </section>
+    );
+  }
 
   if (recent.length === 0) return null;
 

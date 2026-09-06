@@ -18,15 +18,20 @@ import { listMenuImages } from "@/lib/actions/menu";
 import { listGallery } from "@/lib/actions/gallery";
 import { prisma } from "@/lib/prisma";
 import { isRestaurantOpen, cn } from "@/lib/utils";
+import { DataUnavailableNotice } from "@/components/public/data-unavailable-notice";
 
 export const revalidate = 300;
 
 export async function generateStaticParams() {
-  const restaurants = await prisma.restaurant.findMany({
-    where: { isActive: true },
-    select: { slug: true },
-  });
-  return restaurants.map((r) => ({ slug: r.slug }));
+  try {
+    const restaurants = await prisma.restaurant.findMany({
+      where: { isActive: true },
+      select: { slug: true },
+    });
+    return restaurants.map((r) => ({ slug: r.slug }));
+  } catch {
+    return [];
+  }
 }
 
 interface Props {
@@ -69,6 +74,10 @@ async function RestaurantHero({ slug }: { slug: string }) {
     restaurant = await getPublicRestaurantBySlug(slug);
   } catch {
     notFound();
+  }
+
+  if (!restaurant) {
+    return <DataUnavailableNotice label="this restaurant" />;
   }
 
   const { open, label } = isRestaurantOpen(restaurant.openingHours);
@@ -144,13 +153,14 @@ async function RestaurantHero({ slug }: { slug: string }) {
   );
 }
 
-async function RestaurantContentSection({ restaurantId, restaurant }: { restaurantId: string; restaurant: Awaited<ReturnType<typeof getPublicRestaurantBySlug>> }) {
-  const [reviews, menuImages, gallery, similar] = await Promise.all([
+async function RestaurantContentSection({ restaurantId, restaurant }: { restaurantId: string; restaurant: NonNullable<Awaited<ReturnType<typeof getPublicRestaurantBySlug>>> }) {
+  const [reviews, menuImages, gallery, similarResult] = await Promise.all([
     listRestaurantReviews({ restaurantId, limit: 20 }),
     listMenuImages(restaurantId),
     listGallery(restaurantId),
     listRecentlyAdded(4),
   ]);
+  const similar = similarResult.restaurants;
 
   const hasReviews = restaurant.reviewCount > 0;
   const cityLower = restaurant.city?.name?.toLowerCase() || "kigali";
