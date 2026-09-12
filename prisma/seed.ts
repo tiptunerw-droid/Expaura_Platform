@@ -23,36 +23,27 @@ const COMPLAINT_CATEGORIES = [
   { name: "Ambience", icon: "Music" },
 ];
 
+const ALL_FEATURES = {
+  analyticsEnabled: true,
+  aiSummaryEnabled: true,
+  complaintsEnabled: true,
+  employeeTrackingEnabled: true,
+};
+
 const PLANS = [
   {
-    name: "Basic",
-    priceMonthly: "15000",
-    maxBranches: 1,
-    maxStaff: 3,
-    analyticsEnabled: false,
-    aiSummaryEnabled: false,
-    complaintsEnabled: true,
-    employeeTrackingEnabled: false,
-  },
-  {
-    name: "Standard",
-    priceMonthly: "45000",
-    maxBranches: 3,
-    maxStaff: 10,
-    analyticsEnabled: true,
-    aiSummaryEnabled: true,
-    complaintsEnabled: true,
-    employeeTrackingEnabled: true,
-  },
-  {
-    name: "Premium",
-    priceMonthly: "95000",
+    name: "Trial",
+    priceMonthly: "0",
     maxBranches: 10,
     maxStaff: 25,
-    analyticsEnabled: true,
-    aiSummaryEnabled: true,
-    complaintsEnabled: true,
-    employeeTrackingEnabled: true,
+    ...ALL_FEATURES,
+  },
+  {
+    name: "Monthly",
+    priceMonthly: "20000",
+    maxBranches: 10,
+    maxStaff: 25,
+    ...ALL_FEATURES,
   },
 ];
 
@@ -89,7 +80,24 @@ async function main() {
       await prisma.plan.create({ data: plan });
       console.log(`  ✓ ${plan.name}`);
     } else {
-      console.log(`  - ${plan.name} (exists)`);
+      await prisma.plan.update({ where: { id: existing.id }, data: plan });
+      console.log(`  ~ ${plan.name} (updated)`);
+    }
+  }
+
+  await prisma.plan.updateMany({ data: ALL_FEATURES });
+  console.log("  ~ all plans: features enabled (flat pricing)");
+
+  const legacyPlans = await prisma.plan.findMany({
+    where: { name: { notIn: ["Trial", "Monthly"] } },
+    include: { _count: { select: { subscriptions: true } } },
+  });
+  for (const plan of legacyPlans) {
+    if (plan._count.subscriptions > 0) {
+      console.log(`  ! ${plan.name} kept — ${plan._count.subscriptions} subscription(s) still reference it`);
+    } else {
+      await prisma.plan.delete({ where: { id: plan.id } });
+      console.log(`  ✗ ${plan.name} (legacy plan, deleted)`);
     }
   }
 

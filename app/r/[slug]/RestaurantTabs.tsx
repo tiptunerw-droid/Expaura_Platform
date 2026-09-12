@@ -60,11 +60,11 @@ export function RestaurantTabs({
   const searchParams = useSearchParams();
   const tabFromUrl = searchParams.get("tab");
 
-  const availableTabs = ["reviews", "gallery", "report"];
+  const availableTabs = ["menu", "reviews", "gallery", "report"];
 
   const tab = tabFromUrl && availableTabs.includes(tabFromUrl)
     ? tabFromUrl
-    : "reviews";
+    : "menu";
 
   const setTab = React.useCallback((value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -180,13 +180,21 @@ export function RestaurantTabs({
 
   return (
     <>
-      {menuSection}
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="w-full">
+          <TabsTrigger value="menu" className="flex-1">Menu</TabsTrigger>
           <TabsTrigger value="reviews" className="flex-1">Reviews</TabsTrigger>
           <TabsTrigger value="gallery" className="flex-1">Gallery</TabsTrigger>
           <TabsTrigger value="report" className="flex-1">Report</TabsTrigger>
         </TabsList>
+
+      <TabsContent value="menu">
+        {menuSection ?? (
+          <div className="text-center py-12 text-gray-500">
+            <p className="text-sm">No menu photos yet.</p>
+          </div>
+        )}
+      </TabsContent>
 
       <TabsContent value="reviews">
         <div className="space-y-6">

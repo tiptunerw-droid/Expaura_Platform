@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
 import {
   BarChart3,
@@ -128,15 +128,70 @@ interface AdminHeaderProps {
   onMenuToggle?: () => void;
 }
 
+function AdminHeaderSearch() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const urlSearch = pathname === "/admin/restaurants" ? (searchParams.get("search") ?? "") : "";
+
+  return (
+    <AdminHeaderSearchForm
+      key={`${pathname}:${urlSearch}`}
+      defaultValue={urlSearch}
+      preserveCurrentFilters={pathname === "/admin/restaurants"}
+      currentQuery={searchParams.toString()}
+      onNavigate={(qs) => router.push(`/admin/restaurants${qs ? `?${qs}` : ""}`)}
+    />
+  );
+}
+
+function AdminHeaderSearchForm({
+  defaultValue,
+  preserveCurrentFilters,
+  currentQuery,
+  onNavigate,
+}: {
+  defaultValue: string;
+  preserveCurrentFilters: boolean;
+  currentQuery: string;
+  onNavigate: (qs: string) => void;
+}) {
+  const [search, setSearch] = React.useState(defaultValue);
+
+  return (
+    <form
+      className="hidden md:block relative w-64 group"
+      onSubmit={(e) => {
+        e.preventDefault();
+        const params = preserveCurrentFilters
+          ? new URLSearchParams(currentQuery)
+          : new URLSearchParams();
+        const q = search.trim();
+        if (q) params.set("search", q);
+        else params.delete("search");
+        onNavigate(params.toString());
+      }}
+    >
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary group-focus-within:text-purple-500 transition-colors" />
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        type="search"
+        placeholder="SEARCH..."
+        aria-label="Search restaurants"
+        className="w-full pl-10 pr-4 py-2 bg-transparent border-b-2 border-border-subtle focus:outline-none focus:border-purple-500 text-text-primary placeholder-text-tertiary text-xs font-bold uppercase tracking-widest transition-colors"
+      />
+    </form>
+  );
+}
+
 function AdminHeader({
   title,
   breadcrumbs = [{ label: "Admin" }],
   userName,
   onMenuToggle,
 }: AdminHeaderProps) {
-  const router = useRouter();
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const [search, setSearch] = React.useState("");
 
   const initials = userName
     .split(" ")
@@ -170,25 +225,9 @@ function AdminHeader({
       </div>
 
       <div className="flex items-center gap-4 px-8">
-        <form
-          className="hidden md:block relative w-64 group"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const params = new URLSearchParams();
-            if (search.trim()) params.set("search", search.trim());
-            router.push(`/admin/restaurants${params.toString() ? `?${params.toString()}` : ""}`);
-          }}
-        >
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary group-focus-within:text-purple-500 transition-colors" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            type="search"
-            placeholder="SEARCH..."
-            aria-label="Search restaurants"
-            className="w-full pl-10 pr-4 py-2 bg-transparent border-b-2 border-border-subtle focus:outline-none focus:border-purple-500 text-text-primary placeholder-text-tertiary text-xs font-bold uppercase tracking-widest transition-colors"
-          />
-        </form>
+        <React.Suspense fallback={<div className="hidden md:block w-64 h-8" />}>
+          <AdminHeaderSearch />
+        </React.Suspense>
 
         <ThemeToggle />
 

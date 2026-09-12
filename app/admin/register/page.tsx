@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { PasswordInput } from "@/components/auth/password-input";
 
 export default function SuperAdminRegisterPage() {
   const router = useRouter();
@@ -137,14 +138,13 @@ export default function SuperAdminRegisterPage() {
                 <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 group-focus-within:text-white transition-colors">
                   Password
                 </label>
-                <input
-                  type="password"
+                <PasswordInput
                   required
                   minLength={8}
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   placeholder="••••••••••••"
-                  className="w-full bg-transparent border-b-2 border-gray-800 py-3 text-white placeholder-gray-700 focus:outline-none focus:border-purple-600 transition-colors text-lg"
+                  className="bg-transparent border-b-2 border-gray-800 py-3 text-white placeholder-gray-700 focus:outline-none focus:border-purple-600 transition-colors text-lg"
                 />
               </div>
 

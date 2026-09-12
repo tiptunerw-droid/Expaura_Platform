@@ -21,11 +21,11 @@ export default async function DashboardLayout({
   const restaurant = result.restaurant;
 
   let planFeatures = {
-    planName: "Free",
-    analyticsEnabled: false,
-    aiSummaryEnabled: false,
-    complaintsEnabled: false,
-    employeeTrackingEnabled: false,
+    planName: "Trial",
+    analyticsEnabled: true,
+    aiSummaryEnabled: true,
+    complaintsEnabled: true,
+    employeeTrackingEnabled: true,
   };
   try {
     planFeatures = await getManagerPlanFeatures();

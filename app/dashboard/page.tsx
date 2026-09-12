@@ -9,6 +9,7 @@ import { getRestaurantReviewsStats } from "@/lib/actions/reviews";
 import { ratingTrendByPeriod, complaintsByCategory, peakHours } from "@/lib/actions/analytics";
 import { summarizeReviews } from "@/lib/actions/ai";
 import { FeatureLock } from "@/components/dashboard/feature-lock";
+import { AiSummaryWidget } from "@/components/dashboard/ai-summary-widget";
 
 /* ---------- Skeleton fallbacks ---------- */
 
@@ -119,10 +120,10 @@ async function StatCards({ rid }: { rid: string }) {
       <div className="bg-surface border border-border-subtle p-6 flex flex-col justify-between hover:border-emerald-500 transition-colors">
         <div className="mb-8"><TrendingUp className="w-8 h-8 text-text-tertiary" /></div>
         <div>
-          <p className="text-[10px] text-text-tertiary font-bold uppercase tracking-widest">Peak Hour</p>
+          <p className="text-[10px] text-text-tertiary font-bold uppercase tracking-widest">Peak feedback hour</p>
           <p className="text-4xl font-black text-text-primary mt-1">{peakHourLabel}</p>
           <p className="text-[10px] text-text-tertiary font-bold uppercase tracking-widest mt-2">
-            {peakHourEntry ? `${peakHourEntry.count} REVIEWS LOGGED` : "NO DATA"}
+            {peakHourEntry ? `${peakHourEntry.count} REVIEWS SUBMITTED` : "NO DATA"}
           </p>
         </div>
       </div>
@@ -205,20 +206,18 @@ async function BreakdownMatrix({ rid }: { rid: string }) {
 }
 
 async function AiTelemetry({ rid }: { rid: string }) {
-  const aiSummary = await summarizeReviews(rid, 30).catch(() => ({
-    summary: "AI insights unavailable.",
-    highlights: [],
-    painPoints: [],
+  const summary = await summarizeReviews(rid, 30).catch(() => ({
+    summary: "Feedback summary unavailable.",
+    highlights: [] as string[],
+    painPoints: [] as string[],
   }));
 
   return (
-    <div className="bg-surface-alt border border-border-subtle p-6">
-      <h3 className="text-sm font-black uppercase tracking-widest mb-4 text-emerald-400 flex items-center gap-2">
-        <span className="w-2 h-2 bg-emerald-400 animate-pulse" />
-        AI Telemetry
-      </h3>
-      <p className="text-sm text-text-secondary leading-relaxed font-medium">{aiSummary.summary}</p>
-    </div>
+    <AiSummaryWidget
+      summary={summary.summary}
+      highlights={summary.highlights}
+      painPoints={summary.painPoints}
+    />
   );
 }
 
@@ -277,7 +276,7 @@ export default async function AnalyticsDashboard() {
     return (
       <FeatureLock
         title="Analytics"
-        description="Detailed satisfaction, trend and incident analytics are included in the Standard and Premium plans. Upgrade to unlock."
+        description="Detailed satisfaction, trend, and incident analytics unlock when your subscription is active. Ask an admin to record payment, or start from Pricing."
       />
     );
   }
@@ -316,16 +315,16 @@ export default async function AnalyticsDashboard() {
           ) : (
             <div className="bg-surface-alt border border-border-subtle p-6 text-center">
               <h3 className="text-sm font-black uppercase tracking-widest mb-4 text-text-tertiary">
-                AI Telemetry
+                Feedback summary
               </h3>
               <p className="text-xs text-text-tertiary mb-4">
-                AI summaries of guest feedback are not included in your plan.
+                Feedback summaries are not included on your current subscription.
               </p>
               <Link
-                href="/dashboard/profile#subscription"
+                href="/pricing"
                 className="text-xs font-bold uppercase tracking-widest text-emerald-400 hover:text-emerald-300 transition-colors"
               >
-                Upgrade to unlock
+                See pricing
               </Link>
             </div>
           )}

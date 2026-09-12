@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { PasswordInput } from "@/components/auth/password-input";
 
 const RWANDAN_CITIES = [
   "Kigali", "Butare", "Gisenyi", "Musanze", "Ruhengeri",
@@ -116,14 +117,13 @@ export default function RestaurantOwnerRegisterPage() {
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 group-focus-within:text-white transition-colors">
                   Password
                 </label>
-                <input
-                  type="password"
+                <PasswordInput
                   required
                   minLength={8}
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   placeholder="••••••••"
-                  className="w-full bg-transparent border-b-2 border-border-subtle py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
+                  className="bg-transparent border-b-2 border-border-subtle py-2 text-white placeholder-gray-700 focus:outline-none focus:border-emerald-500 transition-colors text-lg"
                 />
               </div>
             </div>

@@ -125,12 +125,11 @@ async function RestaurantHero({ slug }: { slug: string }) {
                 </span>
               </div>
               <div className="flex flex-wrap items-center gap-2 mt-3">
-                <Badge variant="outline" size="sm" className="border-gray-700 text-gray-300">International</Badge>
-                <Badge variant="outline" size="sm" className="border-gray-700 text-gray-300">
-                  {restaurant.reviewCount > 50 ? "$$$$" : restaurant.reviewCount > 10 ? "$$$" : "$$"}
+                <Badge variant={open ? "dark" : "outline"} size="sm">
+                  {open ? "Open now" : "Closed"}
                 </Badge>
-                {hasReviews && restaurant.averageOverall >= 4.5 && (
-                  <Badge variant="brass" size="sm">Travelers&apos; Choice</Badge>
+                {hasReviews && restaurant.averageOverall >= 4.5 && restaurant.reviewCount >= 10 && (
+                  <Badge variant="brass" size="sm">Highly rated</Badge>
                 )}
               </div>
             </div>
@@ -207,12 +206,12 @@ async function RestaurantContentSection({ restaurantId, restaurant }: { restaura
           <div className="bg-surface-alt border border-border-subtle rounded-lg p-5 space-y-4">
             <h3 className="font-display text-lg text-text-primary">Quick actions</h3>
             <div className="space-y-2">
-              <a href="#menu">
+              <Link href="?tab=menu" scroll={false}>
                 <Button variant="primary" size="lg" className="w-full">
                   View Digital Menu
                   <ArrowRight className="w-4 h-4" />
                 </Button>
-              </a>
+              </Link>
               <Link href="?tab=reviews" scroll={false}>
                 <Button variant="outline" size="default" className="w-full">
                   Leave a review
@@ -273,7 +272,7 @@ async function RestaurantContentSection({ restaurantId, restaurant }: { restaura
     {similar.length > 0 && (
       <section className="mt-12 sm:mt-16 pb-8">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="font-display text-xl text-text-primary">Similar restaurants</h2>
+          <h2 className="font-display text-xl text-text-primary">Recently added</h2>
           <Link href={`/directory/${cityLower}`} className="text-xs font-medium text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1">
             View all <ArrowRight className="w-3 h-3" />
           </Link>

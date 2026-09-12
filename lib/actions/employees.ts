@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth/session";
 import { requirePermission } from "@/lib/auth/permissions";
 import { ComplaintStatus } from "@/generated/prisma/client";
+import { errors } from "@/lib/errors";
 
 const addEmployeeSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -23,11 +24,15 @@ const updateEmployeeSchema = z.object({
 });
 
 export const listEmployees = cache(async (restaurantId: string) => {
+  const session = await requirePermission("VIEW_EMPLOYEES");
+  if (!session.activeRestaurantId) throw errors.unauthorized();
+
   const valid = z.string().uuid().safeParse(restaurantId);
-  if (!valid.success) throw new Error("Invalid restaurant ID");
+  if (!valid.success) throw errors.validation("Invalid restaurant ID");
+  if (valid.data !== session.activeRestaurantId) throw errors.unauthorized();
 
   const employees = await prisma.employee.findMany({
-    where: { restaurantId: valid.data },
+    where: { restaurantId: session.activeRestaurantId },
     include: {
       complaints: {
         where: {
@@ -47,7 +52,13 @@ export const listEmployees = cache(async (restaurantId: string) => {
 
 export const listActiveEmployees = cache(async (restaurantId: string) => {
   const valid = z.string().uuid().safeParse(restaurantId);
-  if (!valid.success) throw new Error("Invalid restaurant ID");
+  if (!valid.success) throw errors.validation("Invalid restaurant ID");
+
+  const restaurant = await prisma.restaurant.findUnique({
+    where: { id: valid.data },
+    select: { isActive: true },
+  });
+  if (!restaurant?.isActive) throw errors.notFound("Restaurant not found");
 
   return prisma.employee.findMany({
     where: { restaurantId: valid.data, isActive: true },

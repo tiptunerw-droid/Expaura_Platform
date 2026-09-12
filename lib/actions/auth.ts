@@ -9,10 +9,8 @@ import { seedDefaultRolesForRestaurant, getUserPermissions } from "@/lib/auth/rb
 import { withDbRetry } from "@/lib/prisma";
 import { SignJWT, jwtVerify } from "jose";
 import { sendEmail } from "@/lib/email/brevo";
-
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "expaura_super_secret_jwt_key_change_in_production_2026"
-);
+import { SubscriptionStatus } from "@/generated/prisma/client";
+import { getJwtSecret } from "@/lib/auth/jwt-secret";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -221,6 +219,25 @@ export async function registerRestaurantOwner(
         isActive: true,
       },
     });
+
+    const trialPlan =
+      (await tx.plan.findFirst({ where: { name: "Trial" } })) ??
+      (await tx.plan.findFirst({ orderBy: { priceMonthly: "asc" } }));
+
+    if (trialPlan) {
+      const periodStart = new Date();
+      const periodEnd = new Date(periodStart);
+      periodEnd.setMonth(periodEnd.getMonth() + 1);
+      await tx.subscription.create({
+        data: {
+          restaurantId: restaurant.id,
+          planId: trialPlan.id,
+          periodStart,
+          periodEnd,
+          status: SubscriptionStatus.ACTIVE,
+        },
+      });
+    }
 
     return { user, restaurant };
   });
@@ -528,7 +545,7 @@ export async function forgotPassword(
   const token = await new SignJWT({ userId: user.id, email: user.email, type: "password_reset" })
     .setProtectedHeader({ alg: "HS256" })
     .setExpirationTime("1h")
-    .sign(JWT_SECRET);
+    .sign(getJwtSecret());
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const resetUrl = `${appUrl}/reset-password?token=${encodeURIComponent(token)}`;
@@ -578,7 +595,7 @@ export async function resetPassword(
 
   let payload;
   try {
-    const verified = await jwtVerify(token, JWT_SECRET, { algorithms: ["HS256"] });
+    const verified = await jwtVerify(token, getJwtSecret(), { algorithms: ["HS256"] });
     payload = verified.payload as { userId: string; email: string; type: string };
   } catch {
     throw new Error("Invalid or expired reset token.");

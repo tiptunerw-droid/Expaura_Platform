@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { PasswordInput } from "@/components/auth/password-input";
 
 export default function SharedLoginPage() {
   const router = useRouter();
@@ -85,13 +86,12 @@ export default function SharedLoginPage() {
                   Forgot?
                 </Link>
               </div>
-              <input
-                type="password"
+              <PasswordInput
                 required
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 placeholder="••••••••••••"
-                className="w-full bg-transparent border-b-2 border-border-subtle py-3 text-text-primary placeholder-text-tertiary focus:outline-none focus:border-[#4F46E5] transition-colors text-lg"
+                className="bg-transparent border-b-2 border-border-subtle py-3 text-text-primary placeholder-text-tertiary focus:outline-none focus:border-[#4F46E5] transition-colors text-lg"
               />
             </div>
 

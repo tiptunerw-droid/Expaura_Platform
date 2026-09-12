@@ -22,7 +22,7 @@ const titleMap: Record<string, string> = {
   "/dashboard/menu": "Menu",
   "/dashboard/gallery": "Gallery",
   "/dashboard/staff": "Staff",
-  "/dashboard/waiters": "Waiters",
+  "/dashboard/waiters": "Employees",
   "/dashboard/employees": "Employees",
   "/dashboard/branches": "Branches",
   "/dashboard/profile": "Profile",

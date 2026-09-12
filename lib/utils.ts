@@ -72,3 +72,28 @@ export function cxColorForRating(rating: number) {
   if (rating >= 2.6) return "ember";
   return "rose";
 }
+
+const COMPLAINT_STATUSES = ["PENDING", "IN_PROGRESS", "RESOLVED", "REJECTED"] as const;
+
+export type ComplaintStatusFilter = (typeof COMPLAINT_STATUSES)[number];
+
+export function parseComplaintStatus(value?: string): ComplaintStatusFilter | undefined {
+  if (!value) return undefined;
+  return (COMPLAINT_STATUSES as readonly string[]).includes(value)
+    ? (value as ComplaintStatusFilter)
+    : undefined;
+}
+
+export function hrefWithParams(
+  pathname: string,
+  current: Record<string, string | undefined>,
+  patch: Record<string, string | undefined> = {},
+): string {
+  const params = new URLSearchParams();
+  const merged = { ...current, ...patch };
+  for (const [key, value] of Object.entries(merged)) {
+    if (value) params.set(key, value);
+  }
+  const qs = params.toString();
+  return qs ? `${pathname}?${qs}` : pathname;
+}

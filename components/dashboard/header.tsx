@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Search, ChevronDown, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationDropdown } from "@/components/dashboard/notification-dropdown";
@@ -14,7 +15,7 @@ const SECTION_ROUTES = [
   { keywords: ["menu", "dish", "dishes", "food", "items", "item"], path: "/dashboard/menu" },
   { keywords: ["gallery", "photo", "photos", "image", "images"], path: "/dashboard/gallery" },
   { keywords: ["staff", "team", "member", "members", "people"], path: "/dashboard/staff" },
-  { keywords: ["waiter", "waiters", "employee", "employees", "performance", "tracking"], path: "/dashboard/waiters" },
+  { keywords: ["waiter", "waiters", "employee", "employees", "performance", "tracking"], path: "/dashboard/employees" },
   { keywords: ["branch", "branches", "location", "locations"], path: "/dashboard/branches" },
   { keywords: ["profile", "settings", "plan", "subscription", "billing", "account", "password"], path: "/dashboard/profile" },
 ];
@@ -131,20 +132,13 @@ function DashboardHeader({
                 onClick={() => setMenuOpen(false)}
               />
               <div className="absolute right-0 mt-2 w-48 bg-surface border border-border-subtle z-20">
-                <button
-                  type="button"
-                  className="w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-widest text-text-tertiary hover:bg-surface-alt hover:text-text-primary transition-colors"
+                <Link
+                  href="/dashboard/profile"
+                  className="block w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-widest text-text-tertiary hover:bg-surface-alt hover:text-text-primary transition-colors"
                   onClick={() => setMenuOpen(false)}
                 >
                   Profile Settings
-                </button>
-                <button
-                  type="button"
-                  className="w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-widest text-text-tertiary hover:bg-surface-alt hover:text-text-primary transition-colors border-t border-border-subtle"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Switch Branch
-                </button>
+                </Link>
               </div>
             </>
           )}

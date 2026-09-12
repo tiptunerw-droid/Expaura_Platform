@@ -22,7 +22,7 @@ function AiSummaryWidget({
             <Sparkles className="w-4 h-4 text-brass" />
           </div>
           <div>
-            <h3 className="font-display text-base text-[#fafaf8]">AI Review Summary</h3>
+            <h3 className="font-display text-base text-[#fafaf8]">Feedback summary</h3>
             <p className="text-xs text-[#9e9e9e]">Last 30 days</p>
           </div>
         </div>

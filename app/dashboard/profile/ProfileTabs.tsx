@@ -116,7 +116,7 @@ export function ProfileTabs({ restaurant, canManageSettings, canManageQr }: Prop
                 <div className="flex items-center justify-between p-4 rounded-lg border border-line">
                   <div>
                     <Badge
-                      variant={plan.name === "Premium" ? "brass" : plan.name === "Standard" ? "herb" : "default"}
+                      variant={plan.name === "Monthly" ? "brass" : plan.name === "Trial" ? "herb" : "default"}
                       size="sm"
                     >
                       {plan.name}
@@ -156,7 +156,7 @@ export function ProfileTabs({ restaurant, canManageSettings, canManageQr }: Prop
                   <p className="text-xs text-ink-muted font-medium uppercase tracking-wider">Features</p>
                   {[
                     { label: "Analytics", enabled: plan.analyticsEnabled },
-                    { label: "AI summaries", enabled: plan.aiSummaryEnabled },
+                    { label: "Feedback summaries", enabled: plan.aiSummaryEnabled },
                     { label: "Complaint management", enabled: plan.complaintsEnabled },
                     { label: "Employee tracking", enabled: plan.employeeTrackingEnabled },
                   ].map((f) => (
@@ -171,9 +171,9 @@ export function ProfileTabs({ restaurant, canManageSettings, canManageQr }: Prop
               </>
             ) : (
               <div className="text-center py-6">
-                <p className="text-sm text-ink-muted mb-4">No active subscription.</p>
-                <Link href="/dashboard/profile#subscription">
-                  <Button variant="brass">View plans</Button>
+                <p className="text-sm text-ink-muted mb-4">No active subscription. Trial and Monthly both include every feature.</p>
+                <Link href="/pricing">
+                  <Button variant="brass">See pricing</Button>
                 </Link>
               </div>
             )}

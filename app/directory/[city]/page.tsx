@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { MapPin, Search } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { SiteHeader } from "@/components/site/header";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { listDirectory } from "@/lib/actions/restaurants";
 import { cn } from "@/lib/utils";
 import { DirectoryBrowser } from "./DirectoryBrowser";
@@ -47,10 +46,6 @@ export default async function DirectoryPage({ params }: DirectoryPageProps) {
                   <span className="font-bold text-text-primary">{allRestaurants.length}</span>{" "}
                   {allRestaurants.length === 1 ? "restaurant" : "restaurants"}
                 </p>
-              </div>
-              <div className="relative w-full max-w-xs hidden sm:block">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                <Input placeholder="Search restaurants…" className="pl-9 h-9 bg-surface-alt border-gray-700 text-text-primary placeholder:text-gray-500 text-sm" />
               </div>
             </div>
 

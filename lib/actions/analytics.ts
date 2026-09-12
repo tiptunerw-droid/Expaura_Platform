@@ -138,19 +138,6 @@ export async function peakHours_fn(restaurantId: string, lastNDays: number = 30)
 
 export const peakHours = cache(peakHours_fn);
 
-export async function topItems(restaurantId: string) {
-  const ridValid = z.string().uuid().safeParse(restaurantId);
-  if (!ridValid.success) throw new Error("Invalid restaurant ID");
-
-  return [
-    { name: "Isombe", mentions: 145 },
-    { name: "Brochette", mentions: 122 },
-    { name: "Ugali & Fish", mentions: 98 },
-    { name: "Mtori", mentions: 87 },
-    { name: "Rwandan Platter", mentions: 76 },
-  ];
-}
-
 export const platformAnalytics = cache(async () => {
   const session = await getSession();
   if (!session || session.platformRole !== "SUPER_ADMIN") {
@@ -245,13 +232,30 @@ export const platformAnalytics = cache(async () => {
     }));
 
   const now = new Date();
+  const billedSubs = await prisma.subscription.findMany({
+    where: {
+      status: { in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.EXPIRED] },
+    },
+    select: {
+      periodStart: true,
+      periodEnd: true,
+      plan: { select: { priceMonthly: true } },
+    },
+  });
+
   const revenueByMonth: { monthLabel: string; amountEstimate: number }[] = [];
   for (let i = 5; i >= 0; i--) {
-    const d = new Date(now);
-    d.setMonth(d.getMonth() - i);
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const monthStart = d;
+    const monthEnd = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+    const amountEstimate = billedSubs.reduce((sum, sub) => {
+      const overlaps = sub.periodStart < monthEnd && sub.periodEnd >= monthStart;
+      if (!overlaps) return sum;
+      return sum + Number(sub.plan.priceMonthly);
+    }, 0);
     revenueByMonth.push({
       monthLabel: `${d.getFullYear()}-${pad(d.getMonth() + 1)}`,
-      amountEstimate: 0,
+      amountEstimate,
     });
   }
 

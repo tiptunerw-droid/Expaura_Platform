@@ -5,14 +5,14 @@ import { cn } from "@/lib/utils";
 
 interface UpgradeGateProps {
   feature: string;
-  planRequired?: "Standard" | "Premium";
+  planRequired?: string;
   description?: string;
   className?: string;
 }
 
 function UpgradeGate({
   feature,
-  planRequired = "Standard",
+  planRequired = "Monthly",
   description,
   className,
 }: UpgradeGateProps) {
@@ -29,7 +29,7 @@ function UpgradeGate({
       <h3 className="font-display text-xl text-ink mb-2">{feature}</h3>
       <p className="text-sm text-ink-muted max-w-md mx-auto mb-6">
         {description ||
-          `This feature is part of the ${planRequired} plan. Upgrade to unlock it for your restaurant.`}
+          `This feature is available on the ${planRequired} plan. Activate your subscription to use it.`}
       </p>
       <Link href="/dashboard/profile#subscription">
         <Button variant="brass">View plans</Button>

@@ -1,10 +1,8 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { getJwtSecret } from "@/lib/auth/jwt-secret";
 
 export const SESSION_COOKIE_NAME = "expaura_session";
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "expaura_super_secret_jwt_key_change_in_production_2026"
-);
 
 export interface SessionPayload {
   userId: string;
@@ -22,12 +20,12 @@ export async function encryptSession(payload: SessionPayload): Promise<string> {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("10m")
-    .sign(JWT_SECRET);
+    .sign(getJwtSecret());
 }
 
 export async function decryptSession(token: string): Promise<SessionPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET, {
+    const { payload } = await jwtVerify(token, getJwtSecret(), {
       algorithms: ["HS256"],
     });
     return payload as unknown as SessionPayload;

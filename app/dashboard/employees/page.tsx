@@ -30,12 +30,12 @@ export default async function EmployeesPage() {
     return (
       <FeatureLock
         title="Employee tracking"
-        description="Tracking waiters and staff performance is included in the Premium plan. Upgrade to unlock."
+        description="Tracking floor staff performance unlocks when your subscription is active."
       />
     );
   }
 
-  const employees = await listEmployees(restaurant.id).catch(() => []);
+  const employees = await listEmployees(restaurant.id);
 
   return (
     <div className="space-y-6">

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { Send, CheckCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { RatingInput } from "@/components/ui/rating";
 import { submitReview } from "@/lib/actions/reviews";
 
@@ -24,6 +26,7 @@ export function ReviewForm({ restaurantId, branchId }: ReviewFormProps) {
   const [cleanlinessRating, setCleanlinessRating] = React.useState(0);
   const [wouldRecommend, setWouldRecommend] = React.useState<boolean | null>(null);
   const [comment, setComment] = React.useState("");
+  const [tableNumber, setTableNumber] = React.useState("");
   const [error, setError] = React.useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,6 +48,7 @@ export function ReviewForm({ restaurantId, branchId }: ReviewFormProps) {
         cleanlinessRating: cleanlinessRating || undefined,
         wouldRecommend: wouldRecommend ?? undefined,
         comment: comment.trim() || undefined,
+        tableNumber: tableNumber.trim() || undefined,
       });
       setStep("done");
       router.refresh();
@@ -119,6 +123,16 @@ export function ReviewForm({ restaurantId, branchId }: ReviewFormProps) {
             No
           </button>
         </div>
+      </div>
+
+      <div>
+        <Label htmlFor="tableNumber">Table number (optional)</Label>
+        <Input
+          id="tableNumber"
+          value={tableNumber}
+          onChange={(e) => setTableNumber(e.target.value)}
+          placeholder="e.g. 12"
+        />
       </div>
 
       <div>

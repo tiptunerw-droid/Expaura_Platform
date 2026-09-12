@@ -5,6 +5,8 @@ import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { ComplaintStatus } from "@/generated/prisma/client";
 import { createNotification } from "@/lib/actions/notifications";
+import { requirePermission } from "@/lib/auth/permissions";
+import { getSession } from "@/lib/auth/session";
 import { errors } from "@/lib/errors";
 import { enforceRateLimit, enforceContentAnomaly } from "@/lib/rate-limit";
 import { isDbUnavailable } from "@/lib/graceful";
@@ -31,6 +33,25 @@ const listReviewsSchema = z.object({
   to: z.string().optional(),
   limit: z.number().int().min(1).max(500).optional(),
 });
+
+async function findReviews(data: z.infer<typeof listReviewsSchema>) {
+  const { restaurantId, minRating, from, to, limit } = data;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const where: any = { restaurantId };
+  if (minRating != null) where.overallRating = { gte: minRating };
+  if (from || to) {
+    where.createdAt = {};
+    if (from) where.createdAt.gte = new Date(from);
+    if (to) where.createdAt.lte = new Date(to);
+  }
+
+  return prisma.review.findMany({
+    where,
+    orderBy: { createdAt: "desc" },
+    take: limit || 100,
+  });
+}
 
 export async function submitReview(form: z.infer<typeof submitReviewSchema>) {
   await enforceRateLimit({ scope: "review", limit: 3, windowMs: 60_000 });
@@ -63,9 +84,24 @@ export async function submitReview(form: z.infer<typeof submitReviewSchema>) {
     let complaintId: string | undefined;
 
     if (review.overallRating <= 2 && review.comment) {
+      const categoryPreference = [
+        { name: "Food quality", rating: review.foodRating },
+        { name: "Hygiene & cleanliness", rating: review.cleanlinessRating },
+        { name: "Ambience", rating: review.atmosphereRating },
+        { name: "Service", rating: review.serviceRating },
+      ]
+        .filter((item) => item.rating != null)
+        .sort((a, b) => (a.rating ?? 5) - (b.rating ?? 5));
+
+      const preferredName = categoryPreference[0]?.name ?? "Service";
       let category = await tx.complaintCategory.findFirst({
-        where: { name: { equals: "Service", mode: "insensitive" } },
+        where: { name: { equals: preferredName, mode: "insensitive" } },
       });
+      if (!category) {
+        category = await tx.complaintCategory.findFirst({
+          where: { name: { equals: "Service", mode: "insensitive" } },
+        });
+      }
       if (!category) {
         category = await tx.complaintCategory.findFirst();
       }
@@ -77,6 +113,7 @@ export async function submitReview(form: z.infer<typeof submitReviewSchema>) {
             branchId: review.branchId,
             categoryId: category.id,
             description: review.comment,
+            tableNumber: review.tableNumber,
             status: ComplaintStatus.PENDING,
           },
         });
@@ -114,32 +151,39 @@ export const listRestaurantReviews = cache(async (input: z.infer<typeof listRevi
     throw errors.validation(valid.error.issues[0]?.message || "Validation failed");
   }
 
-  const { restaurantId, minRating, from, to, limit } = valid.data;
+  const restaurant = await prisma.restaurant.findUnique({
+    where: { id: valid.data.restaurantId },
+    select: { isActive: true },
+  });
+  if (!restaurant?.isActive) throw errors.notFound("Restaurant not found");
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const where: any = { restaurantId };
-  if (minRating != null) where.overallRating = { gte: minRating };
-  if (from || to) {
-    where.createdAt = {};
-    if (from) where.createdAt.gte = new Date(from);
-    if (to) where.createdAt.lte = new Date(to);
+  return findReviews(valid.data);
+});
+
+export const listManagerReviews = cache(async (
+  input: Omit<z.infer<typeof listReviewsSchema>, "restaurantId"> = {},
+) => {
+  const session = await requirePermission("VIEW_REVIEWS");
+  if (!session.activeRestaurantId) throw errors.unauthorized();
+
+  const valid = listReviewsSchema.safeParse({
+    ...input,
+    restaurantId: session.activeRestaurantId,
+  });
+  if (!valid.success) {
+    throw errors.validation(valid.error.issues[0]?.message || "Validation failed");
   }
 
-  try {
-    return await prisma.review.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      take: limit || 100,
-    });
-  } catch (err) {
-    if (isDbUnavailable(err)) return [];
-    throw err;
-  }
+  return findReviews(valid.data);
 });
 
 export const getRestaurantReviewsStats = cache(async (restaurantId: string) => {
+  const session = await getSession();
+  if (!session?.activeRestaurantId) throw errors.unauthorized();
+
   const idValid = z.string().uuid().safeParse(restaurantId);
   if (!idValid.success) throw errors.validation("Invalid restaurant ID");
+  if (idValid.data !== session.activeRestaurantId) throw errors.unauthorized();
 
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 

@@ -5,16 +5,13 @@ import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth/password";
 import { setSessionCookie } from "@/lib/auth/session";
 import { getUserPermissions } from "@/lib/auth/rbac";
+import { getJwtSecret } from "@/lib/auth/jwt-secret";
 
 const acceptInviteSchema = z.object({
   token: z.string().min(1, "Invite token is required"),
   name: z.string().min(2, "Name must be at least 2 characters"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
-
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "expaura_super_secret_jwt_key_change_in_production_2026"
-);
 
 export async function POST(request: Request) {
   try {
@@ -32,7 +29,7 @@ export async function POST(request: Request) {
     // Verify token
     let payload;
     try {
-      const verified = await jwtVerify(token, JWT_SECRET, { algorithms: ["HS256"] });
+      const verified = await jwtVerify(token, getJwtSecret(), { algorithms: ["HS256"] });
       payload = verified.payload as {
         email: string;
         restaurantId: string;

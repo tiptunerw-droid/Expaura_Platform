@@ -13,6 +13,8 @@ import { hasPermission } from "@/lib/auth/permissions";
 import { ComplaintStatus } from "@/generated/prisma/client";
 import { FeatureLock } from "@/components/dashboard/feature-lock";
 import { ComplaintsList } from "./ComplaintsList";
+import { hrefWithParams, parseComplaintStatus } from "@/lib/utils";
+import { z } from "zod";
 
 const statusLabel: Record<string, string> = {
   PENDING: "Pending",
@@ -43,15 +45,17 @@ export default async function ComplaintsPage({
     return (
       <FeatureLock
         title="Complaint management"
-        description="Reviewing and resolving customer complaints is included in the Standard and Premium plans. Upgrade to unlock."
+        description="Reviewing and resolving customer complaints unlocks when your subscription is active."
       />
     );
   }
 
+  const status = parseComplaintStatus(sp.status);
+  const categoryId = z.string().uuid().safeParse(sp.category).success ? sp.category : undefined;
   const complaints = await listRestaurantComplaints({
-    status: sp.status as ComplaintStatus | undefined,
-    categoryId: sp.category || undefined,
-  }).catch(() => []);
+    status: status as ComplaintStatus | undefined,
+    categoryId,
+  });
 
   const canManageComplaints = await hasPermission("MANAGE_COMPLAINTS");
 
@@ -93,9 +97,16 @@ export default async function ComplaintsPage({
 
       <div className="flex flex-wrap items-center gap-2">
         {["", "PENDING", "IN_PROGRESS", "RESOLVED", "REJECTED"].map((s) => (
-          <Link key={s} href={`/dashboard/complaints${s ? `?status=${s}` : ""}`}>
+          <Link
+            key={s}
+            href={hrefWithParams(
+              "/dashboard/complaints",
+              { status: sp.status, category: sp.category },
+              { status: s || undefined },
+            )}
+          >
             <Badge
-              variant={sp.status === s || (!sp.status && !s) ? "default" : "outline"}
+              variant={status === s || (!status && !s) ? "default" : "outline"}
               size="sm"
               className="cursor-pointer"
             >
@@ -110,8 +121,8 @@ export default async function ComplaintsPage({
         canManageComplaints={canManageComplaints}
         emptyTitle="No complaints"
         emptyDescription={
-          sp.status
-            ? `No complaints with status "${statusLabel[sp.status] || sp.status}".`
+          status
+            ? `No complaints with status "${statusLabel[status]}".`
             : "No complaints yet. When customers report issues, they appear here."
         }
       />

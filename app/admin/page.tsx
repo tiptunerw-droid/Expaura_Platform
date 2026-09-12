@@ -110,7 +110,7 @@ export default async function AdminOverview() {
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-display">Revenue (est.)</CardTitle>
+            <CardTitle className="text-base font-display">Revenue (subscription)</CardTitle>
           </CardHeader>
           <CardContent>
             {revenueByMonth.length > 0 ? (

@@ -73,7 +73,7 @@ export function ComplaintForm({ restaurantId, branchId }: ComplaintFormProps) {
         </div>
         <h3 className="font-display text-xl text-text-primary mb-1">Complaint sent</h3>
         <p className="text-sm text-gray-400">
-          The restaurant manager has been notified and will follow up.
+          This was sent to the restaurant dashboard. The team will see it there.
         </p>
       </div>
     );

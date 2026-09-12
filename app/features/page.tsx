@@ -17,7 +17,7 @@ import { SiteFooter } from "@/components/site/footer";
 export const metadata: Metadata = {
   title: "Features",
   description:
-    "QR digital menus, guest reviews, complaint tracking, analytics, staff performance, and AI insights for Rwanda's best restaurants.",
+    "QR digital menus, guest reviews, complaint tracking, analytics, staff performance, and feedback summaries for Rwanda's best restaurants.",
 };
 
 const FEATURES = [
@@ -47,9 +47,9 @@ const FEATURES = [
   },
   {
     icon: Users,
-    title: "Staff & Waiter Performance",
+    title: "Staff Performance",
     description:
-      "Monitor employee and waiter performance across branches, so exceptional service gets recognized and weak spots get fixed.",
+      "Monitor floor staff across branches, so exceptional service gets recognized and weak spots get coached.",
   },
   {
     icon: MapPin,
@@ -59,9 +59,9 @@ const FEATURES = [
   },
   {
     icon: Sparkles,
-    title: "AI Review Summaries",
+    title: "Feedback Summaries",
     description:
-      "Instead of reading hundreds of reviews, receive clear, actionable summaries of what guests love — and what to improve.",
+      "See a short digest of what guests praise and what they want improved, based on recent review comments.",
   },
   {
     icon: Building2,

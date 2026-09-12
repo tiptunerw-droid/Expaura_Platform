@@ -10,10 +10,7 @@ import { setSessionCookie, getSession } from "@/lib/auth/session";
 import { requirePermission } from "@/lib/auth/permissions";
 import { getUserPermissions } from "@/lib/auth/rbac";
 import { sendEmail } from "@/lib/email/brevo";
-
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "expaura_super_secret_jwt_key_change_in_production_2026"
-);
+import { getJwtSecret } from "@/lib/auth/jwt-secret";
 
 const inviteSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -77,7 +74,7 @@ export async function inviteStaff(
   })
     .setProtectedHeader({ alg: "HS256" })
     .setExpirationTime("7d")
-    .sign(JWT_SECRET);
+    .sign(getJwtSecret());
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const inviteUrl = `${appUrl}/accept-invite?token=${encodeURIComponent(token)}`;
@@ -287,7 +284,7 @@ export async function acceptStaffInvite(
 
   let payload;
   try {
-    const verified = await jwtVerify(token, JWT_SECRET, { algorithms: ["HS256"] });
+    const verified = await jwtVerify(token, getJwtSecret(), { algorithms: ["HS256"] });
     payload = verified.payload as {
       email: string;
       restaurantId: string;

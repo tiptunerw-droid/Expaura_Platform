@@ -196,10 +196,15 @@ export const listDirectory = cache(async (input: z.infer<typeof listDirectorySch
   try {
     const { cityName, search, minRating } = valid.data;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const where: any = { isActive: true };
-    if (cityName) where.city = { name: { contains: cityName, mode: "insensitive" } };
-    if (search) where.name = { contains: search, mode: "insensitive" };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const where: any = { isActive: true };
+  if (cityName) where.city = { name: { contains: cityName, mode: "insensitive" } };
+  if (search) {
+    where.OR = [
+      { name: { contains: search, mode: "insensitive" } },
+      { address: { contains: search, mode: "insensitive" } },
+    ];
+  }
 
     const restaurants = await prisma.restaurant.findMany({
       where,
@@ -321,6 +326,7 @@ export const getManagerRestaurant = cache(async () => {  const session = await g
           orderBy: { createdAt: "desc" },
         },
         subscriptions: {
+          where: { status: "ACTIVE" },
           orderBy: { createdAt: "desc" },
           take: 1,
           include: { plan: true },
@@ -359,6 +365,7 @@ export const getManagerPlanFeatures = cache(async () => {
       where: { id: session.activeRestaurantId },
       select: {
         subscriptions: {
+          where: { status: "ACTIVE" },
           orderBy: { createdAt: "desc" },
           take: 1,
           include: { plan: true },
@@ -370,11 +377,11 @@ export const getManagerPlanFeatures = cache(async () => {
   const plan = restaurant?.subscriptions[0]?.plan ?? null;
 
   return {
-    planName: plan?.name ?? "Free",
-    analyticsEnabled: plan?.analyticsEnabled ?? false,
-    aiSummaryEnabled: plan?.aiSummaryEnabled ?? false,
-    complaintsEnabled: plan?.complaintsEnabled ?? false,
-    employeeTrackingEnabled: plan?.employeeTrackingEnabled ?? false,
+    planName: plan?.name ?? "Trial",
+    analyticsEnabled: plan?.analyticsEnabled ?? true,
+    aiSummaryEnabled: plan?.aiSummaryEnabled ?? true,
+    complaintsEnabled: plan?.complaintsEnabled ?? true,
+    employeeTrackingEnabled: plan?.employeeTrackingEnabled ?? true,
   };
 });
 
@@ -430,15 +437,27 @@ export async function generateRestaurantQr(form: z.infer<typeof generateQrSchema
   }
 
   const code = randomUUID();
-  const qr = await prisma.qrCode.create({
-    data: {
-      code,
-      isActive: true,
-      restaurantId: session.activeRestaurantId,
-      branchId: valid.data.branchId,
-    },
-    select: { id: true, code: true },
-  });
+  const branchId = valid.data.branchId ?? null;
+
+  const [, qr] = await prisma.$transaction([
+    prisma.qrCode.updateMany({
+      where: {
+        restaurantId: session.activeRestaurantId,
+        branchId,
+        isActive: true,
+      },
+      data: { isActive: false },
+    }),
+    prisma.qrCode.create({
+      data: {
+        code,
+        isActive: true,
+        restaurantId: session.activeRestaurantId,
+        branchId,
+      },
+      select: { id: true, code: true },
+    }),
+  ]);
 
   return qr;
 }

@@ -91,6 +91,11 @@ export function QrDisplay({ qrCodes, slug, canGenerate = true }: Props) {
           </Button>
         ) : null}
       </div>
+      {qrCodes.length > 0 ? (
+        <p className="text-[11px] text-ink-muted text-center">
+          Regenerating turns off the previous code. Reprint tables after you replace it.
+        </p>
+      ) : null}
     </div>
   );
 }

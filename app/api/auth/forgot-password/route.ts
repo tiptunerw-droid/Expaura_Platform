@@ -3,14 +3,11 @@ import { z } from "zod";
 import { SignJWT } from "jose";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email/brevo";
+import { getJwtSecret } from "@/lib/auth/jwt-secret";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Invalid email address"),
 });
-
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "expaura_super_secret_jwt_key_change_in_production_2026"
-);
 
 export async function POST(request: Request) {
   try {
@@ -39,7 +36,7 @@ export async function POST(request: Request) {
     const token = await new SignJWT({ userId: user.id, email: user.email, type: "password_reset" })
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("1h")
-      .sign(JWT_SECRET);
+      .sign(getJwtSecret());
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const resetUrl = `${appUrl}/reset-password?token=${encodeURIComponent(token)}`;

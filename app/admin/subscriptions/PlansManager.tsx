@@ -33,16 +33,16 @@ export interface PlanRow {
 
 const FEATURES: { key: keyof Omit<PlanRow, "id" | "name" | "priceMonthly" | "maxBranches" | "maxStaff" | "subscriptionCount">; label: string }[] = [
   { key: "analyticsEnabled", label: "Analytics" },
-  { key: "aiSummaryEnabled", label: "AI summary" },
+  { key: "aiSummaryEnabled", label: "Feedback summary" },
   { key: "complaintsEnabled", label: "Complaints" },
   { key: "employeeTrackingEnabled", label: "Employee tracking" },
 ];
 
 const EMPTY_FEATURES: Record<string, boolean> = {
-  analyticsEnabled: false,
-  aiSummaryEnabled: false,
-  complaintsEnabled: false,
-  employeeTrackingEnabled: false,
+  analyticsEnabled: true,
+  aiSummaryEnabled: true,
+  complaintsEnabled: true,
+  employeeTrackingEnabled: true,
 };
 
 export function PlansManager({ plans }: { plans: PlanRow[] }) {
@@ -232,7 +232,7 @@ export function PlansManager({ plans }: { plans: PlanRow[] }) {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="plan-name">Name</Label>
-              <Input id="plan-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Standard" required />
+              <Input id="plan-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Monthly" required />
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
